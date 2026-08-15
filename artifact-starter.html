@@ -1,0 +1,785 @@
+<title>Phil's Chart-Reading Starter</title>
+<style>
+/* ---------- tokens: light is the base ---------- */
+:root{
+  --bg:#F6F7F9;
+  --surface:#FFFFFF;
+  --surface-2:#EDF1F7;
+  --ink:#141A24;
+  --ink-2:#4A5567;
+  --ink-3:#7A8598;
+  --rule:#DCE3EC;
+  --rule-soft:#E9EEF5;
+  --accent:#2B5CB8;
+  --accent-ink:#1D4794;
+  --accent-soft:#E7EEFB;
+  --up:#12805C;
+  --up-soft:#E3F3EC;
+  --down:#C2352B;
+  --down-soft:#FBE8E6;
+  --shadow:0 1px 2px rgba(20,26,36,.05), 0 8px 24px -16px rgba(20,26,36,.28);
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono","Cascadia Mono","Roboto Mono",Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1218;
+    --surface:#151A22;
+    --surface-2:#1D242E;
+    --ink:#E8ECF3;
+    --ink-2:#A9B4C4;
+    --ink-3:#78849A;
+    --rule:#2A323E;
+    --rule-soft:#222A35;
+    --accent:#7FA8F0;
+    --accent-ink:#9DBEF7;
+    --accent-soft:#1A2436;
+    --up:#3FCC96;
+    --up-soft:#122A21;
+    --down:#F0736A;
+    --down-soft:#2E1715;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.9);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1218;
+  --surface:#151A22;
+  --surface-2:#1D242E;
+  --ink:#E8ECF3;
+  --ink-2:#A9B4C4;
+  --ink-3:#78849A;
+  --rule:#2A323E;
+  --rule-soft:#222A35;
+  --accent:#7FA8F0;
+  --accent-ink:#9DBEF7;
+  --accent-soft:#1A2436;
+  --up:#3FCC96;
+  --up-soft:#122A21;
+  --down:#F0736A;
+  --down-soft:#2E1715;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.9);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:17px;
+  line-height:1.6;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{
+  max-width:44rem;
+  margin:0 auto;
+  padding:clamp(1.25rem,4vw,2.75rem) clamp(1rem,4vw,1.75rem) 5rem;
+  display:flex;
+  flex-direction:column;
+  gap:2.25rem;
+}
+h1,h2,h3{font-family:var(--serif);font-weight:600;text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:clamp(1.9rem,6vw,2.6rem);letter-spacing:-.01em}
+h2{font-size:clamp(1.35rem,4.4vw,1.7rem)}
+h3{font-size:1.05rem;font-family:var(--sans);font-weight:650;letter-spacing:-.005em}
+p{margin:0}
+.eyebrow{
+  font-family:var(--mono);
+  font-size:.72rem;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--ink-3);
+  margin:0;
+}
+strong{font-weight:650;color:var(--ink)}
+code,.tk{
+  font-family:var(--mono);
+  font-size:.9em;
+  background:var(--surface-2);
+  border:1px solid var(--rule-soft);
+  border-radius:4px;
+  padding:.05em .35em;
+  color:var(--ink);
+}
+
+/* ---------- header ---------- */
+header{display:flex;flex-direction:column;gap:.85rem}
+.lede{color:var(--ink-2);font-size:1.05rem}
+.worry{
+  border-left:3px solid var(--accent);
+  background:var(--accent-soft);
+  padding:.9rem 1.1rem;
+  border-radius:0 8px 8px 0;
+  display:flex;
+  flex-direction:column;
+  gap:.5rem;
+  font-size:.97rem;
+  color:var(--ink-2);
+}
+.worry q{font-style:italic;color:var(--ink)}
+
+/* ---------- progress rail ---------- */
+.rail ol{
+  list-style:none;
+  margin:0;padding:0;
+  display:flex;
+  gap:.4rem;
+}
+.rail li{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:.45rem;
+  font-family:var(--mono);
+  font-size:.66rem;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:var(--ink-3);
+}
+.rail .bar{height:4px;border-radius:2px;background:var(--rule)}
+.rail li.on{color:var(--accent)}
+.rail li.on .bar{background:var(--accent)}
+.rail li.done{color:var(--up)}
+.rail li.done .bar{background:var(--up)}
+
+/* ---------- stages ---------- */
+.stage{
+  background:var(--surface);
+  border:1px solid var(--rule);
+  border-radius:12px;
+  padding:clamp(1.1rem,3.5vw,1.75rem);
+  display:flex;
+  flex-direction:column;
+  gap:1.1rem;
+  box-shadow:var(--shadow);
+}
+.stage-head{display:flex;gap:.9rem;align-items:baseline}
+.num{
+  font-family:var(--mono);
+  font-size:.78rem;
+  color:var(--accent);
+  border:1px solid var(--accent);
+  border-radius:999px;
+  padding:.1rem .5rem;
+  flex:none;
+}
+.stage.locked{opacity:.75}
+.stage.locked .num{color:var(--ink-3);border-color:var(--rule)}
+.stage.locked h2{color:var(--ink-3)}
+.lockquiz{
+  color:var(--ink-3);
+  font-family:var(--mono);
+  font-size:.78rem;
+  letter-spacing:.04em;
+  background:var(--surface-2);
+  border:1px dashed var(--rule);
+  border-radius:8px;
+  padding:.7rem .85rem;
+}
+.stage-body{display:flex;flex-direction:column;gap:1.1rem}
+.stage-body p{color:var(--ink-2)}
+.stage-body p.key{color:var(--ink)}
+ul.plain{margin:0;padding-left:1.15rem;color:var(--ink-2);display:flex;flex-direction:column;gap:.35rem}
+ul.plain::marker{color:var(--ink-3)}
+
+/* ---------- figures ---------- */
+.figure{
+  border:1px solid var(--rule);
+  border-radius:10px;
+  padding:.75rem;
+  overflow-x:auto;
+  background-color:var(--surface);
+  background-image:
+    repeating-linear-gradient(to bottom, var(--rule-soft) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(to right, var(--rule-soft) 0 1px, transparent 1px 28px);
+}
+.figure svg{display:block;width:100%;height:auto;min-width:340px}
+figcaption{
+  margin-top:.6rem;
+  font-size:.85rem;
+  color:var(--ink-3);
+  font-family:var(--mono);
+  line-height:1.5;
+}
+/* svg theming */
+.s-axis{stroke:var(--rule);stroke-width:1}
+.s-up{fill:var(--up);stroke:var(--up);stroke-width:2}
+.s-down{fill:var(--down);stroke:var(--down);stroke-width:2}
+.s-line{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.s-lead{stroke:var(--ink-3);stroke-width:1;stroke-dasharray:2 3;fill:none}
+.s-lab{fill:var(--ink-2);font-family:var(--mono);font-size:13px}
+.s-lab-s{fill:var(--ink-3);font-family:var(--mono);font-size:11.5px;letter-spacing:.06em}
+.s-ttl{fill:var(--ink);font-family:var(--mono);font-size:13px;letter-spacing:.08em}
+.s-level{stroke:var(--ink-2);stroke-width:1.5;stroke-dasharray:6 4;fill:none}
+.s-zone{fill:var(--accent);opacity:.12}
+.s-dot{fill:var(--surface);stroke:var(--accent);stroke-width:2}
+
+/* ---------- aside tied to Phil's worry ---------- */
+.tieback{
+  background:var(--surface-2);
+  border:1px solid var(--rule-soft);
+  border-radius:8px;
+  padding:.85rem 1rem;
+  font-size:.94rem;
+  color:var(--ink-2);
+  display:flex;
+  flex-direction:column;
+  gap:.3rem;
+}
+.tieback .tag{
+  font-family:var(--mono);
+  font-size:.66rem;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--accent);
+}
+
+/* ---------- checks ---------- */
+.check{
+  border-top:1px solid var(--rule);
+  padding-top:1.1rem;
+  display:flex;
+  flex-direction:column;
+  gap:.75rem;
+}
+.check-q{font-weight:600;color:var(--ink)!important}
+.opts{display:flex;flex-direction:column;gap:.5rem}
+.opt{
+  font:inherit;
+  font-size:.97rem;
+  text-align:left;
+  color:var(--ink);
+  background:var(--surface);
+  border:1px solid var(--rule);
+  border-radius:8px;
+  padding:.7rem .85rem;
+  cursor:pointer;
+  transition:border-color .15s ease, background .15s ease, transform .15s ease;
+}
+.opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
+.opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.opt:disabled{cursor:default}
+.opt.ok{background:var(--up-soft);border-color:var(--up);color:var(--ink);font-weight:600}
+.opt.no{background:var(--down-soft);border-color:var(--down);color:var(--ink);opacity:.9}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+.feedback{
+  font-size:.94rem;
+  border-radius:8px;
+  padding:0;
+  line-height:1.55;
+}
+.feedback:not(:empty){padding:.75rem .9rem;border:1px solid transparent}
+.feedback.good{background:var(--up-soft);border-color:var(--up);color:var(--ink)}
+.feedback.bad{background:var(--down-soft);border-color:var(--down);color:var(--ink)}
+.feedback b{font-family:var(--mono);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:.2rem}
+.feedback.good b{color:var(--up)}
+.feedback.bad b{color:var(--down)}
+
+/* ---------- quiz ---------- */
+.qz{display:flex;flex-direction:column;gap:.55rem;padding-bottom:.25rem}
+.qz + .qz{border-top:1px solid var(--rule-soft);padding-top:1.1rem}
+.qz-q{font-weight:600}
+.qz-why{font-size:.9rem;color:var(--ink-2);margin:0}
+.btn{
+  font:inherit;
+  font-weight:600;
+  font-size:1rem;
+  background:var(--accent);
+  color:var(--surface);
+  border:1px solid var(--accent);
+  border-radius:8px;
+  padding:.8rem 1.2rem;
+  cursor:pointer;
+  align-self:flex-start;
+}
+.btn:hover{background:var(--accent-ink);border-color:var(--accent-ink)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.btn.ghost{background:transparent;color:var(--accent);border-color:var(--rule)}
+.btn.ghost:hover{background:var(--accent-soft);border-color:var(--accent)}
+.btnrow{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+.score{
+  border:1px solid var(--rule);
+  border-radius:10px;
+  padding:1rem 1.15rem;
+  display:flex;
+  flex-direction:column;
+  gap:.4rem;
+  background:var(--surface-2);
+}
+.score .n{font-family:var(--mono);font-size:2rem;font-weight:600;font-variant-numeric:tabular-nums;color:var(--accent)}
+.nudge{color:var(--down);font-size:.92rem}
+
+/* ---------- footer ---------- */
+footer{
+  border-top:1px solid var(--rule);
+  padding-top:1.25rem;
+  display:flex;
+  flex-direction:column;
+  gap:.6rem;
+  font-size:.88rem;
+  color:var(--ink-3);
+}
+footer .disc{
+  font-family:var(--mono);
+  font-size:.78rem;
+  line-height:1.6;
+  letter-spacing:.01em;
+}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion: reduce){
+  *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+@media (max-width:520px){
+  body{font-size:16px}
+  .rail li{font-size:0;gap:0}
+  .rail li .bar{height:5px}
+}
+</style>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">Price action · Stocks · Built for Phil</p>
+  <h1>Reading a stock chart, from zero</h1>
+  <p class="lede">Twenty minutes, three lessons, no jargon. By the end you'll be able to look at a stock chart and actually say what it's doing.</p>
+  <div class="worry">
+    <p>You said the thing that worries you is: <q>it seems like an easy way to lose money, and there's a lot of hype around it — I don't want to lose a lot of money and get stressed out.</q></p>
+    <p>That's the correct instinct, and it's the one this page is built around. Trading is an easy way to lose money — mostly because people act before they can read what's in front of them. So there is nothing to buy here and no signals to follow. This is just learning to <strong>read</strong>. Reading costs nothing, carries no risk, and is the part the hype always skips.</p>
+  </div>
+</header>
+
+<nav class="rail" aria-label="Your progress">
+  <ol>
+    <li data-rail="1" class="on"><span class="bar"></span>Candles</li>
+    <li data-rail="2"><span class="bar"></span>Structure</li>
+    <li data-rail="3"><span class="bar"></span>Levels</li>
+    <li data-rail="4"><span class="bar"></span>Quiz</li>
+  </ol>
+</nav>
+
+<!-- ============ LESSON 1 ============ -->
+<section class="stage" data-stage="1">
+  <div class="stage-head"><span class="num">01</span><h2>What one candle is telling you</h2></div>
+  <div class="stage-body">
+    <p class="key">A stock chart is usually drawn as a row of candles. Each candle covers one slice of time — one day on a daily chart, one hour on an hourly chart — and it records four prices from that slice.</p>
+    <p>Take a made-up example. Apple <span class="tk">AAPL</span> on a daily chart. During that one day:</p>
+    <ul class="plain">
+      <li><strong>Open</strong> — the price at the start of the day. Say $180.</li>
+      <li><strong>High</strong> — the highest price anyone paid all day. $186.</li>
+      <li><strong>Low</strong> — the lowest price anyone paid all day. $178.</li>
+      <li><strong>Close</strong> — the price at the end of the day. $184.</li>
+    </ul>
+    <p>The thick part is the <strong>body</strong>: it stretches from the open to the close. The thin lines poking out of the top and bottom are the <strong>wicks</strong> — they reach out to the high and the low. If the close is above the open, the candle is drawn green (an up candle). If the close is below the open, it's red (a down candle).</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 330" role="img" aria-labelledby="fig1t fig1d">
+        <title id="fig1t">Anatomy of an up candle and a down candle</title>
+        <desc id="fig1d">An up candle with the open at the bottom of the body and close at the top, and a down candle with the open at the top and close at the bottom. Wicks reach up to the high and down to the low.</desc>
+
+        <!-- UP CANDLE -->
+        <line x1="180" y1="50" x2="180" y2="270" class="s-up"/>
+        <rect x="158" y="110" width="44" height="115" rx="2" class="s-up"/>
+        <!-- leaders -->
+        <line x1="96" y1="50" x2="174" y2="50" class="s-lead"/>
+        <line x1="96" y1="110" x2="154" y2="110" class="s-lead"/>
+        <line x1="96" y1="225" x2="154" y2="225" class="s-lead"/>
+        <line x1="96" y1="270" x2="174" y2="270" class="s-lead"/>
+        <text x="90" y="54" text-anchor="end" class="s-lab">high $186</text>
+        <text x="90" y="114" text-anchor="end" class="s-lab">close $184</text>
+        <text x="90" y="229" text-anchor="end" class="s-lab">open $180</text>
+        <text x="90" y="274" text-anchor="end" class="s-lab">low $178</text>
+        <!-- body / wick callouts -->
+        <line x1="240" y1="76" x2="188" y2="66" class="s-lead"/>
+        <text x="246" y="80" class="s-lab-s">WICK</text>
+        <line x1="240" y1="164" x2="208" y2="164" class="s-lead"/>
+        <text x="246" y="168" class="s-lab-s">BODY</text>
+        <text x="180" y="305" text-anchor="middle" class="s-lab-s">UP CANDLE</text>
+        <text x="180" y="322" text-anchor="middle" class="s-lab-s">CLOSED HIGHER</text>
+
+        <!-- DOWN CANDLE -->
+        <line x1="450" y1="70" x2="450" y2="265" class="s-down"/>
+        <rect x="428" y="115" width="44" height="115" rx="2" class="s-down"/>
+        <line x1="476" y1="70" x2="556" y2="70" class="s-lead"/>
+        <line x1="476" y1="115" x2="576" y2="115" class="s-lead"/>
+        <line x1="476" y1="230" x2="576" y2="230" class="s-lead"/>
+        <line x1="476" y1="265" x2="556" y2="265" class="s-lead"/>
+        <text x="562" y="74" class="s-lab">high</text>
+        <text x="582" y="119" class="s-lab">open</text>
+        <text x="582" y="234" class="s-lab">close</text>
+        <text x="562" y="269" class="s-lab">low</text>
+        <text x="450" y="305" text-anchor="middle" class="s-lab-s">DOWN CANDLE</text>
+        <text x="450" y="322" text-anchor="middle" class="s-lab-s">CLOSED LOWER</text>
+      </svg>
+      <figcaption>Same four prices every time. Only their order changes: up candle opens low and closes high, down candle opens high and closes low.</figcaption>
+    </figure>
+
+    <p>Wicks matter more than beginners expect. A long wick means price went somewhere and got rejected — buyers or sellers pushed it there, and it came straight back. A candle with a long top wick and a small body says "someone tried to push <span class="tk">AAPL</span> to $186 and it didn't stick."</p>
+
+    <div class="tieback">
+      <span class="tag">Why this answers your worry</span>
+      <p>Hype talks in stories — "this stock is going to the moon." A candle is not a story. It's four numbers that already happened. Learning to read them is how you replace someone else's excitement with your own observation.</p>
+    </div>
+
+    <div class="check" data-check="1">
+      <p class="check-q">Check 1 — A daily candle for Microsoft <span class="tk">MSFT</span> opens at $410, trades as high as $418, dips to $405, and closes at $407. What does that candle look like?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="The high is $418, but the close is only $407 — the candle finished below where it started, so it's a down candle, not an up one. The $418 is the tip of the upper wick, not the top of the body.">A green candle with the body from $410 to $418.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Close ($407) is below open ($410), so it's a down candle. The body runs open to close — $410 down to $407 — and the wicks stretch out to the high ($418) and the low ($405). That long upper wick is price getting pushed up and rejected.">A red candle with a small body from $410 down to $407, a long wick up to $418 and a short wick down to $405.</button>
+        <button type="button" class="opt" data-correct="false" data-why="The body is never drawn from the high to the low — that's what the wicks are for. The body only ever runs from the open to the close.">A red candle with the body running the whole way from $418 to $405.</button>
+      </div>
+      <p class="feedback" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LESSON 2 ============ -->
+<section class="stage locked" data-stage="2">
+  <div class="stage-head"><span class="num">02</span><h2>Market structure: what the chart is doing</h2></div>
+  <p class="lockquiz">Locked — answer Check 1 correctly to open this.</p>
+  <div class="stage-body" hidden>
+    <p class="key">One candle is a moment. Zoom out and the candles form a shape, and that shape has a name. There are only three, and every stock chart you ever look at is doing one of them.</p>
+    <p>To see it, ignore the individual candles and look only at the turning points — the peaks (swing highs) and the dips (swing lows).</p>
+    <ul class="plain">
+      <li><strong>Uptrend</strong> — each peak is higher than the last peak, and each dip is higher than the last dip. <em>Higher highs and higher lows.</em> Buyers are in control.</li>
+      <li><strong>Downtrend</strong> — each peak is lower than the last, and each dip is lower than the last. <em>Lower highs and lower lows.</em> Sellers are in control.</li>
+      <li><strong>Range</strong> — the peaks stop at roughly the same level and the dips stop at roughly the same level. Nobody's in control. Price is going sideways.</li>
+    </ul>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 270" role="img" aria-labelledby="fig2t fig2d">
+        <title id="fig2t">The three market structures</title>
+        <desc id="fig2d">Three panels. An uptrend making higher highs and higher lows, a downtrend making lower highs and lower lows, and a sideways range bouncing between a flat ceiling and a flat floor.</desc>
+
+        <line x1="222" y1="12" x2="222" y2="252" class="s-axis"/>
+        <line x1="442" y1="12" x2="442" y2="252" class="s-axis"/>
+
+        <!-- UPTREND -->
+        <text x="16" y="26" class="s-ttl">UPTREND</text>
+        <polyline points="24,205 58,142 92,172 126,106 160,138 196,58" class="s-line"/>
+        <circle cx="126" cy="106" r="4.5" class="s-dot"/>
+        <circle cx="160" cy="138" r="4.5" class="s-dot"/>
+        <text x="126" y="94" text-anchor="middle" class="s-lab-s">HIGHER HIGH</text>
+        <text x="164" y="156" class="s-lab-s">HIGHER LOW</text>
+        <text x="16" y="243" class="s-lab-s">STAIRS GOING UP</text>
+
+        <!-- DOWNTREND -->
+        <text x="238" y="26" class="s-ttl">DOWNTREND</text>
+        <polyline points="246,62 280,124 314,92 348,158 382,126 416,202" class="s-line"/>
+        <circle cx="382" cy="126" r="4.5" class="s-dot"/>
+        <circle cx="348" cy="158" r="4.5" class="s-dot"/>
+        <text x="386" y="114" text-anchor="middle" class="s-lab-s">LOWER HIGH</text>
+        <text x="300" y="176" class="s-lab-s">LOWER LOW</text>
+        <text x="238" y="243" class="s-lab-s">STAIRS GOING DOWN</text>
+
+        <!-- RANGE -->
+        <text x="458" y="26" class="s-ttl">RANGE</text>
+        <line x1="458" y1="92" x2="646" y2="92" class="s-level"/>
+        <line x1="458" y1="184" x2="646" y2="184" class="s-level"/>
+        <polyline points="462,184 496,94 530,182 564,92 598,184 636,98" class="s-line"/>
+        <text x="458" y="84" class="s-lab-s">CEILING</text>
+        <text x="458" y="202" class="s-lab-s">FLOOR</text>
+        <text x="458" y="243" class="s-lab-s">SIDEWAYS, NO WINNER</text>
+      </svg>
+      <figcaption>Read the turning points, not the candles. Are the peaks and dips climbing, falling, or flat?</figcaption>
+    </figure>
+
+    <p>Two practical notes. First, structure depends on the timeframe: <span class="tk">AAPL</span> can be in an uptrend on the weekly chart and a downtrend on the hourly at the same time, and both are true. Second, a trend doesn't end because it "feels high." It ends when the pattern breaks — an uptrend is over when price makes a lower low, not before.</p>
+
+    <div class="tieback">
+      <span class="tag">Why this answers your worry</span>
+      <p>Most of the money beginners lose is lost buying a stock that's already making lower highs and lower lows, because a headline said it was cheap. Structure gives you one calm question to ask before anything else: <em>which of the three is this?</em> Sometimes the honest answer is "sideways and unclear", and the correct response to that is to do nothing.</p>
+    </div>
+
+    <div class="check" data-check="2">
+      <p class="check-q">Check 2 — Over a few weeks, Nvidia <span class="tk">NVDA</span> peaks at $120, dips to $102, rallies to $115, then dips to $96. What structure is that?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="An uptrend needs the peaks and the dips both climbing. Here the second peak ($115) is below the first ($120) and the second dip ($96) is below the first ($102) — everything is stepping down, not up.">An uptrend — it's rallying $19 off the low, so buyers are in control.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Peak $120 then $115 is a lower high. Dip $102 then $96 is a lower low. Lower highs plus lower lows is the definition of a downtrend — sellers are in control, whatever the news happens to be saying.">A downtrend — lower high ($115 after $120) and lower low ($96 after $102).</button>
+        <button type="button" class="opt" data-correct="false" data-why="A range needs the peaks stopping around the same level and the dips stopping around the same level. These are clearly stepping lower each time — $120 to $115, $102 to $96 — so it's trending down, not going sideways.">A range — price is bouncing up and down between roughly $96 and $120.</button>
+      </div>
+      <p class="feedback" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LESSON 3 ============ -->
+<section class="stage locked" data-stage="3">
+  <div class="stage-head"><span class="num">03</span><h2>Support and resistance: floors and ceilings</h2></div>
+  <p class="lockquiz">Locked — answer Check 2 correctly to open this.</p>
+  <div class="stage-body" hidden>
+    <p class="key">Now the last piece. Price doesn't wander randomly — it keeps reacting at the same prices, over and over. Those prices have names.</p>
+    <ul class="plain">
+      <li><strong>Support</strong> is a floor: a price where falls keep stopping, because enough buyers show up there. Say <span class="tk">MSFT</span> drops to about $400 three separate times and bounces each time — $400 is support.</li>
+      <li><strong>Resistance</strong> is a ceiling: a price where rallies keep stalling, because enough sellers show up there. If <span class="tk">MSFT</span> pushes toward $440 and gets knocked back twice, $440 is resistance.</li>
+    </ul>
+    <p>Why do they exist? Nothing mystical. Lots of people remember that price. Some are waiting to buy where they missed out; some are waiting to sell where they broke even. Their orders sit there and price reacts.</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 300" role="img" aria-labelledby="fig3t fig3d">
+        <title id="fig3t">Support and resistance, and a ceiling turning into a floor</title>
+        <desc id="fig3d">Price bounces up from a support zone and stalls at a resistance zone several times, then breaks above resistance and comes back down to that same level, which now holds it up as support.</desc>
+
+        <!-- zones -->
+        <rect x="34" y="88" width="592" height="15" class="s-zone"/>
+        <rect x="34" y="202" width="592" height="15" class="s-zone"/>
+        <line x1="34" y1="95" x2="626" y2="95" class="s-level"/>
+        <line x1="34" y1="210" x2="626" y2="210" class="s-level"/>
+        <text x="38" y="80" class="s-lab-s">RESISTANCE — THE CEILING</text>
+        <text x="38" y="238" class="s-lab-s">SUPPORT — THE FLOOR</text>
+
+        <!-- price path -->
+        <polyline points="40,150 100,206 160,100 216,204 278,98 340,207 400,99 458,52 506,92 566,44"
+                  class="s-line"/>
+        <circle cx="100" cy="206" r="4.5" class="s-dot"/>
+        <circle cx="216" cy="204" r="4.5" class="s-dot"/>
+        <circle cx="340" cy="207" r="4.5" class="s-dot"/>
+        <circle cx="160" cy="100" r="4.5" class="s-dot"/>
+        <circle cx="278" cy="98" r="4.5" class="s-dot"/>
+        <circle cx="400" cy="99" r="4.5" class="s-dot"/>
+        <circle cx="506" cy="92" r="4.5" class="s-dot"/>
+
+        <line x1="506" y1="100" x2="470" y2="150" class="s-lead"/>
+        <text x="368" y="166" class="s-lab-s">BROKE THROUGH, CAME BACK,</text>
+        <text x="368" y="182" class="s-lab-s">OLD CEILING NOW HOLDS AS FLOOR</text>
+      </svg>
+      <figcaption>Draw them as zones, not hairlines. Price reacts around a level, rarely to the exact cent.</figcaption>
+    </figure>
+
+    <p>Two things to hold on to. Levels are <strong>zones</strong>, not exact prices — <span class="tk">MSFT</span> support at "$400" really means roughly $398–$402. And when a level finally breaks, it often flips role: a ceiling that price climbs above tends to become the floor on the way back down, which is the move drawn on the right of that chart.</p>
+
+    <div class="tieback">
+      <span class="tag">Why this answers your worry</span>
+      <p>This is the piece that most directly protects your money. Levels give you a place where you'd be provably wrong. If you thought $400 was the floor and price closes well below it, the idea was wrong — that's information, not a disaster, and it's a decision you made in advance rather than in a panic. Deciding where you're wrong <em>before</em> you're in is most of the difference between trading and stress.</p>
+    </div>
+
+    <div class="check" data-check="3">
+      <p class="check-q">Check 3 — Amazon <span class="tk">AMZN</span> has stalled at roughly $185 four times over two months. It finally closes at $191, then a week later drifts back to $185 and starts pushing up from there. What just happened?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="Resistance is a ceiling that caps rallies. Price closed above $185 and is now bouncing up off it — it's acting as a floor, not a ceiling. When behaviour changes like that, the label changes with it.">$185 is still resistance, so the stock can't get past it.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Four reactions at the same price isn't chance — that's exactly what makes a level worth watching. The one thing you can say for sure is that a lot of buying and selling decisions are being made around $185.">$185 was a coincidence; four touches don't mean anything.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Exactly — that's the flip. $185 capped four rallies as resistance, price closed above it, and on the return visit the same level held price up instead of pushing it down. Old ceiling, new floor.">$185 was resistance, price broke above it, and it's now acting as support.</button>
+      </div>
+      <p class="feedback" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section class="stage locked" data-stage="4">
+  <div class="stage-head"><span class="num">04</span><h2>Five questions to finish</h2></div>
+  <p class="lockquiz">Locked — answer Check 3 correctly to open this.</p>
+  <div class="stage-body" hidden>
+    <p>No time limit, nothing riding on it. Pick an answer for each, then score it. Anything you miss, the explanation will tell you exactly why.</p>
+
+    <div class="qz" data-qz="1">
+      <p class="qz-q">1. On a daily candle, what does the body show?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="That's the full range of the day, wicks included. The body is narrower than that.">The highest and lowest price of the day.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Right — the body runs from the open to the close. The wicks handle the high and the low.">The opening price and the closing price.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Candles show price, not volume. Volume is usually a separate set of bars underneath the chart.">How many shares were traded.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="2">
+      <p class="qz-q">2. A <span class="tk">TSLA</span> daily candle has a small body near the bottom and a very long upper wick. What's the most reasonable read?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Correct — price was pushed well up during the day and sold back down before the close. Buyers tried, sellers won the day.">Buyers pushed price up during the day but it was rejected and closed back near the lows.</button>
+        <button type="button" class="opt" data-correct="false" data-why="The opposite. A long upper wick means the high was far above the close — the push upward failed rather than held.">The stock closed near its high for the day.</button>
+        <button type="button" class="opt" data-correct="false" data-why="A long wick is the opposite of a quiet day — price travelled a long way, it just didn't stay there.">Nothing much happened; it was a quiet day.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="3">
+      <p class="qz-q">3. Which pattern of swings defines an uptrend?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="Green candles come and go inside every trend, including downtrends. It's the swing highs and lows that define the structure.">A run of green candles in a row.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Yes — each peak above the last peak, each dip above the last dip. That's the whole definition.">Higher highs and higher lows.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Higher highs with lower lows means the swings are widening in both directions — that's volatility, not an uptrend.">Higher highs and lower lows.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="4">
+      <p class="qz-q">4. <span class="tk">MSFT</span> has bounced off roughly $400 three times. What is $400 called, and how should you treat it?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="Support is where falls have stopped so far — it is not a guarantee. Levels break all the time; that's why you decide in advance what a break would mean.">Support, and it guarantees the price won't go lower.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Resistance is a ceiling above price that caps rallies. This level is below price and stopping falls, so it's a floor.">Resistance, because price keeps hitting it.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Right on both counts — it's support, it's a zone rather than an exact number, and it holds until it doesn't. Treating it as a zone that can fail is what keeps a mistake small.">Support — a zone around $400 where buyers have shown up, which can still break.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="5">
+      <p class="qz-q">5. A stock you like is making lower highs and lower lows, but three people online say it's a screaming buy. What does the chart actually tell you?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="Confident opinions aren't evidence, and 'it's fallen a lot' is not a reason for it to stop falling. The structure is the observable fact here; the takes are not.">That the crowd is probably right, since it's already fallen so far.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Exactly the habit worth keeping. The structure says sellers are still in control — that's an observation, not a prediction. Waiting for the chart to stop making lower lows costs you nothing but patience.">That it's still in a downtrend, and nothing in the structure has changed yet.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Not quite — the chart is telling you something quite specific: sellers are still in control. It just isn't telling you what to do about it, which is a different thing.">That the chart can't tell you anything useful here.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="btnrow">
+      <button type="button" class="btn" id="scoreBtn">Score my quiz</button>
+      <button type="button" class="btn ghost" id="resetBtn" hidden>Clear and try again</button>
+      <span class="nudge" id="nudge" hidden>Pick an answer for all five first.</span>
+    </div>
+    <div class="score" id="score" hidden>
+      <span class="n" id="scoreN">0 / 5</span>
+      <p id="scoreMsg"></p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p><strong>What to do next, Phil:</strong> open any free chart of a stock you already know, set it to the daily timeframe, and just answer the three questions out loud — is this an uptrend, downtrend or range? Where are the obvious floors and ceilings? What are the recent wicks saying? Do that on ten charts with no money involved. That's the whole practice, and it costs nothing but time.</p>
+  <p class="disc">Educational material only. Nothing here is financial advice, a recommendation, or a signal to buy or sell anything. All company names, prices and scenarios are illustrations chosen to teach the concept — they are not real market data and not predictions. Trading involves real risk of loss.</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function rail(n, cls) {
+    var li = document.querySelector('.rail li[data-rail="' + n + '"]');
+    if (li) { li.classList.remove("on", "done"); li.classList.add(cls); }
+  }
+
+  function unlock(n) {
+    var stage = document.querySelector('.stage[data-stage="' + n + '"]');
+    if (!stage || !stage.classList.contains("locked")) return;
+    stage.classList.remove("locked");
+    var note = stage.querySelector(".lockquiz");
+    if (note) note.parentNode.removeChild(note);
+    var body = stage.querySelector(".stage-body");
+    if (body) body.hidden = false;
+    rail(n, "on");
+    window.setTimeout(function () {
+      stage.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    }, 150);
+  }
+
+  function say(el, kind, label, text) {
+    el.className = "feedback " + kind;
+    el.innerHTML = "";
+    var b = document.createElement("b");
+    b.textContent = label;
+    var span = document.createElement("span");
+    span.textContent = text;
+    el.appendChild(b);
+    el.appendChild(span);
+  }
+
+  /* ---- lesson checks: must be right to advance ---- */
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest ? e.target.closest(".check .opt") : null;
+    if (!btn || btn.disabled) return;
+
+    var check = btn.closest(".check");
+    var fb = check.querySelector(".feedback");
+    var correct = btn.getAttribute("data-correct") === "true";
+    var why = btn.getAttribute("data-why") || "";
+
+    if (correct) {
+      btn.classList.add("ok");
+      Array.prototype.forEach.call(check.querySelectorAll(".opt"), function (o) { o.disabled = true; });
+      say(fb, "good", "Correct", why);
+      var n = parseInt(check.getAttribute("data-check"), 10);
+      rail(n, "done");
+      unlock(n + 1);
+    } else {
+      btn.classList.add("no");
+      btn.disabled = true;
+      say(fb, "bad", "Not quite — try again", why);
+    }
+  });
+
+  /* ---- quiz ---- */
+  var scoreBtn = document.getElementById("scoreBtn");
+  var resetBtn = document.getElementById("resetBtn");
+  var scoreBox = document.getElementById("score");
+  var scoreN = document.getElementById("scoreN");
+  var scoreMsg = document.getElementById("scoreMsg");
+  var nudge = document.getElementById("nudge");
+  var blocks = Array.prototype.slice.call(document.querySelectorAll(".qz"));
+
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest ? e.target.closest(".qz .opt") : null;
+    if (!btn || btn.disabled) return;
+    var block = btn.closest(".qz");
+    Array.prototype.forEach.call(block.querySelectorAll(".opt"), function (o) { o.classList.remove("sel"); });
+    btn.classList.add("sel");
+    nudge.hidden = true;
+  });
+
+  scoreBtn.addEventListener("click", function () {
+    var unanswered = blocks.filter(function (b) { return !b.querySelector(".opt.sel"); });
+    if (unanswered.length) {
+      nudge.hidden = false;
+      unanswered[0].scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+      return;
+    }
+    nudge.hidden = true;
+
+    var score = 0;
+    blocks.forEach(function (block) {
+      var picked = block.querySelector(".opt.sel");
+      var right = block.querySelector('.opt[data-correct="true"]');
+      var why = block.querySelector(".qz-why");
+      var ok = picked === right;
+      if (ok) score++;
+
+      Array.prototype.forEach.call(block.querySelectorAll(".opt"), function (o) {
+        o.disabled = true;
+        o.classList.remove("sel");
+      });
+      picked.classList.add(ok ? "ok" : "no");
+      if (!ok) right.classList.add("ok");
+
+      why.hidden = false;
+      why.textContent = ok
+        ? "Correct. " + picked.getAttribute("data-why")
+        : "Not this one. " + picked.getAttribute("data-why") + " The right answer is highlighted above.";
+    });
+
+    var msg;
+    if (score === 5) {
+      msg = "Five out of five, Phil. You can now look at a stock chart and describe what it's doing in plain words — which is genuinely more than most people shouting about stocks online can do. Go practise on real charts with no money on the line.";
+    } else if (score >= 3) {
+      msg = "Solid. Read the explanations under the ones you missed — they're short, and the gap is usually one specific definition rather than the whole idea. Then run the quiz again.";
+    } else {
+      msg = "Worth another pass. Scroll back up through the three lessons — especially the diagrams — and come back to this. Getting it wrong here is free, which is exactly the point of learning it this way first.";
+    }
+    scoreN.textContent = score + " / 5";
+    scoreMsg.textContent = msg;
+    scoreBox.hidden = false;
+    resetBtn.hidden = false;
+    scoreBtn.hidden = true;
+    rail(4, "done");
+    scoreBox.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+  });
+
+  resetBtn.addEventListener("click", function () {
+    blocks.forEach(function (block) {
+      Array.prototype.forEach.call(block.querySelectorAll(".opt"), function (o) {
+        o.disabled = false;
+        o.classList.remove("ok", "no", "sel");
+      });
+      var why = block.querySelector(".qz-why");
+      why.hidden = true;
+      why.textContent = "";
+    });
+    scoreBox.hidden = true;
+    resetBtn.hidden = true;
+    scoreBtn.hidden = false;
+    rail(4, "on");
+    blocks[0].scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+  });
+})();
+</script>
