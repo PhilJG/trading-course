@@ -1,0 +1,950 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fundamental Analysis, from zero</title>
+<style>
+/* ---------- tokens: light is the base ---------- */
+:root{
+  --bg:#F6F7F9;
+  --surface:#FFFFFF;
+  --surface-2:#EDF1F7;
+  --ink:#141A24;
+  --ink-2:#4A5567;
+  --ink-3:#7A8598;
+  --rule:#DCE3EC;
+  --rule-soft:#E9EEF5;
+  --accent:#2B5CB8;
+  --accent-ink:#1D4794;
+  --accent-soft:#E7EEFB;
+  --up:#12805C;
+  --up-soft:#E3F3EC;
+  --down:#C2352B;
+  --down-soft:#FBE8E6;
+  --shadow:0 1px 2px rgba(20,26,36,.05), 0 8px 24px -16px rgba(20,26,36,.28);
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono","Cascadia Mono","Roboto Mono",Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1218; --surface:#151A22; --surface-2:#1D242E;
+    --ink:#E8ECF3; --ink-2:#A9B4C4; --ink-3:#78849A;
+    --rule:#2A323E; --rule-soft:#222A35;
+    --accent:#7FA8F0; --accent-ink:#9DBEF7; --accent-soft:#1A2436;
+    --up:#3FCC96; --up-soft:#122A21; --down:#F0736A; --down-soft:#2E1715;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.9);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1218; --surface:#151A22; --surface-2:#1D242E;
+  --ink:#E8ECF3; --ink-2:#A9B4C4; --ink-3:#78849A;
+  --rule:#2A323E; --rule-soft:#222A35;
+  --accent:#7FA8F0; --accent-ink:#9DBEF7; --accent-soft:#1A2436;
+  --up:#3FCC96; --up-soft:#122A21; --down:#F0736A; --down-soft:#2E1715;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.9);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans); font-size:17px; line-height:1.6;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{
+  max-width:44rem; margin:0 auto;
+  padding:clamp(1.25rem,4vw,2.75rem) clamp(1rem,4vw,1.75rem) 5rem;
+  display:flex; flex-direction:column; gap:2.25rem;
+}
+h1,h2,h3{font-family:var(--serif);font-weight:600;text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:clamp(1.9rem,6vw,2.6rem);letter-spacing:-.01em}
+h2{font-size:clamp(1.35rem,4.4vw,1.7rem)}
+h3{font-size:1.05rem;font-family:var(--sans);font-weight:650;letter-spacing:-.005em}
+p{margin:0}
+.eyebrow{
+  font-family:var(--mono); font-size:.72rem; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ink-3); margin:0;
+}
+strong{font-weight:650;color:var(--ink)}
+code,.tk{
+  font-family:var(--mono); font-size:.9em; background:var(--surface-2);
+  border:1px solid var(--rule-soft); border-radius:4px;
+  padding:.05em .35em; color:var(--ink);
+}
+
+/* ---------- header ---------- */
+header{display:flex;flex-direction:column;gap:.85rem}
+.lede{color:var(--ink-2);font-size:1.05rem}
+.worry{
+  border-left:3px solid var(--accent); background:var(--accent-soft);
+  padding:.9rem 1.1rem; border-radius:0 8px 8px 0;
+  display:flex; flex-direction:column; gap:.5rem;
+  font-size:.97rem; color:var(--ink-2);
+}
+.worry q{font-style:italic;color:var(--ink)}
+
+/* ---------- page switcher ---------- */
+.pathnav{display:grid;gap:.7rem;grid-template-columns:1fr 1fr}
+.pathnav.one{grid-template-columns:1fr}
+@media (max-width:560px){.pathnav{grid-template-columns:1fr}}
+.card{
+  display:flex;flex-direction:column;gap:.25rem;
+  padding:.9rem 1rem;border:1px solid var(--rule);border-radius:10px;
+  background:var(--surface);text-decoration:none;color:inherit;box-shadow:var(--shadow);
+  transition:border-color .15s ease, background .15s ease;
+}
+.card:hover{border-color:var(--accent);background:var(--accent-soft)}
+.card .k{font-family:var(--mono);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.card .t{font-weight:650}
+.card .d{font-size:.88rem;color:var(--ink-2);line-height:1.45}
+.card.here{border-color:var(--accent);background:var(--accent-soft)}
+.card.here .k{color:var(--ink-3)}
+
+/* ---------- progress rail ---------- */
+.rail ol{list-style:none;margin:0;padding:0;display:flex;gap:.4rem}
+.rail li{
+  flex:1;display:flex;flex-direction:column;gap:.45rem;
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.rail .bar{height:4px;border-radius:2px;background:var(--rule)}
+.rail li.on{color:var(--accent)}
+.rail li.on .bar{background:var(--accent)}
+.rail li.done{color:var(--up)}
+.rail li.done .bar{background:var(--up)}
+
+/* ---------- stages ---------- */
+.stage{
+  background:var(--surface);border:1px solid var(--rule);border-radius:12px;
+  padding:clamp(1.1rem,3.5vw,1.75rem);
+  display:flex;flex-direction:column;gap:1.1rem;box-shadow:var(--shadow);
+}
+.stage-head{display:flex;gap:.9rem;align-items:baseline}
+.num{
+  font-family:var(--mono);font-size:.78rem;color:var(--accent);
+  border:1px solid var(--accent);border-radius:999px;padding:.1rem .5rem;flex:none;
+}
+.stage.locked{opacity:.75}
+.stage.locked .num{color:var(--ink-3);border-color:var(--rule)}
+.stage.locked h2{color:var(--ink-3)}
+.lockquiz{
+  color:var(--ink-3);font-family:var(--mono);font-size:.78rem;letter-spacing:.04em;
+  background:var(--surface-2);border:1px dashed var(--rule);border-radius:8px;padding:.7rem .85rem;
+}
+.stage-body{display:flex;flex-direction:column;gap:1.1rem}
+.stage-body p{color:var(--ink-2)}
+.stage-body p.key{color:var(--ink)}
+ul.plain{margin:0;padding-left:1.15rem;color:var(--ink-2);display:flex;flex-direction:column;gap:.35rem}
+ul.plain::marker{color:var(--ink-3)}
+
+/* ---------- figures ---------- */
+.figure{
+  border:1px solid var(--rule);border-radius:10px;padding:.75rem;overflow-x:auto;
+  background-color:var(--surface);
+  background-image:
+    repeating-linear-gradient(to bottom, var(--rule-soft) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(to right, var(--rule-soft) 0 1px, transparent 1px 28px);
+}
+.figure svg{display:block;width:100%;height:auto;min-width:340px}
+figcaption{margin-top:.6rem;font-size:.85rem;color:var(--ink-3);font-family:var(--mono);line-height:1.5}
+.s-axis{stroke:var(--rule);stroke-width:1}
+.s-lead{stroke:var(--ink-3);stroke-width:1;stroke-dasharray:2 3;fill:none}
+.s-lab{fill:var(--ink-2);font-family:var(--mono);font-size:13px}
+.s-lab-s{fill:var(--ink-3);font-family:var(--mono);font-size:11.5px;letter-spacing:.06em}
+.s-ttl{fill:var(--ink);font-family:var(--mono);font-size:13px;letter-spacing:.08em}
+.s-level{stroke:var(--ink-2);stroke-width:1.5;stroke-dasharray:6 4;fill:none}
+.s-box{fill:var(--surface-2);stroke:var(--rule);stroke-width:1}
+.s-fill-acc{fill:var(--accent);opacity:.85}
+.s-fill-up{fill:var(--up);opacity:.9}
+.s-fill-down{fill:var(--down);opacity:.75}
+.s-fill-mute{fill:var(--ink-3);opacity:.35}
+.s-line{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.s-arrow{stroke:var(--ink-3);stroke-width:1.5;fill:none}
+
+/* ---------- tables ---------- */
+.tblwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:10px}
+.tbl{width:100%;border-collapse:collapse;font-size:.92rem;min-width:31rem}
+.tbl th,.tbl td{text-align:left;padding:.6rem .8rem;border-bottom:1px solid var(--rule-soft);vertical-align:top;color:var(--ink-2)}
+.tbl tr:last-child td{border-bottom:0}
+.tbl th{
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:400;background:var(--surface-2);
+}
+.tbl td:first-child{font-weight:650;color:var(--ink);white-space:nowrap}
+.tbl td.mono{font-family:var(--mono);font-size:.86rem;white-space:nowrap}
+
+/* ---------- tieback ---------- */
+.tieback{
+  background:var(--surface-2);border:1px solid var(--rule-soft);border-radius:8px;
+  padding:.85rem 1rem;font-size:.94rem;color:var(--ink-2);
+  display:flex;flex-direction:column;gap:.3rem;
+}
+.tieback .tag{
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--accent);
+}
+.tieback.warn{border-color:var(--down);background:var(--down-soft)}
+.tieback.warn .tag{color:var(--down)}
+
+/* ---------- checks ---------- */
+.check{border-top:1px solid var(--rule);padding-top:1.1rem;display:flex;flex-direction:column;gap:.75rem}
+.check-q{font-weight:600;color:var(--ink)!important}
+.opts{display:flex;flex-direction:column;gap:.5rem}
+.opt{
+  font:inherit;font-size:.97rem;text-align:left;color:var(--ink);
+  background:var(--surface);border:1px solid var(--rule);border-radius:8px;
+  padding:.7rem .85rem;cursor:pointer;
+  transition:border-color .15s ease, background .15s ease;
+}
+.opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
+.opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.opt:disabled{cursor:default}
+.opt.ok{background:var(--up-soft);border-color:var(--up);color:var(--ink);font-weight:600}
+.opt.no{background:var(--down-soft);border-color:var(--down);color:var(--ink);opacity:.9}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+.feedback{font-size:.94rem;border-radius:8px;padding:0;line-height:1.55}
+.feedback:not(:empty){padding:.75rem .9rem;border:1px solid transparent}
+.feedback.good{background:var(--up-soft);border-color:var(--up);color:var(--ink)}
+.feedback.bad{background:var(--down-soft);border-color:var(--down);color:var(--ink)}
+.feedback b{font-family:var(--mono);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:.2rem}
+.feedback.good b{color:var(--up)}
+.feedback.bad b{color:var(--down)}
+
+/* ---------- quiz ---------- */
+.qz{display:flex;flex-direction:column;gap:.55rem;padding-bottom:.25rem}
+.qz + .qz{border-top:1px solid var(--rule-soft);padding-top:1.1rem}
+.qz-q{font-weight:600}
+.qz-why{font-size:.9rem;color:var(--ink-2);margin:0}
+.btn{
+  font:inherit;font-weight:600;font-size:1rem;background:var(--accent);color:var(--surface);
+  border:1px solid var(--accent);border-radius:8px;padding:.8rem 1.2rem;cursor:pointer;align-self:flex-start;
+}
+.btn:hover{background:var(--accent-ink);border-color:var(--accent-ink)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.btn.ghost{background:transparent;color:var(--accent);border-color:var(--rule)}
+.btn.ghost:hover{background:var(--accent-soft);border-color:var(--accent)}
+.btnrow{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+.score{
+  border:1px solid var(--rule);border-radius:10px;padding:1rem 1.15rem;
+  display:flex;flex-direction:column;gap:.4rem;background:var(--surface-2);
+}
+.score .n{font-family:var(--mono);font-size:2rem;font-weight:600;font-variant-numeric:tabular-nums;color:var(--accent)}
+.nudge{color:var(--down);font-size:.92rem}
+
+/* ---------- footer ---------- */
+footer{
+  border-top:1px solid var(--rule);padding-top:1.25rem;
+  display:flex;flex-direction:column;gap:.6rem;font-size:.88rem;color:var(--ink-3);
+}
+footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spacing:.01em}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion: reduce){
+  *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+@media (max-width:520px){
+  body{font-size:16px}
+  .rail li{font-size:0;gap:0}
+  .rail li .bar{height:5px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">Course · Part one of two · Fundamental analysis</p>
+  <h1>What a company is actually worth</h1>
+  <p class="lede">Fundamental analysis is reading the <em>business</em> behind the ticker: what it earns, what it owns, what it owes, and whether the price being asked for it makes any sense.</p>
+  <div class="worry">
+    <p>There are two honest ways to look at a stock, and they answer different questions.</p>
+    <p><strong>Fundamental analysis</strong> asks <em>what is this business worth?</em> <strong>Technical analysis</strong> asks <em>what is price doing right now?</em> Neither is the "real" one. This page is the first question. Nothing here is a recommendation to buy anything — it's how to read a company, which costs nothing and risks nothing.</p>
+  </div>
+</header>
+
+<nav class="pathnav" aria-label="Course pages">
+  <span class="card here">
+    <span class="k">You are here</span>
+    <span class="t">Fundamental analysis</span>
+    <span class="d">The business: earnings, cash, debt, and valuation.</span>
+  </span>
+  <a class="card" href="index.html">
+    <span class="k">Part two</span>
+    <span class="t">Technical analysis →</span>
+    <span class="d">The chart: candles, structure, levels, volume, averages, momentum, risk.</span>
+  </a>
+</nav>
+
+<nav class="rail" aria-label="Your progress">
+  <ol>
+    <li data-rail="1" class="on"><span class="bar"></span>Ownership</li>
+    <li data-rail="2"><span class="bar"></span>Statements</li>
+    <li data-rail="3"><span class="bar"></span>Numbers</li>
+    <li data-rail="4"><span class="bar"></span>Valuation</li>
+    <li data-rail="5"><span class="bar"></span>Quality</li>
+    <li data-rail="6"><span class="bar"></span>Quiz</li>
+  </ol>
+</nav>
+
+<!-- ============ LESSON 1 ============ -->
+<section class="stage" data-stage="1">
+  <div class="stage-head"><span class="num">01</span><h2>A share is a slice of a business</h2></div>
+  <div class="stage-body">
+    <p class="key">A share is not a lottery ticket with a company logo on it. It is legal ownership of a fraction of a real business — its profits, its assets, its debts and its problems.</p>
+    <p>Say a fictional company, <span class="tk">Northwind Coffee</span>, has 100 million shares outstanding and each one trades at $20. Multiply the two and you get the <strong>market capitalisation</strong>: $2 billion. That is the price the market is putting on the whole company today.</p>
+    <p>Which sets up the only question fundamental analysis really asks:</p>
+    <ul class="plain">
+      <li><strong>Price</strong> is what the market charges. It's a fact, visible on any screen.</li>
+      <li><strong>Value</strong> is what the business is worth, based on the cash it can produce over its lifetime. It's an estimate, and yours will differ from mine.</li>
+    </ul>
+    <p>You never get to know value exactly. The useful goal is a rough range you can defend, and then noticing when price is far outside it. A $2 billion price tag on a business earning $200 million a year is a very different proposition from the same price tag on a business earning $5 million a year — even though both charts might look identical.</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 250" role="img" aria-labelledby="f1t f1d">
+        <title id="f1t">Share price times share count equals market capitalisation</title>
+        <desc id="f1d">A diagram showing 100 million shares at $20 each multiplying to a $2 billion market capitalisation, which is then compared against the profit the business produces.</desc>
+        <rect x="24" y="52" width="150" height="76" rx="8" class="s-box"/>
+        <text x="99" y="82" text-anchor="middle" class="s-ttl">$20</text>
+        <text x="99" y="104" text-anchor="middle" class="s-lab-s">PRICE PER SHARE</text>
+        <text x="196" y="98" text-anchor="middle" class="s-ttl">×</text>
+        <rect x="218" y="52" width="150" height="76" rx="8" class="s-box"/>
+        <text x="293" y="82" text-anchor="middle" class="s-ttl">100M</text>
+        <text x="293" y="104" text-anchor="middle" class="s-lab-s">SHARES ISSUED</text>
+        <text x="390" y="98" text-anchor="middle" class="s-ttl">=</text>
+        <rect x="412" y="44" width="224" height="92" rx="8" fill="var(--accent-soft)" stroke="var(--accent)"/>
+        <text x="524" y="80" text-anchor="middle" class="s-ttl">$2,000,000,000</text>
+        <text x="524" y="102" text-anchor="middle" class="s-lab-s">MARKET CAP — THE WHOLE COMPANY</text>
+        <line x1="524" y1="140" x2="524" y2="168" class="s-arrow"/>
+        <path d="M519 162 L524 172 L529 162" class="s-arrow"/>
+        <text x="524" y="196" text-anchor="middle" class="s-lab">"…for a business earning how much?"</text>
+        <text x="524" y="222" text-anchor="middle" class="s-lab-s">THAT IS THE ENTIRE QUESTION</text>
+        <text x="24" y="196" class="s-lab-s">PRICE = A FACT</text>
+        <text x="24" y="218" class="s-lab-s">VALUE = YOUR ESTIMATE</text>
+      </svg>
+      <figcaption>Market cap is the sticker price of the entire business. Always compare it to something the business actually produces.</figcaption>
+    </figure>
+
+    <div class="tieback">
+      <span class="tag">The habit this builds</span>
+      <p>Whenever someone quotes you a share price, it means nothing on its own. A $900 share isn't "expensive" and a $3 share isn't "cheap" — those are just the results of how many slices the pie was cut into. Price per share is meaningless until you pair it with earnings per share.</p>
+    </div>
+
+    <div class="check" data-check="1">
+      <p class="check-q">Check 1 — Company A trades at $400 a share; Company B trades at $4. Which is the more expensive business?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="Share price alone tells you nothing about expensiveness. A company can do a 100-for-1 stock split tomorrow, turning a $400 share into a hundred $4 shares, and absolutely nothing about the business would have changed.">Company A — a $400 share is obviously pricier than a $4 one.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Not necessarily. A very low share price is often a company that has fallen a long way, but plenty of large healthy businesses trade in single digits simply because of how many shares they issued.">Company B — cheap share prices usually mean a troubled company.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Exactly. You need the market cap (price × share count) and something to compare it against — earnings, cash flow, assets. Share price on its own is an arbitrary number set by how finely the company sliced itself up.">You can't tell — you need the share count and the profits before either number means anything.</button>
+      </div>
+      <p class="feedback" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LESSON 2 ============ -->
+<section class="stage locked" data-stage="2">
+  <div class="stage-head"><span class="num">02</span><h2>The three financial statements</h2></div>
+  <p class="lockquiz">Locked — answer Check 1 correctly to open this.</p>
+  <div class="stage-body" hidden>
+    <p class="key">Every public company publishes the same three reports every quarter. They are free, and between them they tell you almost everything a beginner needs. Each answers a different question.</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 240" role="img" aria-labelledby="f2t f2d">
+        <title id="f2t">What each of the three financial statements answers</title>
+        <desc id="f2d">Three panels: the income statement covers a period and asks whether the company made a profit, the balance sheet is a snapshot asking what it owns and owes, and the cash flow statement covers a period asking whether real cash came in.</desc>
+        <rect x="16" y="28" width="200" height="184" rx="10" class="s-box"/>
+        <rect x="230" y="28" width="200" height="184" rx="10" class="s-box"/>
+        <rect x="444" y="28" width="200" height="184" rx="10" class="s-box"/>
+
+        <text x="34" y="56" class="s-ttl">INCOME</text>
+        <text x="34" y="74" class="s-ttl">STATEMENT</text>
+        <text x="34" y="98" class="s-lab-s">A PERIOD — 3 OR 12 MONTHS</text>
+        <text x="34" y="130" class="s-lab">Did it make</text>
+        <text x="34" y="150" class="s-lab">a profit?</text>
+        <text x="34" y="184" class="s-lab-s">REVENUE, COSTS,</text>
+        <text x="34" y="200" class="s-lab-s">NET INCOME, EPS</text>
+
+        <text x="248" y="56" class="s-ttl">BALANCE</text>
+        <text x="248" y="74" class="s-ttl">SHEET</text>
+        <text x="248" y="98" class="s-lab-s">A SNAPSHOT — ONE DAY</text>
+        <text x="248" y="130" class="s-lab">What does it own,</text>
+        <text x="248" y="150" class="s-lab">what does it owe?</text>
+        <text x="248" y="184" class="s-lab-s">ASSETS = LIABILITIES</text>
+        <text x="248" y="200" class="s-lab-s">+ EQUITY</text>
+
+        <text x="462" y="56" class="s-ttl">CASH FLOW</text>
+        <text x="462" y="74" class="s-ttl">STATEMENT</text>
+        <text x="462" y="98" class="s-lab-s">A PERIOD — 3 OR 12 MONTHS</text>
+        <text x="462" y="130" class="s-lab">Did real money</text>
+        <text x="462" y="150" class="s-lab">actually arrive?</text>
+        <text x="462" y="184" class="s-lab-s">OPERATING, INVESTING,</text>
+        <text x="462" y="200" class="s-lab-s">FINANCING, FREE CASH FLOW</text>
+      </svg>
+      <figcaption>Two of them cover a stretch of time. The balance sheet is a photograph of one single day.</figcaption>
+    </figure>
+
+    <h3>The income statement — a funnel from sales to profit</h3>
+    <p>It starts with everything that came in the door and subtracts its way down. Each subtraction has a name, and the leftover after each one has a name too.</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 320" role="img" aria-labelledby="f3t f3d">
+        <title id="f3t">A margin waterfall from revenue down to net income</title>
+        <desc id="f3d">A waterfall chart: revenue of one hundred dollars, minus forty-two of cost of goods sold leaves fifty-eight gross profit, minus thirty-six of operating expenses leaves twenty-two operating profit, minus six of interest and tax leaves sixteen of net income.</desc>
+        <line x1="24" y1="250" x2="644" y2="250" class="s-axis"/>
+
+        <rect x="34" y="50" width="66" height="200" rx="2" class="s-fill-acc"/>
+        <text x="67" y="42" text-anchor="middle" class="s-lab">$100</text>
+        <text x="67" y="272" text-anchor="middle" class="s-lab-s">REVENUE</text>
+        <text x="67" y="288" text-anchor="middle" class="s-lab-s">(SALES)</text>
+
+        <rect x="122" y="50" width="66" height="84" rx="2" class="s-fill-down"/>
+        <text x="155" y="42" text-anchor="middle" class="s-lab">−$42</text>
+        <text x="155" y="272" text-anchor="middle" class="s-lab-s">COST OF</text>
+        <text x="155" y="288" text-anchor="middle" class="s-lab-s">GOODS SOLD</text>
+
+        <rect x="210" y="134" width="66" height="116" rx="2" class="s-fill-acc"/>
+        <text x="243" y="126" text-anchor="middle" class="s-lab">$58</text>
+        <text x="243" y="272" text-anchor="middle" class="s-lab-s">GROSS</text>
+        <text x="243" y="288" text-anchor="middle" class="s-lab-s">PROFIT · 58%</text>
+
+        <rect x="298" y="134" width="66" height="72" rx="2" class="s-fill-down"/>
+        <text x="331" y="126" text-anchor="middle" class="s-lab">−$36</text>
+        <text x="331" y="272" text-anchor="middle" class="s-lab-s">OPERATING</text>
+        <text x="331" y="288" text-anchor="middle" class="s-lab-s">EXPENSES</text>
+
+        <rect x="386" y="206" width="66" height="44" rx="2" class="s-fill-acc"/>
+        <text x="419" y="198" text-anchor="middle" class="s-lab">$22</text>
+        <text x="419" y="272" text-anchor="middle" class="s-lab-s">OPERATING</text>
+        <text x="419" y="288" text-anchor="middle" class="s-lab-s">PROFIT · 22%</text>
+
+        <rect x="474" y="206" width="66" height="12" rx="2" class="s-fill-down"/>
+        <text x="507" y="198" text-anchor="middle" class="s-lab">−$6</text>
+        <text x="507" y="272" text-anchor="middle" class="s-lab-s">INTEREST</text>
+        <text x="507" y="288" text-anchor="middle" class="s-lab-s">+ TAX</text>
+
+        <rect x="562" y="218" width="66" height="32" rx="2" class="s-fill-up"/>
+        <text x="595" y="210" text-anchor="middle" class="s-lab">$16</text>
+        <text x="595" y="272" text-anchor="middle" class="s-lab-s">NET INCOME</text>
+        <text x="595" y="288" text-anchor="middle" class="s-lab-s">· 16%</text>
+
+        <text x="24" y="310" class="s-lab-s">EVERY "MARGIN" IS JUST ONE OF THESE BARS DIVIDED BY REVENUE</text>
+      </svg>
+      <figcaption>Revenue is the top line, net income is the bottom line. Everything in between is a cost with a label.</figcaption>
+    </figure>
+
+    <p>Divide any of those leftovers by revenue and you get a <strong>margin</strong>. Gross margin 58%, operating margin 22%, net margin 16%. Divide net income by the share count and you get <strong>earnings per share (EPS)</strong> — the single most quoted number in investing, and the one that feeds most valuation ratios.</p>
+
+    <h3>The balance sheet — what it owns and owes, today</h3>
+    <p>One equation holds always: <strong>assets = liabilities + equity</strong>. Assets are what the company controls (cash, inventory, buildings, patents). Liabilities are claims other people have on it (debt, bills due, deferred revenue). What's left over — equity — belongs to shareholders. That's you.</p>
+    <p>The thing to look for as a beginner is simple: does it have more cash than debt, or the other way round? Debt isn't evil — it's how most real businesses grow — but debt is a promise with a date on it, and a company that can't meet it doesn't get a second opinion.</p>
+
+    <h3>The cash flow statement — the honest one</h3>
+    <p>Net income involves judgement calls: when to book a sale, how fast to depreciate a machine. Cash is harder to argue with. <strong>Operating cash flow</strong> is the money the business actually generated. Subtract <strong>capital expenditure</strong> (the money spent on equipment and buildings just to keep going and grow) and you get <strong>free cash flow</strong> — cash genuinely available to pay down debt, buy back shares, pay a dividend, or reinvest.</p>
+    <p>If profits are rising for years but free cash flow is flat or negative, that's the single most useful red flag an amateur can spot. It usually means the "profit" is stuck in unpaid invoices or unsold inventory.</p>
+
+    <div class="tieback">
+      <span class="tag">The habit this builds</span>
+      <p>Profit is an opinion; cash is a fact. When a company's story and its cash flow statement disagree, believe the cash flow statement.</p>
+    </div>
+
+    <div class="check" data-check="2">
+      <p class="check-q">Check 2 — <span class="tk">Northwind Coffee</span> reports rising net income for three straight years, but operating cash flow has gone slightly negative over the same period. What's the most sensible reading?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="Net income and cash flow are genuinely different measures, and reported profit is the one built out of accounting judgements. Rising profits with falling cash is exactly the combination worth investigating, not waving through.">Fine — net income is the real profit number, so the business is healthy.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Right. Profit that never turns into cash is usually sitting in receivables customers haven't paid, or inventory nobody bought. It may have an innocent explanation, but it is the question to ask before anything else.">A warning sign — the reported profit isn't converting into actual money, so it's worth finding out where it's stuck.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Cash flow isn't a minor footnote — for many analysts it's the primary statement, precisely because it's the hardest to dress up. Ignoring it is how people end up holding companies that looked profitable right up until they ran out of money.">Irrelevant — cash flow is an accounting detail that doesn't affect shareholders.</button>
+      </div>
+      <p class="feedback" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LESSON 3 ============ -->
+<section class="stage locked" data-stage="3">
+  <div class="stage-head"><span class="num">03</span><h2>The handful of numbers that actually matter</h2></div>
+  <p class="lockquiz">Locked — answer Check 2 correctly to open this.</p>
+  <div class="stage-body" hidden>
+    <p class="key">There are hundreds of metrics. You need about seven. Here they are, with what each one is really asking.</p>
+
+    <div class="tblwrap">
+      <table class="tbl">
+        <thead>
+          <tr><th>Metric</th><th>How it's built</th><th>The question behind it</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Revenue growth</td><td class="mono">this year ÷ last year − 1</td><td>Is the business getting bigger, and is that speeding up or slowing down?</td></tr>
+          <tr><td>Gross margin</td><td class="mono">gross profit ÷ revenue</td><td>How much pricing power does it have over its own product?</td></tr>
+          <tr><td>Operating margin</td><td class="mono">operating profit ÷ revenue</td><td>Is it disciplined about its own overheads?</td></tr>
+          <tr><td>Free cash flow</td><td class="mono">operating cash − capex</td><td>How much real money is left over each year?</td></tr>
+          <tr><td>Net debt</td><td class="mono">total debt − cash</td><td>Could a bad year kill it?</td></tr>
+          <tr><td>Return on equity</td><td class="mono">net income ÷ equity</td><td>How well does it turn shareholders' money into profit?</td></tr>
+          <tr><td>Share count</td><td class="mono">shares outstanding, year by year</td><td>Is your slice of the pie growing or shrinking?</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Two of those deserve extra attention because beginners routinely miss them.</p>
+
+    <h3>Margins tell you what kind of business it is</h3>
+    <p>A supermarket might run a 3% net margin and a software company 30% — that isn't one being "better run", it's two different businesses. What matters is the <strong>direction over time</strong> and how it compares to direct competitors. Margins quietly falling for six straight quarters is a story; a single number in isolation is not.</p>
+
+    <h3>Share count: the dilution most people never check</h3>
+    <p>If profits grow 10% but the company issues 12% more shares, your slice of those profits actually shrank. Companies issue shares to pay staff, to fund acquisitions, or to raise cash. It isn't automatically bad — but it is a cost, and it doesn't appear as one on the income statement.</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 300" role="img" aria-labelledby="f4t f4d">
+        <title id="f4t">Total profit rising while earnings per share stays flat</title>
+        <desc id="f4d">Two lines over five years. Total net income climbs steadily upward while earnings per share stays flat, because the share count is rising at the same rate as profits.</desc>
+        <line x1="60" y1="30" x2="60" y2="240" class="s-axis"/>
+        <line x1="60" y1="240" x2="628" y2="240" class="s-axis"/>
+
+        <polyline points="90,206 214,182 338,152 462,120 586,84" class="s-line"/>
+        <polyline points="90,196 214,194 338,198 462,193 586,196" fill="none" stroke="var(--down)" stroke-width="2.5" stroke-dasharray="7 4" stroke-linecap="round"/>
+
+        <circle cx="586" cy="84" r="4.5" fill="var(--surface)" stroke="var(--accent)" stroke-width="2"/>
+        <circle cx="586" cy="196" r="4.5" fill="var(--surface)" stroke="var(--down)" stroke-width="2"/>
+
+        <text x="90" y="70" class="s-ttl">TOTAL PROFIT +64%</text>
+        <text x="90" y="88" class="s-lab-s">"RECORD EARNINGS" — THE HEADLINE</text>
+
+        <text x="300" y="228" class="s-ttl">EPS: FLAT</text>
+        <text x="90" y="264" class="s-lab-s">YEAR 1</text>
+        <text x="558" y="264" class="s-lab-s">YEAR 5</text>
+        <text x="60" y="288" class="s-lab-s">SHARE COUNT GREW JUST AS FAST — YOUR SLICE DIDN'T GROW AT ALL</text>
+        <text x="16" y="136" class="s-lab-s" transform="rotate(-90 16 136)">SIZE</text>
+      </svg>
+      <figcaption>"Record profits" and "no gain for shareholders" can both be true at once. EPS is the version that includes you.</figcaption>
+    </figure>
+
+    <div class="tieback">
+      <span class="tag">The habit this builds</span>
+      <p>Always read metrics as a trend, not a snapshot. One quarter is noise. Three years of direction is information. Most company reports helpfully print several years side by side for exactly this reason.</p>
+    </div>
+
+    <div class="check" data-check="3">
+      <p class="check-q">Check 3 — A company's net income rose 10% this year, but its share count rose 14%. What happened to earnings per share?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="EPS is net income divided by share count, so it depends on both. Profit growing isn't enough on its own — it has to grow faster than the number of people you're splitting it with.">It rose about 10%, in line with profits.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Correct. Profits up 10% split across 14% more shares means EPS fell by roughly 3.5%. The company can honestly announce record profits while every existing shareholder is slightly worse off per share.">It fell — the profit was split among more shares than it grew by.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Share issuance is very much a shareholder's concern. It's the mechanism by which your ownership stake shrinks, and it's the reason to check the share count line every single year.">It's unchanged — share count doesn't affect earnings per share.</button>
+      </div>
+      <p class="feedback" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LESSON 4 ============ -->
+<section class="stage locked" data-stage="4">
+  <div class="stage-head"><span class="num">04</span><h2>Valuation: is the price sensible?</h2></div>
+  <p class="lockquiz">Locked — answer Check 3 correctly to open this.</p>
+  <div class="stage-body" hidden>
+    <p class="key">A great business at a terrible price is a bad investment. Valuation ratios exist to put price and performance on the same scale so you can compare a $2bn company with a $200bn one.</p>
+
+    <h3>Price-to-earnings (P/E), the one everyone quotes</h3>
+    <p>Share price divided by earnings per share. If <span class="tk">Northwind Coffee</span> trades at $20 and earned $1.00 per share last year, its P/E is 20. The most useful way to say that out loud: <em>you're paying twenty years of current earnings for one share.</em> Flip it upside down and you get the <strong>earnings yield</strong> — 1 ÷ 20 = 5% — which you can compare directly to what a savings account or a government bond pays.</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 270" role="img" aria-labelledby="f5t f5d">
+        <title id="f5t">Three companies with the same price and different earnings</title>
+        <desc id="f5d">Three companies each trading at twenty dollars a share. The first earns two dollars per share for a P/E of ten, the second earns one dollar for a P/E of twenty, the third earns twenty cents for a P/E of one hundred.</desc>
+        <text x="24" y="30" class="s-ttl">SAME $20 SHARE PRICE — VERY DIFFERENT PRICES</text>
+
+        <rect x="24" y="58" width="196" height="150" rx="10" class="s-box"/>
+        <rect x="232" y="58" width="196" height="150" rx="10" class="s-box"/>
+        <rect x="440" y="58" width="196" height="150" rx="10" class="s-box"/>
+
+        <text x="122" y="88" text-anchor="middle" class="s-lab-s">EARNS $2.00 / SHARE</text>
+        <rect x="60" y="100" width="124" height="34" rx="3" class="s-fill-up"/>
+        <text x="122" y="158" text-anchor="middle" class="s-ttl">P/E 10</text>
+        <text x="122" y="184" text-anchor="middle" class="s-lab-s">10% EARNINGS YIELD</text>
+
+        <text x="330" y="88" text-anchor="middle" class="s-lab-s">EARNS $1.00 / SHARE</text>
+        <rect x="268" y="100" width="124" height="17" rx="3" class="s-fill-acc"/>
+        <text x="330" y="158" text-anchor="middle" class="s-ttl">P/E 20</text>
+        <text x="330" y="184" text-anchor="middle" class="s-lab-s">5% EARNINGS YIELD</text>
+
+        <text x="538" y="88" text-anchor="middle" class="s-lab-s">EARNS $0.20 / SHARE</text>
+        <rect x="476" y="100" width="124" height="4" rx="2" class="s-fill-down"/>
+        <text x="538" y="158" text-anchor="middle" class="s-ttl">P/E 100</text>
+        <text x="538" y="184" text-anchor="middle" class="s-lab-s">1% EARNINGS YIELD</text>
+
+        <text x="24" y="240" class="s-lab">The bar is what you get each year for the same $20 you hand over.</text>
+        <text x="24" y="260" class="s-lab-s">A HIGH P/E ISN'T WRONG — IT MEANS THE MARKET EXPECTS THAT BAR TO GROW A LOT</text>
+      </svg>
+      <figcaption>P/E is a payback period in disguise. High P/E companies are being priced on future earnings, not current ones.</figcaption>
+    </figure>
+
+    <p>A high P/E is not automatically "expensive" and a low one is not automatically "cheap". A P/E of 40 says the market expects earnings to grow quickly; if they do, it was cheap. A P/E of 6 often belongs to a business the market thinks is shrinking — the famous <strong>value trap</strong>, where the ratio stays low forever because the earnings keep falling underneath it.</p>
+
+    <h3>The rest of the toolkit</h3>
+    <div class="tblwrap">
+      <table class="tbl">
+        <thead><tr><th>Ratio</th><th>Use it when</th><th>Watch out for</th></tr></thead>
+        <tbody>
+          <tr><td>P/E</td><td>The company is reliably profitable</td><td>Useless if earnings are negative or a one-off distorted them</td></tr>
+          <tr><td>Forward P/E</td><td>You want price against next year's expected earnings</td><td>It's built on analyst forecasts, which are often too optimistic</td></tr>
+          <tr><td>P/S</td><td>Young or unprofitable companies with real revenue</td><td>Ignores whether those sales ever become profit</td></tr>
+          <tr><td>EV/EBITDA</td><td>Comparing companies with very different debt loads</td><td>EBITDA flatters companies with heavy equipment costs</td></tr>
+          <tr><td>P/B</td><td>Banks and asset-heavy businesses</td><td>Meaningless for software, where the value isn't on the books</td></tr>
+          <tr><td>FCF yield</td><td>You want the cash-based version of earnings yield</td><td>Lumpy capex can make a single year misleading</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>A ratio on its own is a number with no meaning. It becomes information only when you compare it to something:</p>
+    <ul class="plain">
+      <li><strong>Its own history.</strong> Has this company usually traded at 15× and it's now at 30×? Why?</li>
+      <li><strong>Its direct competitors.</strong> Compare a retailer to a retailer, not to a chip designer.</li>
+      <li><strong>Its growth rate.</strong> A P/E of 30 for a business growing 30% a year is a different proposition than a P/E of 30 for one growing 3%.</li>
+      <li><strong>The risk-free rate.</strong> If a government bond pays 5% with no risk, a 4% earnings yield with plenty of risk needs an argument behind it.</li>
+    </ul>
+
+    <div class="tieback warn">
+      <span class="tag">Where this goes wrong</span>
+      <p>Cheap is not the same as good, and good is not the same as cheap. The two mistakes are symmetrical: buying a declining business because the ratio looks low, and paying any price for a wonderful business because the story is exciting. You need both halves of the judgement.</p>
+    </div>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 320" role="img" aria-labelledby="f6t f6d">
+        <title id="f6t">Business quality against valuation, as four quadrants</title>
+        <desc id="f6d">A two-by-two grid. Good business at a fair price is the target. Good business at a stretched price risks years of no return. Weak business that is cheap is a value trap. Weak business that is expensive is the worst combination.</desc>
+        <line x1="330" y1="24" x2="330" y2="266" class="s-axis"/>
+        <line x1="40" y1="145" x2="628" y2="145" class="s-axis"/>
+
+        <rect x="46" y="30" width="276" height="108" rx="8" fill="var(--up-soft)" stroke="var(--up)"/>
+        <text x="62" y="60" class="s-ttl">THE TARGET</text>
+        <text x="62" y="84" class="s-lab">Good business,</text>
+        <text x="62" y="104" class="s-lab">sensible price.</text>
+        <text x="62" y="126" class="s-lab-s">RARE, AND USUALLY DULL</text>
+
+        <rect x="338" y="30" width="284" height="108" rx="8" fill="var(--accent-soft)" stroke="var(--accent)"/>
+        <text x="354" y="60" class="s-ttl">PRICED FOR PERFECTION</text>
+        <text x="354" y="84" class="s-lab">Great business, but</text>
+        <text x="354" y="104" class="s-lab">years of growth already paid for.</text>
+        <text x="354" y="126" class="s-lab-s">CAN GO NOWHERE FOR YEARS</text>
+
+        <rect x="46" y="152" width="276" height="108" rx="8" fill="var(--down-soft)" stroke="var(--down)"/>
+        <text x="62" y="182" class="s-ttl">THE VALUE TRAP</text>
+        <text x="62" y="206" class="s-lab">Weak business that</text>
+        <text x="62" y="226" class="s-lab">looks statistically cheap.</text>
+        <text x="62" y="248" class="s-lab-s">THE RATIO NEVER RECOVERS</text>
+
+        <rect x="338" y="152" width="284" height="108" rx="8" fill="var(--down-soft)" stroke="var(--down)"/>
+        <text x="354" y="182" class="s-ttl">THE HYPE ZONE</text>
+        <text x="354" y="206" class="s-lab">Weak business,</text>
+        <text x="354" y="226" class="s-lab">expensive anyway.</text>
+        <text x="354" y="248" class="s-lab-s">WHERE MOST MONEY IS LOST</text>
+
+        <text x="40" y="290" class="s-lab-s">← CHEAPER</text>
+        <text x="628" y="290" text-anchor="end" class="s-lab-s">MORE EXPENSIVE →</text>
+        <text x="40" y="312" class="s-lab-s">TOP ROW = STRONG BUSINESS · BOTTOM ROW = WEAK BUSINESS</text>
+      </svg>
+      <figcaption>Quality and price are two separate questions. You have to answer both before you have an opinion.</figcaption>
+    </figure>
+
+    <div class="check" data-check="4">
+      <p class="check-q">Check 4 — A retailer trades at a P/E of 5 while its competitors sit around 14. Revenue has fallen for four straight years and margins are shrinking. What's the most disciplined read?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="A low ratio is not automatically a discount. The market usually prices in what it can already see — and four years of falling revenue with shrinking margins is very visible.">A bargain — it's trading at a third of its sector, so the upside is obvious.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Exactly right. If earnings keep falling, the P denominator falls with them and the ratio stays low forever while the share price drifts down. The low ratio is a symptom, not the opportunity — you'd need a specific reason to believe the decline stops.">Possibly a value trap — the ratio is low because earnings are shrinking, so it can stay low indefinitely.</button>
+        <button type="button" class="opt" data-correct="false" data-why="P/E is genuinely useful, just not on its own. Paired with the direction of revenue and margins it told you something important here — that's the comparison doing its job, not the ratio failing.">P/E is useless — you should ignore ratios and just look at the story.</button>
+      </div>
+      <p class="feedback" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LESSON 5 ============ -->
+<section class="stage locked" data-stage="5">
+  <div class="stage-head"><span class="num">05</span><h2>The part that isn't a number</h2></div>
+  <p class="lockquiz">Locked — answer Check 4 correctly to open this.</p>
+  <div class="stage-body" hidden>
+    <p class="key">Numbers describe what already happened. Whether it keeps happening depends on things you have to reason about rather than calculate.</p>
+
+    <h3>The moat</h3>
+    <p>High profits attract competitors the way an open window attracts flies. A <strong>moat</strong> is whatever stops them. The durable kinds are worth knowing by name:</p>
+    <ul class="plain">
+      <li><strong>Switching costs</strong> — moving off the product is painful. Enterprise software, banking, payroll systems.</li>
+      <li><strong>Network effects</strong> — each new user makes the product better for existing ones. Marketplaces, exchanges, social platforms.</li>
+      <li><strong>Cost advantage</strong> — it can genuinely produce cheaper than anyone else, through scale or location or process.</li>
+      <li><strong>Intangibles</strong> — brands people pay a premium for, patents, regulatory licences.</li>
+    </ul>
+    <p>A useful test: <em>if a well-funded competitor launched an identical product tomorrow at a 20% lower price, what happens?</em> If the honest answer is "most customers leave", there's no moat, and today's high margins are borrowed rather than owned.</p>
+
+    <h3>Management and incentives</h3>
+    <p>Read what the company said it would do three years ago, then check what it did. That comparison tells you more than any interview. Then check how the people running it are paid — if bonuses depend on revenue growth alone, expect acquisitions and price cuts; if they depend on return on capital, expect discipline.</p>
+
+    <h3>What can go wrong</h3>
+    <p>Write the bear case yourself before you own anything. Customer concentration (one client is 40% of sales), regulatory risk, a single supplier, debt that must be refinanced next year at higher rates, technology that could obsolete the product. If you can't articulate what would make you wrong, you don't understand the position well enough to hold it through a bad month.</p>
+
+    <div class="tieback">
+      <span class="tag">The habit this builds</span>
+      <p>Fundamental analysis is slow on purpose. Nothing in this lesson changes hour to hour, which means there's never a reason to rush a decision. If an opportunity requires you to act before you've finished reading, it isn't an opportunity — it's pressure.</p>
+    </div>
+
+    <h3>The ten-minute first pass</h3>
+    <p>Before any deep work, run this on any company. It rules out most of them fast:</p>
+    <ul class="plain">
+      <li>Can you explain in one sentence how it makes money?</li>
+      <li>Revenue over five years — growing, flat, or shrinking?</li>
+      <li>Is it profitable, and are margins going up or down?</li>
+      <li>Is free cash flow positive and roughly tracking net income?</li>
+      <li>More cash than debt, or a debt load it can comfortably service?</li>
+      <li>Share count — rising or falling over five years?</li>
+      <li>What's the P/E versus its own history and its competitors?</li>
+      <li>What's the one thing that would break this business?</li>
+    </ul>
+
+    <div class="check" data-check="5">
+      <p class="check-q">Check 5 — A software company has run 70% gross margins for five years. A competitor launches an identical product at half the price, and customers would need six months and a costly data migration to switch. What does that tell you?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="Margins aren't defended by being high — plenty of high-margin businesses have been undercut into the ground. The defence has to come from something structural, which is exactly what the migration cost is here.">Nothing — a 70% margin is high, so the business is safe by definition.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Too pessimistic. A cheaper competitor matters a great deal when switching is easy and very little when it's painful. Six months and a costly migration is real friction that buys the incumbent time to respond.">The margins will collapse — a cheaper identical product always wins.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Exactly. That's a switching-cost moat, and it's why the margins have lasted. Note it's a delay rather than a guarantee — it buys time, so the thing to watch is whether new customer wins start going to the competitor while existing ones stay put.">There's a switching-cost moat protecting those margins — worth watching, but not easily taken.</button>
+      </div>
+      <p class="feedback" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section class="stage locked" data-stage="6">
+  <div class="stage-head"><span class="num">06</span><h2>Six questions to finish</h2></div>
+  <p class="lockquiz">Locked — answer Check 5 correctly to open this.</p>
+  <div class="stage-body" hidden>
+    <p>No time limit, nothing riding on it. Pick an answer for each, then score it. Anything you miss, the explanation will tell you exactly why.</p>
+
+    <div class="qz" data-qz="1">
+      <p class="qz-q">1. Which statement tells you what a company owns and owes on a given day?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="The income statement covers a stretch of time — a quarter or a year — and ends at profit. It doesn't list what the company owns.">The income statement.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Right — the balance sheet is the snapshot: assets on one side, liabilities and equity on the other, always balancing.">The balance sheet.</button>
+        <button type="button" class="opt" data-correct="false" data-why="The cash flow statement tracks money moving in and out over a period. It tells you about cash generation, not the full picture of assets and debts.">The cash flow statement.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="2">
+      <p class="qz-q">2. Free cash flow is best described as:</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="That's revenue — the top line, before any costs at all.">All the money customers paid the company.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Correct — operating cash flow minus capital expenditure. It's the cash actually left over after keeping the business running.">Cash generated by operations, minus the money spent on equipment and facilities.</button>
+        <button type="button" class="opt" data-correct="false" data-why="That's net income, which is an accounting figure. Free cash flow is deliberately the harder-to-massage version.">Net income as reported at the bottom of the income statement.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="3">
+      <p class="qz-q">3. A company trades at a P/E of 45. What is the market implicitly saying?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Yes — a high P/E is an expectation baked into the price. If growth arrives, it was reasonable; if it doesn't, the ratio compresses and the share price falls with it.">That it expects earnings to grow substantially from here.</button>
+        <button type="button" class="opt" data-correct="false" data-why="A high P/E says nothing about the quality of the business by itself — mediocre companies can carry high ratios during a hype cycle, and excellent ones sometimes trade cheaply.">That it is definitely a high-quality business.</button>
+        <button type="button" class="opt" data-correct="false" data-why="It's expensive relative to *current* earnings, which is the whole point of the ratio. Whether it turns out to be overpriced depends entirely on what earnings do next.">That the stock is overpriced and will fall.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="4">
+      <p class="qz-q">4. Which of these is a genuine moat?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="Being first is a head start, not a defence. Plenty of first movers were overtaken by better-funded competitors who watched them make the early mistakes.">The company was first to market with the idea.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Right — that's a network effect. The product's value comes from the other users, which is something a competitor can't simply copy by writing the same software.">Every new user makes the product more valuable to existing users.</button>
+        <button type="button" class="opt" data-correct="false" data-why="A rising share price is a result, not a competitive advantage. It also frequently reverses, which no real moat does overnight.">The share price has gone up a lot this year.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="5">
+      <p class="qz-q">5. Over five years a company's revenue doubles, but its share count also doubles and net income is flat. As a shareholder from day one, how did you do on the fundamentals?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="Revenue doubling is genuinely good news for the business, but it never reached the bottom line, and your ownership stake halved along the way. Growth you don't get a share of isn't your growth.">Very well — revenue doubling is the headline number that matters.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Correct. Flat net income split across twice as many shares means EPS halved. The company got bigger; your claim on its profits got smaller.">Badly — flat profits split across twice the shares means earnings per share halved.</button>
+        <button type="button" class="opt" data-correct="false" data-why="It's measurable, and it's the exact reason to track the share count line. Dilution is one of the few things you can check in thirty seconds that regularly changes the conclusion.">Impossible to say — dilution can't really be measured.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="6">
+      <p class="qz-q">6. Fundamental analysis says a company is excellent and reasonably priced. The chart is in a clear downtrend. What's the honest conclusion?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="Charts aren't noise — the downtrend is a real observation about what actual buyers and sellers are doing right now, and sometimes they know something not yet in the filings.">The chart is noise; fundamentals are the only thing that's real.</button>
+        <button type="button" class="opt" data-correct="false" data-why="The reverse mistake. Price falling doesn't prove the analysis is wrong — good businesses go through long periods of falling prices for reasons that have nothing to do with the business.">The fundamentals must be wrong, since price is always right.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Yes — they're answering different questions, and disagreement is information rather than a contradiction to resolve. The practical version: the fundamentals tell you what you'd want to own, the chart tells you the market hasn't agreed yet. Patience is a legitimate answer.">They're answering different questions, and the disagreement itself is worth taking seriously.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="btnrow">
+      <button type="button" class="btn" id="scoreBtn">Score my quiz</button>
+      <button type="button" class="btn ghost" id="resetBtn" hidden>Clear and try again</button>
+      <span class="nudge" id="nudge" hidden>Pick an answer for every question first.</span>
+    </div>
+    <div class="score" id="score" hidden>
+      <span class="n" id="scoreN">0 / 6</span>
+      <p id="scoreMsg"></p>
+    </div>
+  </div>
+</section>
+
+<nav class="pathnav one" aria-label="Continue">
+  <a class="card" href="index.html">
+    <span class="k">Next</span>
+    <span class="t">Technical analysis →</span>
+    <span class="d">The other half: candles, trend structure, levels, volume, moving averages, momentum, patterns — and how to size a position so being wrong stays survivable.</span>
+  </a>
+</nav>
+
+<footer>
+  <p><strong>What to do next:</strong> pick one company whose product you already use and understand. Find its most recent annual report — every public company publishes one free on its investor relations page — and run the ten-minute first pass on it. Don't buy anything. Just get to the point where you can say in three sentences how it makes money, whether that's growing, and what would break it. Do that on five companies and you'll be ahead of most people with opinions.</p>
+  <p class="disc">Educational material only. Nothing here is financial advice, a recommendation, or a signal to buy or sell anything. All company names, figures and scenarios are illustrations chosen to teach the concept — they are not real financial data and not predictions. Investing involves real risk of loss, including loss of the full amount invested.</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var lastStage = document.querySelectorAll(".stage").length;
+
+  function rail(n, cls) {
+    var li = document.querySelector('.rail li[data-rail="' + n + '"]');
+    if (li) { li.classList.remove("on", "done"); li.classList.add(cls); }
+  }
+
+  function unlock(n) {
+    var stage = document.querySelector('.stage[data-stage="' + n + '"]');
+    if (!stage || !stage.classList.contains("locked")) return;
+    stage.classList.remove("locked");
+    var note = stage.querySelector(".lockquiz");
+    if (note) note.parentNode.removeChild(note);
+    var body = stage.querySelector(".stage-body");
+    if (body) body.hidden = false;
+    rail(n, "on");
+    window.setTimeout(function () {
+      stage.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    }, 150);
+  }
+
+  function say(el, kind, label, text) {
+    el.className = "feedback " + kind;
+    el.innerHTML = "";
+    var b = document.createElement("b");
+    b.textContent = label;
+    var span = document.createElement("span");
+    span.textContent = text;
+    el.appendChild(b);
+    el.appendChild(span);
+  }
+
+  /* ---- lesson checks: must be right to advance ---- */
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest ? e.target.closest(".check .opt") : null;
+    if (!btn || btn.disabled) return;
+
+    var check = btn.closest(".check");
+    var fb = check.querySelector(".feedback");
+    var correct = btn.getAttribute("data-correct") === "true";
+    var why = btn.getAttribute("data-why") || "";
+
+    if (correct) {
+      btn.classList.add("ok");
+      Array.prototype.forEach.call(check.querySelectorAll(".opt"), function (o) { o.disabled = true; });
+      say(fb, "good", "Correct", why);
+      var n = parseInt(check.getAttribute("data-check"), 10);
+      rail(n, "done");
+      unlock(n + 1);
+    } else {
+      btn.classList.add("no");
+      btn.disabled = true;
+      say(fb, "bad", "Not quite — try again", why);
+    }
+  });
+
+  /* ---- quiz ---- */
+  var scoreBtn = document.getElementById("scoreBtn");
+  var resetBtn = document.getElementById("resetBtn");
+  var scoreBox = document.getElementById("score");
+  var scoreN = document.getElementById("scoreN");
+  var scoreMsg = document.getElementById("scoreMsg");
+  var nudge = document.getElementById("nudge");
+  var blocks = Array.prototype.slice.call(document.querySelectorAll(".qz"));
+  var total = blocks.length;
+
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest ? e.target.closest(".qz .opt") : null;
+    if (!btn || btn.disabled) return;
+    var block = btn.closest(".qz");
+    Array.prototype.forEach.call(block.querySelectorAll(".opt"), function (o) { o.classList.remove("sel"); });
+    btn.classList.add("sel");
+    nudge.hidden = true;
+  });
+
+  scoreBtn.addEventListener("click", function () {
+    var unanswered = blocks.filter(function (b) { return !b.querySelector(".opt.sel"); });
+    if (unanswered.length) {
+      nudge.hidden = false;
+      unanswered[0].scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+      return;
+    }
+    nudge.hidden = true;
+
+    var score = 0;
+    blocks.forEach(function (block) {
+      var picked = block.querySelector(".opt.sel");
+      var right = block.querySelector('.opt[data-correct="true"]');
+      var why = block.querySelector(".qz-why");
+      var ok = picked === right;
+      if (ok) score++;
+
+      Array.prototype.forEach.call(block.querySelectorAll(".opt"), function (o) {
+        o.disabled = true;
+        o.classList.remove("sel");
+      });
+      picked.classList.add(ok ? "ok" : "no");
+      if (!ok) right.classList.add("ok");
+
+      why.hidden = false;
+      why.textContent = ok
+        ? "Correct. " + picked.getAttribute("data-why")
+        : "Not this one. " + picked.getAttribute("data-why") + " The right answer is highlighted above.";
+    });
+
+    var msg;
+    if (score === total) {
+      msg = "Full marks. You can now open a company's annual report and know which numbers to look at and what they're telling you — which is the slow, unglamorous half of investing that almost nobody online bothers with. Next stop: the chart.";
+    } else if (score >= Math.ceil(total * 0.6)) {
+      msg = "Solid. Read the explanations under the ones you missed — the gap is usually one specific definition rather than the whole idea. Then run it again.";
+    } else {
+      msg = "Worth another pass. Scroll back up through the lessons, especially the waterfall and the P/E diagram, and come back to this. Getting it wrong here is free, which is the entire point of learning it this way first.";
+    }
+    scoreN.textContent = score + " / " + total;
+    scoreMsg.textContent = msg;
+    scoreBox.hidden = false;
+    resetBtn.hidden = false;
+    scoreBtn.hidden = true;
+    rail(lastStage, "done");
+    scoreBox.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+  });
+
+  resetBtn.addEventListener("click", function () {
+    blocks.forEach(function (block) {
+      Array.prototype.forEach.call(block.querySelectorAll(".opt"), function (o) {
+        o.disabled = false;
+        o.classList.remove("ok", "no", "sel");
+      });
+      var why = block.querySelector(".qz-why");
+      why.hidden = true;
+      why.textContent = "";
+    });
+    scoreBox.hidden = true;
+    resetBtn.hidden = true;
+    scoreBtn.hidden = false;
+    rail(lastStage, "on");
+    blocks[0].scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+  });
+})();
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Phil's Chart-Reading Starter</title>
+<title>Technical Analysis, from zero</title>
 <style>
 /* ---------- tokens: light is the base ---------- */
 :root{
@@ -124,21 +124,39 @@ header{display:flex;flex-direction:column;gap:.85rem}
 }
 .worry q{font-style:italic;color:var(--ink)}
 
+/* ---------- page switcher ---------- */
+.pathnav{display:grid;gap:.7rem;grid-template-columns:1fr 1fr}
+.pathnav.one{grid-template-columns:1fr}
+@media (max-width:560px){.pathnav{grid-template-columns:1fr}}
+.card{
+  display:flex;flex-direction:column;gap:.25rem;
+  padding:.9rem 1rem;border:1px solid var(--rule);border-radius:10px;
+  background:var(--surface);text-decoration:none;color:inherit;box-shadow:var(--shadow);
+  transition:border-color .15s ease, background .15s ease;
+}
+.card:hover{border-color:var(--accent);background:var(--accent-soft)}
+.card .k{font-family:var(--mono);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.card .t{font-weight:650}
+.card .d{font-size:.88rem;color:var(--ink-2);line-height:1.45}
+.card.here{border-color:var(--accent);background:var(--accent-soft)}
+.card.here .k{color:var(--ink-3)}
+
 /* ---------- progress rail ---------- */
 .rail ol{
   list-style:none;
   margin:0;padding:0;
   display:flex;
+  flex-wrap:wrap;
   gap:.4rem;
 }
 .rail li{
-  flex:1;
+  flex:1 1 4rem;
   display:flex;
   flex-direction:column;
   gap:.45rem;
   font-family:var(--mono);
-  font-size:.66rem;
-  letter-spacing:.09em;
+  font-size:.6rem;
+  letter-spacing:.05em;
   text-transform:uppercase;
   color:var(--ink-3);
 }
@@ -212,6 +230,7 @@ figcaption{
 .s-up{fill:var(--up);stroke:var(--up);stroke-width:2}
 .s-down{fill:var(--down);stroke:var(--down);stroke-width:2}
 .s-line{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.s-line-thin{fill:none;stroke:var(--accent);stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
 .s-lead{stroke:var(--ink-3);stroke-width:1;stroke-dasharray:2 3;fill:none}
 .s-lab{fill:var(--ink-2);font-family:var(--mono);font-size:13px}
 .s-lab-s{fill:var(--ink-3);font-family:var(--mono);font-size:11.5px;letter-spacing:.06em}
@@ -219,6 +238,25 @@ figcaption{
 .s-level{stroke:var(--ink-2);stroke-width:1.5;stroke-dasharray:6 4;fill:none}
 .s-zone{fill:var(--accent);opacity:.12}
 .s-dot{fill:var(--surface);stroke:var(--accent);stroke-width:2}
+.s-box{fill:var(--surface-2);stroke:var(--rule);stroke-width:1}
+.s-vol{fill:var(--ink-3);opacity:.35}
+.s-vol-hot{fill:var(--up);opacity:.85}
+.s-ma-fast{fill:none;stroke:var(--accent);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.s-ma-slow{fill:none;stroke:var(--ink-3);stroke-width:2.2;stroke-dasharray:7 4;stroke-linecap:round}
+.s-price{fill:none;stroke:var(--ink-2);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+.s-warn{fill:none;stroke:var(--down);stroke-width:2;stroke-linecap:round}
+.s-arrow{fill:none;stroke:var(--ink-3);stroke-width:1.5}
+
+/* ---------- tables ---------- */
+.tblwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:10px}
+.tbl{width:100%;border-collapse:collapse;font-size:.92rem;min-width:31rem}
+.tbl th,.tbl td{text-align:left;padding:.6rem .8rem;border-bottom:1px solid var(--rule-soft);vertical-align:top;color:var(--ink-2)}
+.tbl tr:last-child td{border-bottom:0}
+.tbl th{
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:400;background:var(--surface-2);
+}
+.tbl td:first-child{font-weight:650;color:var(--ink);white-space:nowrap}
 
 /* ---------- aside tied to Phil's worry ---------- */
 .tieback{
@@ -239,6 +277,8 @@ figcaption{
   text-transform:uppercase;
   color:var(--accent);
 }
+.tieback.warn{border-color:var(--down);background:var(--down-soft)}
+.tieback.warn .tag{color:var(--down)}
 
 /* ---------- checks ---------- */
 .check{
@@ -346,21 +386,41 @@ footer .disc{
 <div class="wrap">
 
 <header>
-  <p class="eyebrow">Price action · Stocks · Built for Phil</p>
+  <p class="eyebrow">Course · Part two of two · Technical analysis</p>
   <h1>Reading a stock chart, from zero</h1>
-  <p class="lede">Twenty minutes, three lessons, no jargon. By the end you'll be able to look at a stock chart and actually say what it's doing.</p>
+  <p class="lede">Nine lessons, no jargon. Candles and trend structure first, then volume, moving averages, momentum, patterns — and the part that actually protects your money, which is risk.</p>
   <div class="worry">
     <p>You said the thing that worries you is: <q>it seems like an easy way to lose money, and there's a lot of hype around it — I don't want to lose a lot of money and get stressed out.</q></p>
     <p>That's the correct instinct, and it's the one this page is built around. Trading is an easy way to lose money — mostly because people act before they can read what's in front of them. So there is nothing to buy here and no signals to follow. This is just learning to <strong>read</strong>. Reading costs nothing, carries no risk, and is the part the hype always skips.</p>
+    <p>One promise up front, since this is the half of the subject that attracts the most nonsense: technical analysis is <strong>not</strong> a prediction machine, and no indicator on this page tells you what happens next. What it does is describe the current balance of buyers and sellers, and give you a specific price at which an idea is provably wrong. That second part is the whole of your protection.</p>
   </div>
 </header>
+
+<nav class="pathnav" aria-label="Course pages">
+  <a class="card" href="fundamental-analysis.html">
+    <span class="k">Part one</span>
+    <span class="t">← Fundamental analysis</span>
+    <span class="d">The business: earnings, cash, debt, and whether the price is sensible.</span>
+  </a>
+  <span class="card here">
+    <span class="k">You are here</span>
+    <span class="t">Technical analysis</span>
+    <span class="d">The chart: candles, structure, levels, volume, averages, momentum, risk.</span>
+  </span>
+</nav>
 
 <nav class="rail" aria-label="Your progress">
   <ol>
     <li data-rail="1" class="on"><span class="bar"></span>Candles</li>
     <li data-rail="2"><span class="bar"></span>Structure</li>
     <li data-rail="3"><span class="bar"></span>Levels</li>
-    <li data-rail="4"><span class="bar"></span>Quiz</li>
+    <li data-rail="4"><span class="bar"></span>Timeframes</li>
+    <li data-rail="5"><span class="bar"></span>Volume</li>
+    <li data-rail="6"><span class="bar"></span>Averages</li>
+    <li data-rail="7"><span class="bar"></span>Momentum</li>
+    <li data-rail="8"><span class="bar"></span>Patterns</li>
+    <li data-rail="9"><span class="bar"></span>Risk</li>
+    <li data-rail="10"><span class="bar"></span>Quiz</li>
   </ol>
 </nav>
 
@@ -514,7 +574,7 @@ footer .disc{
   <div class="stage-head"><span class="num">03</span><h2>Support and resistance: floors and ceilings</h2></div>
   <p class="lockquiz">Locked — answer Check 2 correctly to open this.</p>
   <div class="stage-body" hidden>
-    <p class="key">Now the last piece. Price doesn't wander randomly — it keeps reacting at the same prices, over and over. Those prices have names.</p>
+    <p class="key">Now the last piece of the basics. Price doesn't wander randomly — it keeps reacting at the same prices, over and over. Those prices have names.</p>
     <ul class="plain">
       <li><strong>Support</strong> is a floor: a price where falls keep stopping, because enough buyers show up there. Say <span class="tk">MSFT</span> drops to about $400 three separate times and bounces each time — $400 is support.</li>
       <li><strong>Resistance</strong> is a ceiling: a price where rallies keep stalling, because enough sellers show up there. If <span class="tk">MSFT</span> pushes toward $440 and gets knocked back twice, $440 is resistance.</li>
@@ -556,7 +616,7 @@ footer .disc{
 
     <div class="tieback">
       <span class="tag">Why this answers your worry</span>
-      <p>This is the piece that most directly protects your money. Levels give you a place where you'd be provably wrong. If you thought $400 was the floor and price closes well below it, the idea was wrong — that's information, not a disaster, and it's a decision you made in advance rather than in a panic. Deciding where you're wrong <em>before</em> you're in is most of the difference between trading and stress.</p>
+      <p>This is the piece that most directly protects your money. Levels give you a place where you'd be provably wrong. If you thought $400 was the floor and price closes well below it, the idea was wrong — that's information, not a disaster, and it's a decision you made in advance rather than in a panic. Deciding where you're wrong <em>before</em> you're in is most of the difference between trading and stress. Lesson 09 turns that into arithmetic.</p>
     </div>
 
     <div class="check" data-check="3">
@@ -571,10 +631,415 @@ footer .disc{
   </div>
 </section>
 
-<!-- ============ QUIZ ============ -->
+<!-- ============ LESSON 4 ============ -->
 <section class="stage locked" data-stage="4">
-  <div class="stage-head"><span class="num">04</span><h2>Five questions to finish</h2></div>
+  <div class="stage-head"><span class="num">04</span><h2>Timeframes: the same chart, three answers</h2></div>
   <p class="lockquiz">Locked — answer Check 3 correctly to open this.</p>
+  <div class="stage-body" hidden>
+    <p class="key">You've now got the three basics: candles, structure, levels. Everything from here refines them — starting with the question that has to be settled before any of it means anything. <em>Which timeframe am I looking at, and does it match how long I intend to hold?</em></p>
+    <p>A chart's timeframe is how much time each candle covers. On a weekly chart each candle is a week; on a 15-minute chart each candle is fifteen minutes. Lesson 02 mentioned this in passing — here's what it actually looks like. Change the timeframe and the same stock can be in an uptrend, a downtrend and a range simultaneously, and all three readings are correct.</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 280" role="img" aria-labelledby="f1t f1d">
+        <title id="f1t">The same stock on three timeframes</title>
+        <desc id="f1d">Three panels of the same stock. The weekly chart shows a strong uptrend, the daily chart shows that uptrend currently pulling back, and the hourly chart shows only the pullback, which looks like a downtrend on its own.</desc>
+        <line x1="222" y1="12" x2="222" y2="238" class="s-axis"/>
+        <line x1="442" y1="12" x2="442" y2="238" class="s-axis"/>
+
+        <text x="16" y="28" class="s-ttl">WEEKLY</text>
+        <polyline points="22,206 54,168 86,186 118,132 150,152 182,96 206,116" class="s-line"/>
+        <rect x="176" y="88" width="34" height="40" fill="var(--accent)" opacity=".12"/>
+        <text x="16" y="228" class="s-lab-s">UPTREND — INTACT</text>
+
+        <text x="238" y="28" class="s-ttl">DAILY</text>
+        <polyline points="244,180 272,120 300,146 328,86 356,110 384,64 412,132" class="s-line"/>
+        <rect x="380" y="58" width="34" height="80" fill="var(--accent)" opacity=".12"/>
+        <text x="238" y="228" class="s-lab-s">UPTREND, NOW PULLING BACK</text>
+
+        <text x="458" y="28" class="s-ttl">HOURLY</text>
+        <polyline points="462,58 490,96 518,78 546,124 574,106 602,158 630,140" class="s-line"/>
+        <text x="458" y="228" class="s-lab-s">LOOKS LIKE A DOWNTREND</text>
+
+        <line x1="193" y1="128" x2="252" y2="176" class="s-lead"/>
+        <line x1="397" y1="132" x2="460" y2="62" class="s-lead"/>
+        <text x="16" y="256" class="s-lab-s">THE SHADED BOX ON EACH PANEL IS THE WHOLE OF THE PANEL TO ITS RIGHT</text>
+        <text x="16" y="272" class="s-lab-s">SAME STOCK · SAME MOMENT · THREE HONEST ANSWERS</text>
+      </svg>
+      <figcaption>Zooming in doesn't reveal a truer chart. It reveals a smaller slice of the same one.</figcaption>
+    </figure>
+
+    <p>The working rule is <strong>top-down</strong>. Start on the timeframe well above the one you intend to act on, establish the trend there, and let it set your bias. Then drop down for detail. What you must not do is form a view on the weekly chart and then let a scary 5-minute candle talk you out of it — that candle was always going to be there, and it isn't information about your idea.</p>
+
+    <div class="tblwrap">
+      <table class="tbl">
+        <thead><tr><th>If you plan to hold for</th><th>Set your context on</th><th>Look for detail on</th></tr></thead>
+        <tbody>
+          <tr><td>Months to years</td><td>Monthly / weekly</td><td>Daily</td></tr>
+          <tr><td>Weeks</td><td>Weekly</td><td>Daily / 4-hour</td></tr>
+          <tr><td>Days</td><td>Daily</td><td>1-hour</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Notice what's missing from that table: anything under an hour. Short timeframes contain far more randomness relative to signal, cost more in fees and spreads, and demand decisions faster than a beginner can make them well. Almost nobody's first chart should be a 1-minute chart.</p>
+
+    <div class="tieback">
+      <span class="tag">Why this answers your worry</span>
+      <p>Decide your timeframe before you open the chart, not after. Choosing it afterwards is how people end up justifying a position they already hold by scrolling until they find a timeframe that agrees with them — which is stress dressed up as analysis.</p>
+    </div>
+
+    <div class="check" data-check="4">
+      <p class="check-q">Check 4 — A stock is in a clear uptrend on the weekly chart. On the hourly chart it's been making lower highs and lower lows for two days. What's the most sensible read?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="Two days of hourly candles is a very small slice of a weekly trend. It might turn into the start of a reversal, but on its own it's the sort of pullback that happens repeatedly inside every uptrend that ever existed.">The uptrend is over — the hourly chart is more current, so it wins.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Right. Pullbacks are how uptrends work; they're not a contradiction of it. The weekly trend sets the bias and the hourly shows a normal countertrend move. What would change the weekly read is a lower low on the weekly chart — not on the hourly.">Both are true: it's a short-term pullback inside a longer uptrend, which is completely normal.</button>
+        <button type="button" class="opt" data-correct="false" data-why="They don't actually contradict each other — they're measuring different lengths of time. Treating disagreement between timeframes as noise-to-be-ignored throws away the most useful bit of context you have.">The timeframes contradict each other, so the chart is unreadable right now.</button>
+      </div>
+      <p class="feedback" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LESSON 5 ============ -->
+<section class="stage locked" data-stage="5">
+  <div class="stage-head"><span class="num">05</span><h2>Volume: how much conviction is behind the move</h2></div>
+  <p class="lockquiz">Locked — answer Check 4 correctly to open this.</p>
+  <div class="stage-body" hidden>
+    <p class="key">Volume is the number of shares traded in each period, drawn as bars under the price. Price tells you <em>where</em>; volume tells you <em>how many people cared</em>.</p>
+    <p>The single most useful application is at a level — exactly the levels from lesson 03. When price finally pushes through a resistance that has held several times, the volume on that push is your conviction check. A breakout on heavy volume means real participation: a lot of buyers were willing to pay above the old ceiling. A breakout on thin volume means very few people were involved, and those tend to fall back inside the range.</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 300" role="img" aria-labelledby="f2t f2d">
+        <title id="f2t">A breakout confirmed by a surge in volume</title>
+        <desc id="f2d">Price repeatedly stalls at a resistance level on modest volume, then breaks above it accompanied by a volume bar several times larger than the surrounding ones.</desc>
+
+        <line x1="34" y1="68" x2="626" y2="68" class="s-level"/>
+        <text x="38" y="60" class="s-lab-s">RESISTANCE</text>
+        <polyline points="40,132 90,74 140,126 190,70 240,124 290,72 340,116 390,44 440,60 490,34 540,52 590,22" class="s-line"/>
+        <circle cx="90" cy="74" r="4" class="s-dot"/>
+        <circle cx="190" cy="70" r="4" class="s-dot"/>
+        <circle cx="290" cy="72" r="4" class="s-dot"/>
+        <circle cx="390" cy="44" r="4.5" fill="var(--up)" stroke="var(--up)"/>
+
+        <line x1="34" y1="252" x2="626" y2="252" class="s-axis"/>
+        <rect x="32" y="234" width="16" height="18" class="s-vol"/>
+        <rect x="82" y="230" width="16" height="22" class="s-vol"/>
+        <rect x="132" y="236" width="16" height="16" class="s-vol"/>
+        <rect x="182" y="232" width="16" height="20" class="s-vol"/>
+        <rect x="232" y="238" width="16" height="14" class="s-vol"/>
+        <rect x="282" y="235" width="16" height="17" class="s-vol"/>
+        <rect x="332" y="237" width="16" height="15" class="s-vol"/>
+        <rect x="382" y="194" width="16" height="58" class="s-vol-hot"/>
+        <rect x="432" y="226" width="16" height="26" class="s-vol"/>
+        <rect x="482" y="218" width="16" height="34" class="s-vol"/>
+        <rect x="532" y="230" width="16" height="22" class="s-vol"/>
+        <rect x="582" y="222" width="16" height="30" class="s-vol"/>
+
+        <line x1="390" y1="52" x2="390" y2="190" class="s-lead"/>
+        <text x="402" y="120" class="s-ttl">BREAKOUT</text>
+        <text x="402" y="138" class="s-lab-s">PRICE CLEARS THE CEILING</text>
+        <text x="402" y="156" class="s-lab-s">AND VOLUME TRIPLES</text>
+        <text x="34" y="276" class="s-lab-s">VOLUME</text>
+        <text x="34" y="294" class="s-lab-s">THE SAME BREAKOUT ON A TINY VOLUME BAR IS THE ONE THAT USUALLY FAILS</text>
+      </svg>
+      <figcaption>Volume doesn't predict direction. It tells you how much agreement there was about the move that just happened.</figcaption>
+    </figure>
+
+    <p>A few readings worth knowing:</p>
+    <ul class="plain">
+      <li><strong>Rising price on rising volume</strong> — the trend has participation behind it.</li>
+      <li><strong>Rising price on steadily falling volume</strong> — the move is running out of new buyers. Not a sell signal, but a reason to stop adding.</li>
+      <li><strong>A huge volume spike after a long move</strong> — often the last rush of people arriving late. Frequently marks a turning point rather than a continuation.</li>
+      <li><strong>Very low volume overall</strong> — thin stocks move erratically, cost more to get in and out of, and are far easier to push around. Beginners should avoid them.</li>
+    </ul>
+    <p>One important caveat: volume is much more reliable on stocks and futures than on some other markets. Spot foreign exchange has no central exchange, so the "volume" your platform shows is only what one broker saw, not the whole market.</p>
+
+    <div class="tieback">
+      <span class="tag">Why this answers your worry</span>
+      <p>Ask "who else was involved?" before believing any move. A price that jumps 8% on almost no volume is not the same event as one that jumps 8% on the heaviest day of the year, even though both look identical if you only read the price — and the first is exactly the kind of move that gets hyped.</p>
+    </div>
+
+    <div class="check" data-check="5">
+      <p class="check-q">Check 5 — A stock has stalled at $50 four times over three months. Today it closes at $51.20, on the lightest volume of the entire quarter. How much weight should you give that breakout?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="The close above the level is real, but the point of volume is to ask how many people stood behind it. On the quarter's lightest volume, very few did — which is exactly the profile of a breakout that gets given back.">A lot — a close above resistance is a close above resistance, whatever the volume.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Correct. Light volume means the level was cleared without meaningful participation, so the sellers who defended $50 four times may simply not have shown up today. It's a breakout worth watching rather than trusting — waiting for it to hold on decent volume costs you a little upside and avoids a lot of false starts.">Not much on its own — the level was cleared without participation, so treat it as unconfirmed.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Low volume isn't a bearish signal in itself — it's an absence of evidence rather than evidence against. The correct posture is 'unconfirmed', not 'reverse'.">It's a bearish signal — low volume means the stock is about to fall.</button>
+      </div>
+      <p class="feedback" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LESSON 6 ============ -->
+<section class="stage locked" data-stage="6">
+  <div class="stage-head"><span class="num">06</span><h2>Moving averages: the trend with the noise removed</h2></div>
+  <p class="lockquiz">Locked — answer Check 5 correctly to open this.</p>
+  <div class="stage-body" hidden>
+    <p class="key">A moving average is the average closing price over the last N periods, recalculated each period and drawn as a line. That's the entire idea. A 50-day moving average on a daily chart is simply the average of the last 50 closes.</p>
+    <p>It does one job well: it strips out the day-to-day jitter so the structure you learned in lesson 02 becomes visible at a glance. The trade-off is built in and unavoidable — an average of the past always <strong>lags</strong> the present. A long average is smooth but slow; a short one is responsive but noisy. There's no setting that avoids this, which is why arguments about the "best" length are mostly wasted breath.</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 300" role="img" aria-labelledby="f3t f3d">
+        <title id="f3t">Price with a fast and a slow moving average</title>
+        <desc id="f3d">A jagged price line with a smoother 50-period average tracking it closely and a much smoother 200-period average beneath. Price pulls back to the fast average repeatedly and bounces.</desc>
+
+        <polyline class="s-price" points="34,222 62,206 90,228 118,196 146,210 174,178 202,196 230,160 258,178 286,146 314,168 342,132 370,152 398,118 426,140 454,104 482,126 510,86 538,110 566,72 594,96 622,58"/>
+        <polyline class="s-ma-fast" points="34,228 90,220 146,206 202,190 258,172 314,154 370,136 426,118 482,100 538,82 594,64 622,56"/>
+        <polyline class="s-ma-slow" points="34,244 90,242 146,238 202,232 258,224 314,214 370,204 426,192 482,180 538,166 594,152 622,144"/>
+
+        <circle cx="146" cy="210" r="4.5" class="s-dot"/>
+        <circle cx="314" cy="168" r="4.5" class="s-dot"/>
+        <circle cx="482" cy="126" r="4.5" class="s-dot"/>
+
+        <text x="34" y="34" class="s-ttl">PRICE — NOISY</text>
+        <text x="34" y="54" class="s-lab-s">EVERY WIGGLE INCLUDED</text>
+        <line x1="122" y1="46" x2="118" y2="190" class="s-lead"/>
+
+        <text x="360" y="34" class="s-ttl">FAST AVERAGE (50)</text>
+        <text x="360" y="54" class="s-lab-s">PULLBACKS KEEP STOPPING AT IT</text>
+        <line x1="440" y1="62" x2="426" y2="112" class="s-lead"/>
+
+        <text x="34" y="272" class="s-lab-s">SLOW AVERAGE (200) — THE BACKGROUND TREND, ALMOST STRAIGHT</text>
+        <text x="34" y="290" class="s-lab-s">FAST ABOVE SLOW AND BOTH RISING = UPTREND, STATED WITHOUT DRAMA</text>
+      </svg>
+      <figcaption>Averages don't predict. They summarise, and the summary is easier to act on calmly than the raw chart.</figcaption>
+    </figure>
+
+    <p>Three legitimate uses, in order of usefulness:</p>
+    <ul class="plain">
+      <li><strong>Trend filter.</strong> Price above a rising 200-day average is a different environment from price below a falling one. Many people use nothing more than this and are better off for it.</li>
+      <li><strong>Dynamic support and resistance.</strong> In a healthy trend, pullbacks often stall around the rising average. Treat it as a zone, exactly like the horizontal levels in lesson 03.</li>
+      <li><strong>Crossovers.</strong> A fast average crossing above a slow one (the "golden cross") or below it (the "death cross"). These are famous and genuinely lagging — by the time they trigger, a good part of the move has happened. They describe a change that already occurred; they don't call it in advance.</li>
+    </ul>
+
+    <div class="tieback warn">
+      <span class="tag">Where this goes wrong</span>
+      <p>Moving averages are useless in a sideways market. Price chops back and forth across the line, generating cross after cross, each one wrong. This is the standard way beginners lose money with indicators: applying a trend tool in the absence of a trend. Check the structure first — if lesson 02 says it's a range, put the averages away.</p>
+    </div>
+
+    <p>On the endless SMA-versus-EMA debate: a simple moving average weights every period equally; an exponential one weights recent periods more heavily, so it turns faster. Pick one and stay consistent. The difference between them is far smaller than the difference between having a plan and not having one.</p>
+
+    <div class="check" data-check="6">
+      <p class="check-q">Check 6 — A stock has traded sideways between $30 and $34 for four months. Its 20-day and 50-day averages have crossed each other six times in that stretch. What's happening?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="Six crosses in four months isn't six signals — it's the same non-signal repeating. In a range, price oscillates around its own average by definition, so crossovers fire constantly and mean nothing.">Six trend changes — the stock is extremely volatile and each cross is a signal.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Exactly. Crossovers are a trend tool, and there's no trend here. In a range they whipsaw endlessly and each one loses a little money in fees and small losses. The structure — a range — is the thing to read, and the averages have nothing useful to add to it.">There's no trend, so the crossover signal is meaningless here — this is classic whipsaw.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Shortening the averages makes them more sensitive, which in a sideways market means more false crosses, not fewer. The problem isn't the settings — it's that a trend tool is being used where there's no trend.">The averages are set wrong — shorter settings would fix the false signals.</button>
+      </div>
+      <p class="feedback" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LESSON 7 ============ -->
+<section class="stage locked" data-stage="7">
+  <div class="stage-head"><span class="num">07</span><h2>Momentum: how hard price is being pushed</h2></div>
+  <p class="lockquiz">Locked — answer Check 6 correctly to open this.</p>
+  <div class="stage-body" hidden>
+    <p class="key">Momentum indicators measure the <em>speed</em> of price movement rather than its direction. The useful question they answer is: is this move still accelerating, or is it running on fumes?</p>
+
+    <h3>RSI — the relative strength index</h3>
+    <p>RSI compares the size of recent gains to the size of recent losses over a lookback period (14 by default) and scales the result from 0 to 100. High readings mean gains have dominated recently; low readings mean losses have.</p>
+    <p>The conventional labels are "overbought" above 70 and "oversold" below 30, and this is where almost every beginner goes wrong. <strong>Overbought does not mean sell.</strong> In a strong uptrend RSI can sit above 70 for weeks while price keeps climbing — that's what strength looks like. Selling every 70 print in a bull market is a reliable way to miss the entire move.</p>
+    <p>The more informative use is <strong>divergence</strong>: price makes a higher high, but RSI makes a lower high. Buyers got price to a new peak with noticeably less force behind it. That's a warning about the health of the move, not a signal to reverse — divergences can persist for a long time before anything happens, and plenty resolve by simply going away.</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 320" role="img" aria-labelledby="f4t f4d">
+        <title id="f4t">Bearish divergence between price and RSI</title>
+        <desc id="f4d">Price makes two peaks, the second higher than the first. Underneath, the RSI panel shows two corresponding peaks, but the second RSI peak is lower than the first, and it falls back below the seventy line.</desc>
+
+        <text x="34" y="26" class="s-ttl">PRICE</text>
+        <polyline class="s-line" points="34,132 96,150 158,86 220,116 282,70 344,104 406,54 468,92 530,44 592,110"/>
+        <circle cx="282" cy="70" r="4.5" class="s-dot"/>
+        <circle cx="530" cy="44" r="4.5" class="s-dot"/>
+        <line x1="282" y1="70" x2="530" y2="44" class="s-warn" stroke-dasharray="6 4"/>
+        <text x="300" y="36" class="s-lab-s">HIGHER HIGH IN PRICE</text>
+
+        <line x1="34" y1="158" x2="626" y2="158" class="s-axis"/>
+
+        <text x="34" y="184" class="s-ttl">RSI (14)</text>
+        <line x1="34" y1="204" x2="626" y2="204" class="s-level"/>
+        <line x1="34" y1="286" x2="626" y2="286" class="s-level"/>
+        <text x="596" y="200" class="s-lab-s">70</text>
+        <text x="596" y="282" class="s-lab-s">30</text>
+        <polyline class="s-line-thin" points="34,262 96,272 158,224 220,246 282,196 344,238 406,208 468,244 530,214 592,268"/>
+        <circle cx="282" cy="196" r="4.5" class="s-dot"/>
+        <circle cx="530" cy="214" r="4.5" class="s-dot"/>
+        <line x1="282" y1="196" x2="530" y2="214" class="s-warn" stroke-dasharray="6 4"/>
+        <text x="300" y="182" class="s-lab-s">LOWER HIGH IN RSI</text>
+        <text x="34" y="310" class="s-lab-s">SAME NEW HIGH IN PRICE, LESS FORCE BEHIND IT — A CAUTION, NOT A SELL SIGNAL</text>
+      </svg>
+      <figcaption>Divergence is a statement about the quality of a move. It says "this is getting tired", not "this ends now".</figcaption>
+    </figure>
+
+    <h3>MACD — two averages, plotted as a spread</h3>
+    <p>MACD is the gap between a fast and a slow exponential average, drawn as a line, with an average of itself (the signal line) on top and their difference as a histogram. In plain terms it measures whether the fast average is pulling away from the slow one or closing in on it. Widening histogram bars mean the move is accelerating; shrinking bars mean it's decelerating even while price still rises.</p>
+    <p>It shares every weakness of moving averages, because it's made of them: reliable-ish in trends, noisy garbage in ranges.</p>
+
+    <div class="tieback">
+      <span class="tag">Why this answers your worry</span>
+      <p>Indicators are derived from price. They cannot know anything price doesn't already contain — they only reshape it into something easier to read. This is why stacking eight of them on one chart adds no information: they're all reading the same numbers. Two, understood properly, beat eight glanced at. Anyone selling you a proprietary indicator is selling you rearranged arithmetic.</p>
+    </div>
+
+    <div class="check" data-check="7">
+      <p class="check-q">Check 7 — A stock has been in a strong uptrend for three months and its RSI has been above 70 for the last five weeks. What does that tell you?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="This is the single most common misuse of RSI. In a strong trend, sustained readings above 70 are what strength looks like — a persistent overbought reading confirms the trend rather than contradicting it.">It's overbought and due to fall — that's a sell signal.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Right. Five weeks above 70 means gains have consistently dominated losses, which is a description of a strong trend. RSI would become interesting here if it started making lower highs while price made higher highs, or if it broke back below 70 — but a high reading alone is not a signal.">It confirms the trend is strong — sustained high readings are normal in powerful uptrends.</button>
+        <button type="button" class="opt" data-correct="false" data-why="It isn't broken — it's doing exactly what it's built to do, which is measure the balance of recent gains against recent losses. The mistake is in the interpretation of 70 as a threshold rather than as a description.">The RSI is broken — it should have reset below 70 by now.</button>
+      </div>
+      <p class="feedback" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LESSON 8 ============ -->
+<section class="stage locked" data-stage="8">
+  <div class="stage-head"><span class="num">08</span><h2>Patterns: what they actually represent</h2></div>
+  <p class="lockquiz">Locked — answer Check 7 correctly to open this.</p>
+  <div class="stage-body" hidden>
+    <p class="key">Chart patterns have exotic names and a reputation for mysticism they don't deserve. Every one of them is a picture of the same two things you already know from lesson 03: a level that keeps holding, and what happens when it stops holding.</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 270" role="img" aria-labelledby="f5t f5d">
+        <title id="f5t">Three common chart patterns</title>
+        <desc id="f5d">A double top where price fails twice at the same ceiling and then breaks its neckline, a double bottom where price holds twice at the same floor, and a consolidation where price pauses in a tight sideways drift before continuing in the original direction.</desc>
+        <line x1="222" y1="12" x2="222" y2="228" class="s-axis"/>
+        <line x1="442" y1="12" x2="442" y2="228" class="s-axis"/>
+
+        <text x="16" y="28" class="s-ttl">DOUBLE TOP</text>
+        <line x1="20" y1="66" x2="208" y2="66" class="s-level"/>
+        <line x1="20" y1="150" x2="208" y2="150" class="s-level"/>
+        <polyline class="s-line" points="22,190 60,68 98,148 136,70 174,152 204,200"/>
+        <text x="20" y="58" class="s-lab-s">CEILING, TWICE</text>
+        <text x="20" y="168" class="s-lab-s">NECKLINE</text>
+        <text x="16" y="216" class="s-lab-s">FAILS TWICE, THEN GIVES WAY</text>
+
+        <text x="238" y="28" class="s-ttl">DOUBLE BOTTOM</text>
+        <line x1="242" y1="170" x2="428" y2="170" class="s-level"/>
+        <line x1="242" y1="88" x2="428" y2="88" class="s-level"/>
+        <polyline class="s-line" points="244,44 282,168 320,90 358,166 396,86 424,40"/>
+        <text x="242" y="188" class="s-lab-s">FLOOR, TWICE</text>
+        <text x="242" y="80" class="s-lab-s">NECKLINE</text>
+        <text x="238" y="216" class="s-lab-s">HOLDS TWICE, THEN BREAKS UP</text>
+
+        <text x="458" y="28" class="s-ttl">CONSOLIDATION</text>
+        <rect x="510" y="96" width="70" height="44" class="s-zone"/>
+        <polyline class="s-line" points="460,192 508,102 522,132 540,106 558,134 578,104 600,60 634,44"/>
+        <text x="458" y="216" class="s-lab-s">PAUSE, THEN CARRY ON</text>
+        <text x="458" y="164" class="s-lab-s">A REST, NOT</text>
+        <text x="458" y="180" class="s-lab-s">A REVERSAL</text>
+      </svg>
+      <figcaption>Strip the names away and each one is a level being tested, plus the resolution when the test finally fails.</figcaption>
+    </figure>
+
+    <p>Read them as stories about supply and demand rather than as shapes to spot:</p>
+    <ul class="plain">
+      <li><strong>Double top.</strong> Buyers tried twice to get above a price and were beaten both times. When price then breaks the low between the two attempts (the neckline), the people who bought expecting a third try are now offside.</li>
+      <li><strong>Double bottom.</strong> The mirror image. Sellers failed twice at the same floor, and the break of the intervening high says buyers have taken control.</li>
+      <li><strong>Consolidation — flags, triangles, boxes.</strong> A tight sideways drift after a strong move. Nobody is forcing the issue; the market is digesting. These usually resolve in the direction of the move that preceded them, though "usually" is doing real work in that sentence.</li>
+      <li><strong>Head and shoulders.</strong> A double top with an extra, higher middle peak. Same story: a series of failures at the top, then a neckline break.</li>
+    </ul>
+
+    <h3>Three things nobody tells beginners about patterns</h3>
+    <ul class="plain">
+      <li><strong>Patterns fail constantly.</strong> A "breakout" that closes back inside the range within a day or two is a <em>false breakout</em>, and it's common enough that experienced traders often wait for the retest rather than chase the first move.</li>
+      <li><strong>You will see patterns that aren't there.</strong> Human pattern-matching is aggressive and works on random data too. If you have to squint, it isn't a pattern.</li>
+      <li><strong>The name adds nothing.</strong> Knowing it's called a "bull pennant" doesn't improve the outcome. Knowing where you'd be wrong does.</li>
+    </ul>
+
+    <div class="tieback warn">
+      <span class="tag">Where this goes wrong</span>
+      <p>The retrospective trap: on a chart of the past, every pattern that worked is obvious and every one that failed is invisible, because you weren't looking for it. Any pattern only counts if you named it on the right-hand edge of the chart, before the outcome was known. That's a completely different exercise, and it's far harder. It's also why screenshots of perfect setups prove nothing.</p>
+    </div>
+
+    <div class="check" data-check="8">
+      <p class="check-q">Check 8 — Price breaks above a two-month range on Monday, then closes back inside the range on Wednesday. What has most likely happened?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="Being briefly above the level isn't the same as holding above it. A move that immediately gives itself back tells you the buying that pushed it up wasn't sustained — which is the opposite of what the breakout was supposed to demonstrate.">The breakout is still valid — price got above the level, and that's what matters.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Correct. That's a false breakout, and it's a genuinely informative event: buyers pushed above the ceiling and failed to hold it. The range is back in charge, and anyone who bought the breakout is now underwater — which can add selling pressure of its own.">A false breakout — the move didn't hold, so the range is still the dominant structure.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Two months of range plus a failed attempt to leave it is a lot of information. It just isn't the bullish information the initial breakout suggested. 'The range still holds' is a conclusion, not an absence of one.">Nothing readable — two days is too short to conclude anything at all.</button>
+      </div>
+      <p class="feedback" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LESSON 9 ============ -->
+<section class="stage locked" data-stage="9">
+  <div class="stage-head"><span class="num">09</span><h2>Risk: the only part that protects you</h2></div>
+  <p class="lockquiz">Locked — answer Check 8 correctly to open this.</p>
+  <div class="stage-body" hidden>
+    <p class="key">Everything above this lesson is analysis. This lesson is the one that decides whether you're still solvent in a year, and it's the direct answer to the worry you started with. If you take one section from this page, take this one.</p>
+    <p>The reason risk management belongs in a technical analysis course is that charts are what make it possible. A level from lesson 03 gives you a specific price at which your idea is demonstrably wrong — and once you have that, you can size the position so that being wrong costs a known, survivable amount.</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 300" role="img" aria-labelledby="f6t f6d">
+        <title id="f6t">Entry, stop and target expressed in R multiples</title>
+        <desc id="f6d">Three horizontal levels. Entry in the middle, a stop below it defining one R of risk, and a target above it two R away, giving a two-to-one reward-to-risk ratio.</desc>
+
+        <rect x="150" y="80" width="420" height="84" fill="var(--up)" opacity=".10"/>
+        <rect x="150" y="164" width="420" height="42" fill="var(--down)" opacity=".12"/>
+
+        <line x1="60" y1="80" x2="600" y2="80" class="s-level" stroke="var(--up)"/>
+        <line x1="60" y1="164" x2="600" y2="164" class="s-level" stroke="var(--accent)"/>
+        <line x1="60" y1="206" x2="600" y2="206" class="s-level" stroke="var(--down)"/>
+
+        <text x="60" y="72" class="s-ttl">TARGET $66</text>
+        <text x="60" y="156" class="s-ttl">ENTRY $60</text>
+        <text x="60" y="228" class="s-ttl">STOP $57 — BELOW THE LEVEL THAT WOULD PROVE YOU WRONG</text>
+
+        <line x1="612" y1="80" x2="612" y2="164" class="s-arrow"/>
+        <line x1="612" y1="164" x2="612" y2="206" class="s-arrow"/>
+        <text x="622" y="126" class="s-lab-s">2R</text>
+        <text x="622" y="190" class="s-lab-s">1R</text>
+
+        <text x="160" y="106" class="s-lab">Reward if right: $6 a share</text>
+        <text x="160" y="130" class="s-lab-s">TWO UNITS OF RISK</text>
+        <text x="160" y="190" class="s-lab">Loss if wrong: $3 a share — decided in advance</text>
+
+        <text x="60" y="258" class="s-lab-s">RISK 1% OF A $10,000 ACCOUNT = $100 ÷ $3 PER SHARE = 33 SHARES</text>
+        <text x="60" y="278" class="s-lab-s">THE POSITION SIZE FALLS OUT OF THE STOP. IT IS NEVER A FEELING.</text>
+      </svg>
+      <figcaption>Define the stop from the chart, then let the arithmetic decide the size. Doing it the other way round is how accounts get wrecked.</figcaption>
+    </figure>
+
+    <h3>The three numbers, in order</h3>
+    <ul class="plain">
+      <li><strong>The stop.</strong> A price where the reason you're in has stopped being true — usually just beyond a support level or a swing low. Not "a number I'm comfortable losing", and never a mental note.</li>
+      <li><strong>The risk per share.</strong> Entry minus stop. In the diagram, $3.</li>
+      <li><strong>The position size.</strong> Decide the maximum you'll lose on any single idea — commonly 1% of the account — and divide. $100 of risk ÷ $3 per share = 33 shares. That's the answer, whatever your enthusiasm says.</li>
+    </ul>
+
+    <p>Expressing everything in <strong>R</strong> — multiples of your risk — makes results comparable across positions of different sizes, and it takes the money out of the emotional foreground. A loss is "minus one R", not "minus £300 I was going to spend on something".</p>
+
+    <h3>Why the ratio matters more than the hit rate</h3>
+    <p>You do not need to be right most of the time. With a consistent 2R target and a 1R stop, being right 40% of the time still comes out ahead over many attempts: four wins at +2R is +8R, six losses at −1R is −6R, net +2R before costs. Being right 70% of the time with losses twice the size of your wins loses money. <em>Hit rate alone tells you nothing.</em></p>
+
+    <div class="tieback warn">
+      <span class="tag">The three ways beginners actually lose</span>
+      <p>Not from picking bad charts. From <strong>position sizing on excitement</strong> — one oversized position that wipes out a year of careful ones. From <strong>moving the stop</strong> when price approaches it, converting a planned small loss into an unplanned large one. And from <strong>revenge trading</strong> — trying to win it straight back after a loss, at exactly the moment your judgement is worst. All three are decisions made after entering. All three are prevented by deciding beforehand and writing it down.</p>
+    </div>
+
+    <p>Two more practical points. Costs are real: spreads, commissions and slippage come out of every result, and strategies that look profitable on paper often aren't after them. And leverage — trading with borrowed money, including CFDs and most crypto perpetuals — multiplies both directions. It is not a way to make a small account grow faster; it is a way to make a small mistake final.</p>
+
+    <div class="check" data-check="9">
+      <p class="check-q">Check 9 — You have a $10,000 account and cap your risk at 1% per idea. You want to buy at $80 with a stop at $76. How many shares?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="That's what your cash could buy, which is a different question entirely. Spending your whole account on one position means a move to your stop costs 5% of everything — five times the risk you said you'd take.">125 shares — that's what $10,000 buys at $80.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Correct. 1% of $10,000 is $100 of risk. Risk per share is $80 − $76 = $4. $100 ÷ $4 = 25 shares, a position of $2,000. Notice the size came out of the arithmetic, not out of how good the setup felt.">25 shares — $100 of risk divided by $4 of risk per share.</button>
+        <button type="button" class="opt" data-correct="false" data-why="That's 1% of the account spent, not 1% of the account risked. The two are only the same if your stop is at zero. Sizing by cash outlay ignores the stop entirely, which is the one number that makes the risk knowable.">1.25 shares — 1% of the account is $100, which buys one share at $80.</button>
+      </div>
+      <p class="feedback" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section class="stage locked" data-stage="10">
+  <div class="stage-head"><span class="num">10</span><h2>Twelve questions to finish</h2></div>
+  <p class="lockquiz">Locked — answer Check 9 correctly to open this.</p>
   <div class="stage-body" hidden>
     <p>No time limit, nothing riding on it. Pick an answer for each, then score it. Anything you miss, the explanation will tell you exactly why.</p>
 
@@ -619,11 +1084,81 @@ footer .disc{
     </div>
 
     <div class="qz" data-qz="5">
-      <p class="qz-q">5. A stock you like is making lower highs and lower lows, but three people online say it's a screaming buy. What does the chart actually tell you?</p>
+      <p class="qz-q">5. Price breaks above three-month resistance on the heaviest volume in a year. What does the volume add?</p>
       <div class="opts">
-        <button type="button" class="opt" data-correct="false" data-why="Confident opinions aren't evidence, and 'it's fallen a lot' is not a reason for it to stop falling. The structure is the observable fact here; the takes are not.">That the crowd is probably right, since it's already fallen so far.</button>
-        <button type="button" class="opt" data-correct="true" data-why="Exactly the habit worth keeping. The structure says sellers are still in control — that's an observation, not a prediction. Waiting for the chart to stop making lower lows costs you nothing but patience.">That it's still in a downtrend, and nothing in the structure has changed yet.</button>
-        <button type="button" class="opt" data-correct="false" data-why="Not quite — the chart is telling you something quite specific: sellers are still in control. It just isn't telling you what to do about it, which is a different thing.">That the chart can't tell you anything useful here.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Nothing guarantees a move continues. Heavy volume raises the odds that the break was genuine; it doesn't remove the possibility of failure.">A guarantee the move continues.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Yes — heavy volume means many participants were involved in clearing the level, which is what separates a breakout with something behind it from one that drifts back.">Evidence that a lot of participants were behind the move, making it more credible.</button>
+        <button type="button" class="opt" data-correct="false" data-why="High volume at a breakout is confirming, not contrarian. The 'everyone's in' warning applies to volume spikes after a long extended move, not at the moment a level is first cleared.">A warning that everyone's already in, so it's too late.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="6">
+      <p class="qz-q">6. What is a moving average?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Right — the average of the last N closing prices, recalculated each period. Everything else people claim for it follows from that one definition.">The average closing price over the last N periods, redrawn each period.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Nothing on a chart forecasts price. A moving average is built entirely from closes that have already happened.">A forecast of where price is heading next.</button>
+        <button type="button" class="opt" data-correct="false" data-why="That's volume, which is drawn as separate bars under the price, not as a line through it.">The average number of shares traded per day.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="7">
+      <p class="qz-q">7. In which market condition are moving-average crossovers least useful?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="Sustained trends are where they work best — that's the environment they were designed for.">A long sustained uptrend.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Correct — in a range price oscillates around its own average, so the lines cross repeatedly and every signal is noise. Check the structure before reaching for a trend tool.">A sideways range.</button>
+        <button type="button" class="opt" data-correct="false" data-why="They lag in a downtrend as in any trend, but they still describe the direction correctly. The range is where they actively mislead.">A steady downtrend.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="8">
+      <p class="qz-q">8. RSI has been above 70 for a month while a stock trends strongly upward. The best interpretation is:</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="This is the classic beginner error. 'Overbought' describes what has happened, not what must happen next — strong trends stay overbought for a long time.">Overbought, so it must fall soon.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Right. Persistent high readings mean gains have consistently outweighed losses, which is a description of strength. The interesting signal would be divergence, or RSI losing the 70 line.">A confirmation of strength, not a signal to act against the trend.</button>
+        <button type="button" class="opt" data-correct="false" data-why="RSI's formula is straightforward and it's doing exactly what it's designed to do. The problem is only ever in reading 70 as an instruction rather than an observation.">A sign the indicator is miscalibrated.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="9">
+      <p class="qz-q">9. Price breaks above a long-standing range, then closes back inside it two days later. This is:</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Correct — a false breakout. The buying that cleared the level didn't sustain, the range is still the dominant structure, and everyone who chased the break is now offside.">A false breakout — the range is still in charge.</button>
+        <button type="button" class="opt" data-correct="false" data-why="A breakout has to hold to mean anything. Closing back inside is the market undoing the very thing the breakout was supposed to show.">Still a valid breakout, since price did trade above the level.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Head and shoulders is a specific three-peak topping pattern. This is simply a failed attempt to leave a range — no pattern name required.">A head and shoulders pattern forming.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="10">
+      <p class="qz-q">10. You have a $20,000 account, cap risk at 1% per idea, and your stop is $2 below your entry. Position size?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="That's the risk budget itself, not a share count. You still have to divide it by risk per share.">200 shares — that's $200 of risk.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Correct. 1% of $20,000 is $200. $200 ÷ $2 per share = 100 shares. The stop determines the size — always in that order.">100 shares — $200 of risk ÷ $2 per share.</button>
+        <button type="button" class="opt" data-correct="false" data-why="You can't answer this from the entry price, and you don't need to. Position sizing depends on the risk budget and the distance to the stop, not on how much the share costs.">It depends on the share price, which isn't given.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="11">
+      <p class="qz-q">11. A strategy wins 40% of the time. Wins average +2R, losses average −1R. Over 100 attempts, before costs, what happens?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="Hit rate alone doesn't determine the outcome — the size of wins relative to losses matters just as much, and here the wins are twice the size.">It loses money — you're wrong more often than you're right.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Right: 40 wins × 2R = +80R, 60 losses × 1R = −60R, so +20R before costs. This is why the reward-to-risk ratio is the number to protect, and why 'I'm right most of the time' is not by itself a claim about profitability.">It makes +20R — 40 wins at +2R against 60 losses at −1R.</button>
+        <button type="button" class="opt" data-correct="false" data-why="It's not a coin flip — the asymmetry between win size and loss size gives a positive expectancy. Breakeven would need wins averaging +1.5R at this hit rate.">It breaks even — the maths cancels out.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="12">
+      <p class="qz-q">12. A stock you like is making lower highs and lower lows, three people online say it's a screaming buy, and price is drifting toward your stop. What's the disciplined response?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="false" data-why="Moving a stop is the single most expensive habit in trading. It converts a planned, survivable loss into an open-ended one, and it's always justified with a reason invented on the spot — often a reason handed to you by someone online.">Move the stop lower — the structure will turn around, and those three can't all be wrong.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Adding to a losing position increases your risk at exactly the moment the chart is telling you the idea isn't working. It's the same mistake as moving the stop, with extra money attached.">Buy more to average down, so it takes less of a recovery to break even.</button>
+        <button type="button" class="opt" data-correct="true" data-why="Yes — and this is the whole course in one answer. The structure says sellers are still in control; confident opinions aren't evidence; and the stop was chosen when you were calm and the level meant something. The discomfort now is information about you, not about the chart. Taking the planned loss is the plan working as designed.">Let the stop do its job — the structure hasn't changed, and the plan was made when you were thinking clearly.</button>
       </div>
       <p class="qz-why" hidden></p>
     </div>
@@ -631,18 +1166,26 @@ footer .disc{
     <div class="btnrow">
       <button type="button" class="btn" id="scoreBtn">Score my quiz</button>
       <button type="button" class="btn ghost" id="resetBtn" hidden>Clear and try again</button>
-      <span class="nudge" id="nudge" hidden>Pick an answer for all five first.</span>
+      <span class="nudge" id="nudge" hidden>Pick an answer for every question first.</span>
     </div>
     <div class="score" id="score" hidden>
-      <span class="n" id="scoreN">0 / 5</span>
+      <span class="n" id="scoreN">0 / 12</span>
       <p id="scoreMsg"></p>
     </div>
   </div>
 </section>
 
+<nav class="pathnav one" aria-label="Where to go next">
+  <a class="card" href="fundamental-analysis.html">
+    <span class="k">The other half</span>
+    <span class="t">Fundamental analysis →</span>
+    <span class="d">What the business behind the ticker is actually worth: the three statements, the numbers that matter, and whether the price is sensible.</span>
+  </a>
+</nav>
+
 <footer>
-  <p><strong>What to do next, Phil:</strong> open any free chart of a stock you already know, set it to the daily timeframe, and just answer the three questions out loud — is this an uptrend, downtrend or range? Where are the obvious floors and ceilings? What are the recent wicks saying? Do that on ten charts with no money involved. That's the whole practice, and it costs nothing but time.</p>
-  <p class="disc">Educational material only. Nothing here is financial advice, a recommendation, or a signal to buy or sell anything. All company names, prices and scenarios are illustrations chosen to teach the concept — they are not real market data and not predictions. Trading involves real risk of loss.</p>
+  <p><strong>What to do next, Phil:</strong> open any free chart of a stock you already know, set it to the daily timeframe, and answer the three basic questions out loud — is this an uptrend, downtrend or range? Where are the obvious floors and ceilings? What are the recent wicks saying? Then add one moving average and nothing else. Finally, write down — before anything happens — where you'd be wrong and what that would cost at 1% risk. Do that on ten charts with no money involved. That's the whole practice, and it costs nothing but time.</p>
+  <p class="disc">Educational material only. Nothing here is financial advice, a recommendation, or a signal to buy or sell anything. All company names, prices, patterns and scenarios are illustrations chosen to teach the concept — they are not real market data and not predictions. Technical analysis does not forecast future prices. Trading involves real risk of loss, and leveraged trading can lose more than the amount deposited.</p>
 </footer>
 
 </div>
@@ -652,6 +1195,7 @@ footer .disc{
   "use strict";
 
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var lastStage = document.querySelectorAll(".stage").length;
 
   function rail(n, cls) {
     var li = document.querySelector('.rail li[data-rail="' + n + '"]');
@@ -715,6 +1259,7 @@ footer .disc{
   var scoreMsg = document.getElementById("scoreMsg");
   var nudge = document.getElementById("nudge");
   var blocks = Array.prototype.slice.call(document.querySelectorAll(".qz"));
+  var total = blocks.length;
 
   document.addEventListener("click", function (e) {
     var btn = e.target.closest ? e.target.closest(".qz .opt") : null;
@@ -756,19 +1301,19 @@ footer .disc{
     });
 
     var msg;
-    if (score === 5) {
-      msg = "Five out of five, Phil. You can now look at a stock chart and describe what it's doing in plain words — which is genuinely more than most people shouting about stocks online can do. Go practise on real charts with no money on the line.";
-    } else if (score >= 3) {
-      msg = "Solid. Read the explanations under the ones you missed — they're short, and the gap is usually one specific definition rather than the whole idea. Then run the quiz again.";
+    if (score === total) {
+      msg = "Full marks, Phil. You can read a chart in context, judge whether a move has anything behind it, and — the part that actually matters — size a position from a stop instead of from enthusiasm. That last one is what most people shouting about stocks online never learn. Go practise on real charts with no money on the line.";
+    } else if (score >= Math.ceil(total * 0.6)) {
+      msg = "Solid. Read the explanations under the ones you missed — the gap is usually one specific definition rather than the whole idea. If any of them were in lesson 09, reread that section specifically: it's the one with money attached.";
     } else {
-      msg = "Worth another pass. Scroll back up through the three lessons — especially the diagrams — and come back to this. Getting it wrong here is free, which is exactly the point of learning it this way first.";
+      msg = "Worth another pass. Scroll back up through the lessons, especially the diagrams, and come back to this. Getting it wrong here is free, which is exactly the point of learning it this way first.";
     }
-    scoreN.textContent = score + " / 5";
+    scoreN.textContent = score + " / " + total;
     scoreMsg.textContent = msg;
     scoreBox.hidden = false;
     resetBtn.hidden = false;
     scoreBtn.hidden = true;
-    rail(4, "done");
+    rail(lastStage, "done");
     scoreBox.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
   });
 
@@ -785,7 +1330,7 @@ footer .disc{
     scoreBox.hidden = true;
     resetBtn.hidden = true;
     scoreBtn.hidden = false;
-    rail(4, "on");
+    rail(lastStage, "on");
     blocks[0].scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
   });
 })();
