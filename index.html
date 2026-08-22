@@ -128,6 +128,8 @@ header{display:flex;flex-direction:column;gap:.85rem}
 .pathnav{display:grid;gap:.7rem;grid-template-columns:1fr 1fr}
 .pathnav.one{grid-template-columns:1fr}
 @media (max-width:560px){.pathnav{grid-template-columns:1fr}}
+.pathnav.three{grid-template-columns:repeat(3,1fr)}
+@media (max-width:680px){.pathnav.three{grid-template-columns:1fr}}
 .card{
   display:flex;flex-direction:column;gap:.25rem;
   padding:.9rem 1rem;border:1px solid var(--rule);border-radius:10px;
@@ -408,7 +410,7 @@ footer .disc{
 <div class="wrap">
 
 <header>
-  <p class="eyebrow">Course · Part two of two · Technical analysis</p>
+  <p class="eyebrow">Course · Part three of three · Technical analysis</p>
   <h1>Reading a stock chart, from zero</h1>
   <p class="lede">Nine lessons, no jargon. Candles and trend structure first, then volume, moving averages, momentum, patterns — and the part that actually protects your money, which is risk.</p>
   <div class="worry">
@@ -418,16 +420,21 @@ footer .disc{
   </div>
 </header>
 
-<nav class="pathnav" aria-label="Course pages">
+<nav class="pathnav three" aria-label="Course pages">
   <a class="card" href="fundamental-analysis.html">
     <span class="k">Part one</span>
     <span class="t">← Fundamental analysis</span>
-    <span class="d">The business: earnings, cash, debt, and whether the price is sensible.</span>
+    <span class="d">The business: earnings, cash, debt, valuation.</span>
+  </a>
+  <a class="card" href="accounting.html">
+    <span class="k">Part two</span>
+    <span class="t">← Accounting</span>
+    <span class="d">The statements: how they are built and how they connect.</span>
   </a>
   <span class="card here">
     <span class="k">You are here</span>
     <span class="t">Technical analysis</span>
-    <span class="d">The chart: candles, structure, levels, volume, averages, momentum, risk.</span>
+    <span class="d">The chart: structure, levels, volume, risk.</span>
   </span>
 </nav>
 

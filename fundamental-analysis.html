@@ -88,6 +88,8 @@ header{display:flex;flex-direction:column;gap:.85rem}
 .pathnav{display:grid;gap:.7rem;grid-template-columns:1fr 1fr}
 .pathnav.one{grid-template-columns:1fr}
 @media (max-width:560px){.pathnav{grid-template-columns:1fr}}
+.pathnav.three{grid-template-columns:repeat(3,1fr)}
+@media (max-width:680px){.pathnav.three{grid-template-columns:1fr}}
 .card{
   display:flex;flex-direction:column;gap:.25rem;
   padding:.9rem 1rem;border:1px solid var(--rule);border-radius:10px;
@@ -281,7 +283,7 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
 <div class="wrap">
 
 <header>
-  <p class="eyebrow">Course · Part one of two · Fundamental analysis</p>
+  <p class="eyebrow">Course · Part one of three · Fundamental analysis</p>
   <h1>What a company is actually worth</h1>
   <p class="lede">Fundamental analysis is reading the <em>business</em> behind the ticker: what it earns, what it owns, what it owes, and whether the price being asked for it makes any sense.</p>
   <div class="worry">
@@ -290,16 +292,21 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
   </div>
 </header>
 
-<nav class="pathnav" aria-label="Course pages">
+<nav class="pathnav three" aria-label="Course pages">
   <span class="card here">
     <span class="k">You are here</span>
     <span class="t">Fundamental analysis</span>
-    <span class="d">The business: earnings, cash, debt, and valuation.</span>
+    <span class="d">The business: earnings, cash, debt, valuation.</span>
   </span>
-  <a class="card" href="index.html">
+  <a class="card" href="accounting.html">
     <span class="k">Part two</span>
+    <span class="t">Accounting →</span>
+    <span class="d">The statements: how they are built and how they connect.</span>
+  </a>
+  <a class="card" href="index.html">
+    <span class="k">Part three</span>
     <span class="t">Technical analysis →</span>
-    <span class="d">The chart: candles, structure, levels, volume, averages, momentum, risk.</span>
+    <span class="d">The chart: structure, levels, volume, risk.</span>
   </a>
 </nav>
 
@@ -1058,10 +1065,10 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
 </section>
 
 <nav class="pathnav one" aria-label="Continue">
-  <a class="card" href="index.html">
+  <a class="card" href="accounting.html">
     <span class="k">Next</span>
-    <span class="t">Technical analysis →</span>
-    <span class="d">The other half: candles, trend structure, levels, volume, moving averages, momentum, patterns — and how to size a position so being wrong stays survivable.</span>
+    <span class="t">Accounting →</span>
+    <span class="d">This page said profit is an opinion and cash is a fact, then moved on. Part two is where that gets proved: what each statement says, how the three lock together, and where the judgement calls hide.</span>
   </a>
 </nav>
 
@@ -1198,7 +1205,7 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
 
     var msg;
     if (score === total) {
-      msg = "Full marks. You can now open a company's annual report and know which numbers to look at and what they're telling you — which is the slow, unglamorous half of investing that almost nobody online bothers with. Next stop: the chart.";
+      msg = "Full marks. You can now open a company's annual report and know which numbers to look at and what they're telling you — which is the slow, unglamorous half of investing that almost nobody online bothers with. Next stop: the statements themselves, in detail.";
     } else if (score >= Math.ceil(total * 0.6)) {
       msg = "Solid. Read the explanations under the ones you missed — the gap is usually one specific definition rather than the whole idea. Then run it again.";
     } else {

@@ -1,0 +1,1629 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accounting, from zero</title>
+<style>
+/* ---------- tokens: light is the base ---------- */
+:root{
+  --bg:#F6F7F9;
+  --surface:#FFFFFF;
+  --surface-2:#EDF1F7;
+  --ink:#141A24;
+  --ink-2:#4A5567;
+  --ink-3:#7A8598;
+  --rule:#DCE3EC;
+  --rule-soft:#E9EEF5;
+  --accent:#2B5CB8;
+  --accent-ink:#1D4794;
+  --accent-soft:#E7EEFB;
+  --up:#12805C;
+  --up-soft:#E3F3EC;
+  --down:#C2352B;
+  --down-soft:#FBE8E6;
+  --shadow:0 1px 2px rgba(20,26,36,.05), 0 8px 24px -16px rgba(20,26,36,.28);
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono","Cascadia Mono","Roboto Mono",Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1218; --surface:#151A22; --surface-2:#1D242E;
+    --ink:#E8ECF3; --ink-2:#A9B4C4; --ink-3:#78849A;
+    --rule:#2A323E; --rule-soft:#222A35;
+    --accent:#7FA8F0; --accent-ink:#9DBEF7; --accent-soft:#1A2436;
+    --up:#3FCC96; --up-soft:#122A21; --down:#F0736A; --down-soft:#2E1715;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.9);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1218; --surface:#151A22; --surface-2:#1D242E;
+  --ink:#E8ECF3; --ink-2:#A9B4C4; --ink-3:#78849A;
+  --rule:#2A323E; --rule-soft:#222A35;
+  --accent:#7FA8F0; --accent-ink:#9DBEF7; --accent-soft:#1A2436;
+  --up:#3FCC96; --up-soft:#122A21; --down:#F0736A; --down-soft:#2E1715;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.9);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans); font-size:17px; line-height:1.6;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{
+  max-width:44rem; margin:0 auto;
+  padding:clamp(1.25rem,4vw,2.75rem) clamp(1rem,4vw,1.75rem) 5rem;
+  display:flex; flex-direction:column; gap:2.25rem;
+}
+h1,h2,h3{font-family:var(--serif);font-weight:600;text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:clamp(1.9rem,6vw,2.6rem);letter-spacing:-.01em}
+h2{font-size:clamp(1.35rem,4.4vw,1.7rem)}
+h3{font-size:1.05rem;font-family:var(--sans);font-weight:650;letter-spacing:-.005em}
+p{margin:0}
+.eyebrow{
+  font-family:var(--mono); font-size:.72rem; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ink-3); margin:0;
+}
+strong{font-weight:650;color:var(--ink)}
+code,.tk{
+  font-family:var(--mono); font-size:.9em; background:var(--surface-2);
+  border:1px solid var(--rule-soft); border-radius:4px;
+  padding:.05em .35em; color:var(--ink);
+}
+
+/* ---------- header ---------- */
+header{display:flex;flex-direction:column;gap:.85rem}
+.lede{color:var(--ink-2);font-size:1.05rem}
+.worry{
+  border-left:3px solid var(--accent); background:var(--accent-soft);
+  padding:.9rem 1.1rem; border-radius:0 8px 8px 0;
+  display:flex; flex-direction:column; gap:.5rem;
+  font-size:.97rem; color:var(--ink-2);
+}
+.worry q{font-style:italic;color:var(--ink)}
+
+/* ---------- page switcher ---------- */
+.pathnav{display:grid;gap:.7rem;grid-template-columns:1fr 1fr}
+.pathnav.one{grid-template-columns:1fr}
+@media (max-width:560px){.pathnav{grid-template-columns:1fr}}
+.pathnav.three{grid-template-columns:repeat(3,1fr)}
+@media (max-width:680px){.pathnav.three{grid-template-columns:1fr}}
+.card{
+  display:flex;flex-direction:column;gap:.25rem;
+  padding:.9rem 1rem;border:1px solid var(--rule);border-radius:10px;
+  background:var(--surface);text-decoration:none;color:inherit;box-shadow:var(--shadow);
+  transition:border-color .15s ease, background .15s ease;
+}
+.card:hover{border-color:var(--accent);background:var(--accent-soft)}
+.card .k{font-family:var(--mono);font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.card .t{font-weight:650}
+.card .d{font-size:.88rem;color:var(--ink-2);line-height:1.45}
+.card.here{border-color:var(--accent);background:var(--accent-soft)}
+.card.here .k{color:var(--ink-3)}
+
+/* ---------- progress rail ---------- */
+.rail ol{list-style:none;margin:0;padding:0;display:flex;gap:.4rem}
+.rail li{
+  flex:1;display:flex;flex-direction:column;gap:.45rem;
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.rail .bar{height:4px;border-radius:2px;background:var(--rule)}
+.rail li.on{color:var(--accent)}
+.rail li.on .bar{background:var(--accent)}
+.rail li.done{color:var(--up)}
+.rail li.done .bar{background:var(--up)}
+
+/* ---------- stages ---------- */
+.stage{
+  background:var(--surface);border:1px solid var(--rule);border-radius:12px;
+  padding:clamp(1.1rem,3.5vw,1.75rem);
+  display:flex;flex-direction:column;gap:1.1rem;box-shadow:var(--shadow);
+}
+.stage-head{display:flex;gap:.9rem;align-items:baseline}
+.num{
+  font-family:var(--mono);font-size:.78rem;color:var(--accent);
+  border:1px solid var(--accent);border-radius:999px;padding:.1rem .5rem;flex:none;
+}
+.stage.locked{opacity:.75}
+.stage.locked .num{color:var(--ink-3);border-color:var(--rule)}
+.stage.locked h2{color:var(--ink-3)}
+.lockquiz{
+  color:var(--ink-3);font-family:var(--mono);font-size:.78rem;letter-spacing:.04em;
+  background:var(--surface-2);border:1px dashed var(--rule);border-radius:8px;padding:.7rem .85rem;
+}
+.stage-body{display:flex;flex-direction:column;gap:1.1rem}
+.stage-body p{color:var(--ink-2)}
+.stage-body p.key{color:var(--ink)}
+ul.plain{margin:0;padding-left:1.15rem;color:var(--ink-2);display:flex;flex-direction:column;gap:.35rem}
+ul.plain::marker{color:var(--ink-3)}
+
+/* ---------- figures ---------- */
+.figure{
+  border:1px solid var(--rule);border-radius:10px;padding:.75rem;overflow-x:auto;
+  background-color:var(--surface);
+  background-image:
+    repeating-linear-gradient(to bottom, var(--rule-soft) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(to right, var(--rule-soft) 0 1px, transparent 1px 28px);
+}
+.figure svg{display:block;width:100%;height:auto;min-width:340px}
+figcaption{margin-top:.6rem;font-size:.85rem;color:var(--ink-3);font-family:var(--mono);line-height:1.5}
+.s-axis{stroke:var(--rule);stroke-width:1}
+.s-lead{stroke:var(--ink-3);stroke-width:1;stroke-dasharray:2 3;fill:none}
+.s-lab{fill:var(--ink-2);font-family:var(--mono);font-size:13px}
+.s-lab-s{fill:var(--ink-3);font-family:var(--mono);font-size:11.5px;letter-spacing:.06em}
+.s-ttl{fill:var(--ink);font-family:var(--mono);font-size:13px;letter-spacing:.08em}
+.s-level{stroke:var(--ink-2);stroke-width:1.5;stroke-dasharray:6 4;fill:none}
+.s-box{fill:var(--surface-2);stroke:var(--rule);stroke-width:1}
+.s-fill-acc{fill:var(--accent);opacity:.85}
+.s-fill-up{fill:var(--up);opacity:.9}
+.s-fill-down{fill:var(--down);opacity:.75}
+.s-fill-mute{fill:var(--ink-3);opacity:.35}
+.s-line{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.s-arrow{stroke:var(--ink-3);stroke-width:1.5;fill:none}
+.s-line-thin{fill:none;stroke:var(--accent);stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
+.s-price{fill:none;stroke:var(--ink-2);stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round}
+.s-warn{fill:none;stroke:var(--down);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.s-dot{fill:var(--surface);stroke:var(--accent);stroke-width:2}
+
+/* ---------- tables ---------- */
+.tblwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:10px}
+.tbl{width:100%;border-collapse:collapse;font-size:.92rem;min-width:31rem}
+.tbl th,.tbl td{text-align:left;padding:.6rem .8rem;border-bottom:1px solid var(--rule-soft);vertical-align:top;color:var(--ink-2)}
+.tbl tr:last-child td{border-bottom:0}
+.tbl th{
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:400;background:var(--surface-2);
+}
+.tbl td:first-child{font-weight:650;color:var(--ink);white-space:nowrap}
+.tbl td.mono{font-family:var(--mono);font-size:.86rem;white-space:nowrap}
+
+/* ---------- tieback ---------- */
+.tieback{
+  background:var(--surface-2);border:1px solid var(--rule-soft);border-radius:8px;
+  padding:.85rem 1rem;font-size:.94rem;color:var(--ink-2);
+  display:flex;flex-direction:column;gap:.3rem;
+}
+.tieback .tag{
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--accent);
+}
+.tieback.warn{border-color:var(--down);background:var(--down-soft)}
+.tieback.warn .tag{color:var(--down)}
+
+/* ---------- checks ---------- */
+.checks{border-top:1px solid var(--rule);padding-top:1.1rem;display:flex;flex-direction:column;gap:1.25rem}
+.checks-h{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)!important}
+.check{display:flex;flex-direction:column;gap:.75rem}
+.check + .check{border-top:1px solid var(--rule-soft);padding-top:1.25rem}
+.check-q{font-weight:600;color:var(--ink)!important}
+.opts{display:flex;flex-direction:column;gap:.5rem}
+.opt{
+  font:inherit;font-size:.97rem;text-align:left;color:var(--ink);
+  background:var(--surface);border:1px solid var(--rule);border-radius:8px;
+  padding:.7rem .85rem;cursor:pointer;
+  transition:border-color .15s ease, background .15s ease;
+}
+.opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
+.opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.opt:disabled{cursor:default}
+.opt.ok{background:var(--up-soft);border-color:var(--up);color:var(--ink);font-weight:600}
+.opt.no{background:var(--down-soft);border-color:var(--down);color:var(--ink);opacity:.9}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+.feedback{font-size:.94rem;border-radius:8px;padding:0;line-height:1.55}
+.feedback:not(:empty){padding:.75rem .9rem;border:1px solid transparent}
+.feedback.good{background:var(--up-soft);border-color:var(--up);color:var(--ink)}
+.feedback.bad{background:var(--down-soft);border-color:var(--down);color:var(--ink)}
+.feedback b{font-family:var(--mono);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:.2rem}
+.feedback.good b{color:var(--up)}
+.feedback.bad b{color:var(--down)}
+
+/* ---------- quiz ---------- */
+.qz{display:flex;flex-direction:column;gap:.55rem;padding-bottom:.25rem}
+.qz + .qz{border-top:1px solid var(--rule-soft);padding-top:1.1rem}
+.qz-q{font-weight:600}
+.qz-why{font-size:.9rem;color:var(--ink-2);margin:0}
+.btn{
+  font:inherit;font-weight:600;font-size:1rem;background:var(--accent);color:var(--surface);
+  border:1px solid var(--accent);border-radius:8px;padding:.8rem 1.2rem;cursor:pointer;align-self:flex-start;
+}
+.btn:hover{background:var(--accent-ink);border-color:var(--accent-ink)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.btn.ghost{background:transparent;color:var(--accent);border-color:var(--rule)}
+.btn.ghost:hover{background:var(--accent-soft);border-color:var(--accent)}
+.btnrow{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+.score{
+  border:1px solid var(--rule);border-radius:10px;padding:1rem 1.15rem;
+  display:flex;flex-direction:column;gap:.4rem;background:var(--surface-2);
+}
+.score .n{font-family:var(--mono);font-size:2rem;font-weight:600;font-variant-numeric:tabular-nums;color:var(--accent)}
+.nudge{color:var(--down);font-size:.92rem}
+
+/* ---------- footer ---------- */
+footer{
+  border-top:1px solid var(--rule);padding-top:1.25rem;
+  display:flex;flex-direction:column;gap:.6rem;font-size:.88rem;color:var(--ink-3);
+}
+footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spacing:.01em}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion: reduce){
+  *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+/* ---------- mobile: fit the diagrams to the screen rather than scrolling them ---------- */
+@media (max-width:640px){
+  .wrap{padding-left:.55rem;padding-right:.55rem}
+  .stage{padding:1rem .75rem}
+  .figure{
+    margin-left:-.75rem;margin-right:-.75rem;
+    padding:.4rem .3rem;
+    border-left:0;border-right:0;border-radius:0;
+    overflow:visible;
+  }
+  .figure svg{min-width:0;overflow:visible}
+  figcaption{padding:0 .5rem}
+  /* scale the in-diagram type up to offset the diagram being scaled down */
+  .s-lab{font-size:15px}
+  .s-lab-s{font-size:13px}
+  .s-ttl{font-size:15px}
+  .s-lead{stroke-width:1.4}
+  .s-axis{stroke-width:1.4}
+  /* tables wrap instead of scrolling sideways */
+  .tbl{min-width:0;font-size:.84rem}
+  .tbl th,.tbl td{padding:.45rem .5rem}
+  .tbl td:first-child,.tbl td.mono{white-space:normal}
+  .rail ol{flex-wrap:wrap}
+  .worry{padding:.8rem .85rem}
+}
+@media (max-width:520px){
+  body{font-size:16px}
+  .rail li{font-size:0;gap:0}
+  .rail li .bar{height:5px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">Course · Part two of three · Accounting</p>
+  <h1>Reading the three statements</h1>
+  <p class="lede">Eight lessons on the accounting a private investor actually needs: what each statement says, how the three lock into one another, and where the judgement calls are hiding.</p>
+  <div class="worry">
+    <p>Part one made a claim and then moved on: <q>profit is an opinion, cash is a fact.</q> This page is where that claim gets proved.</p>
+    <p>Accounting has a reputation for being both dull and impenetrable, and it earns about half of that. The dull half is real. The impenetrable half is mostly vocabulary — perhaps forty terms, each of which means something ordinary. There is no maths here beyond addition, subtraction and division.</p>
+    <p>What you get for the effort is the ability to check a story against the numbers. Almost every company that has gone badly wrong for ordinary shareholders was describable beforehand from its own published accounts. Not predictable — <strong>describable</strong>. That is a lower bar and a far more useful skill.</p>
+  </div>
+</header>
+
+<nav class="pathnav three" aria-label="Course pages">
+  <a class="card" href="fundamental-analysis.html">
+    <span class="k">Part one</span>
+    <span class="t">← Fundamental analysis</span>
+    <span class="d">The business: earnings, cash, debt, valuation.</span>
+  </a>
+  <span class="card here">
+    <span class="k">You are here</span>
+    <span class="t">Accounting</span>
+    <span class="d">The statements: how they are built and how they connect.</span>
+  </span>
+  <a class="card" href="index.html">
+    <span class="k">Part three</span>
+    <span class="t">Technical analysis →</span>
+    <span class="d">The chart: structure, levels, volume, risk.</span>
+  </a>
+</nav>
+
+<nav class="rail" aria-label="Your progress">
+  <ol>
+    <li data-rail="1" class="on"><span class="bar"></span>Rules</li>
+    <li data-rail="2"><span class="bar"></span>Income</li>
+    <li data-rail="3"><span class="bar"></span>Balance</li>
+    <li data-rail="4"><span class="bar"></span>Cash</li>
+    <li data-rail="5"><span class="bar"></span>Linkage</li>
+    <li data-rail="6"><span class="bar"></span>Working capital</li>
+    <li data-rail="7"><span class="bar"></span>Judgement</li>
+    <li data-rail="8"><span class="bar"></span>Red flags</li>
+    <li data-rail="9"><span class="bar"></span>Quiz</li>
+  </ol>
+</nav>
+
+<!-- ============ LESSON 1 ============ -->
+<section class="stage" data-stage="1">
+  <div class="stage-head"><span class="num">01</span><h2>What the accounts are trying to do</h2></div>
+  <div class="stage-body">
+    <p class="key">A set of company accounts is an attempt to answer three questions with numbers. Did it make a profit? What does it own and owe? Did real money actually move? One statement answers each, and the rest of this page is those three questions in detail.</p>
+
+    <p>Before any of that, one rule governs how the numbers get written down, and almost every confusion about accounting traces back to it.</p>
+
+    <h3>Accrual accounting: earned, not received</h3>
+    <p>Under <strong>accrual accounting</strong>, revenue is recorded when it is <em>earned</em> and costs are recorded when they are <em>incurred</em> — not when cash changes hands. A sale you have delivered but not been paid for is revenue today. A bill you have received but not yet paid is a cost today.</p>
+
+    <p>Suppose <span class="tk">Northwind Coffee</span> signs a $120,000 supply contract in March, delivers coffee steadily through the year, and is paid in a single lump in June. Two entirely different pictures come out of the same events.</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 264" role="img" aria-labelledby="a1t a1d">
+        <title id="a1t">Accrual revenue compared with cash received on the same contract</title>
+        <desc id="a1d">A contract worth one hundred and twenty thousand dollars is recognised as thirty thousand of revenue in each of four months under accrual accounting, while the cash arrives as a single payment in June.</desc>
+        <text x="24" y="32" class="s-ttl">THE SAME $120,000 CONTRACT</text>
+
+        <text x="24" y="70" class="s-lab-s">ACCRUAL — REVENUE AS IT IS EARNED</text>
+        <rect x="75" y="80" width="90" height="34" rx="2" class="s-fill-acc"/>
+        <rect x="215" y="80" width="90" height="34" rx="2" class="s-fill-acc"/>
+        <rect x="355" y="80" width="90" height="34" rx="2" class="s-fill-acc"/>
+        <rect x="495" y="80" width="90" height="34" rx="2" class="s-fill-acc"/>
+        <line x1="60" y1="114" x2="620" y2="114" class="s-axis"/>
+        <text x="120" y="102" text-anchor="middle" class="s-lab">$30K</text>
+        <text x="260" y="102" text-anchor="middle" class="s-lab">$30K</text>
+        <text x="400" y="102" text-anchor="middle" class="s-lab">$30K</text>
+        <text x="540" y="102" text-anchor="middle" class="s-lab">$30K</text>
+
+        <text x="24" y="160" class="s-lab-s">CASH — MONEY ACTUALLY RECEIVED</text>
+        <rect x="495" y="140" width="90" height="74" rx="2" class="s-fill-up"/>
+        <line x1="60" y1="214" x2="620" y2="214" class="s-axis"/>
+        <text x="540" y="132" text-anchor="middle" class="s-lab">$120K</text>
+        <text x="120" y="204" text-anchor="middle" class="s-lab-s">NOTHING</text>
+        <text x="260" y="204" text-anchor="middle" class="s-lab-s">NOTHING</text>
+        <text x="400" y="204" text-anchor="middle" class="s-lab-s">NOTHING</text>
+
+        <text x="120" y="236" text-anchor="middle" class="s-lab-s">MARCH</text>
+        <text x="260" y="236" text-anchor="middle" class="s-lab-s">APRIL</text>
+        <text x="400" y="236" text-anchor="middle" class="s-lab-s">MAY</text>
+        <text x="540" y="236" text-anchor="middle" class="s-lab-s">JUNE</text>
+        <text x="24" y="258" class="s-lab-s">PROFIT IS MEASURED ON THE TOP ROW. SURVIVAL ON THE BOTTOM.</text>
+      </svg>
+      <figcaption>Neither row is wrong. They answer different questions, and a business can look healthy on one while running out of room on the other.</figcaption>
+    </figure>
+
+    <p>The companion rule is the <strong>matching principle</strong>: a cost belongs in the same period as the revenue it helped produce. If Northwind buys beans in February and sells the coffee in April, the cost of those beans lands in April alongside the sale, not in February when the money left.</p>
+
+    <p>Accrual exists for a good reason. Cash-basis accounts lurch about with the timing of payments and tell you very little about whether the business works. Accrual smooths that out and shows you the underlying trade. The price is that somebody has to decide when revenue is earned and how to spread a cost — and those decisions are judgement, which is lesson 07.</p>
+
+    <h3>Where to find the actual documents</h3>
+    <ul class="plain">
+      <li><strong>The annual report</strong> — every listed company publishes one, free, on its investor relations page. In the United States the regulatory version is the <span class="tk">10-K</span>; the quarterly one is the <span class="tk">10-Q</span>.</li>
+      <li><strong>The three statements</strong> sit together in the middle, usually across four or five pages, with three years of history side by side.</li>
+      <li><strong>The notes</strong> follow them and are longer than everything else combined. They are where the accounting policies live, and they are lesson 08.</li>
+      <li><strong>A fiscal year is not a calendar year.</strong> Plenty of companies end theirs in June, or in late January after the Christmas trade has cleared. Compare like periods, and be careful with any year that contains 53 weeks.</li>
+    </ul>
+
+    <div class="tieback">
+      <span class="tag">Why this matters</span>
+      <p>Every argument about whether a company is "really" profitable is, underneath, an argument about accrual judgement. That is precisely why the cash flow statement exists — it is the check on the other two, and it is the one that is hardest to dress up.</p>
+    </div>
+
+    <div class="checks" data-checks="1">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — <span class="tk">Northwind Coffee</span> delivers $30,000 of coffee in March and is paid for it in June. Under accrual accounting, when is the $30,000 recorded as revenue?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right — revenue is recorded when it is earned, which is when the coffee was delivered. The June payment settles a receivable that was created back in March.">In March, when the coffee was delivered.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That would be cash accounting. Under accrual, June is when the cash arrives and the receivable is cleared — the revenue was already recognised in March.">In June, when the money arrived.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Splitting it would only be right if the delivery itself were spread across those months. Here the whole $30,000 was earned in March.">Split evenly across March to June.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q2 — What does the matching principle say?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Yes. Beans bought in February for coffee sold in April are a April cost. It is what makes a period's profit a meaningful measure of that period's trading.">A cost belongs in the same period as the revenue it helped produce.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That is cash accounting again. Matching deliberately separates the cost from the moment the money left.">A cost belongs in the period the money was paid out.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Nothing requires costs and revenues to be equal — that would mean every company broke exactly even. Matching is about timing, not about size.">Total costs must equal total revenue over a full year.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — Why does accrual accounting exist at all, given that it makes the numbers harder to verify?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct. Cash-basis results lurch with payment timing and say little about the underlying trade. Accrual shows the trade — and hands you judgement calls as the price.">Cash-basis results swing with the timing of payments and describe the underlying trade poorly.</button>
+          <button type="button" class="opt" data-correct="false" data-why="It is not a tax device. Tax is computed on its own rules, which often differ from the reported accounts precisely because the two have different purposes.">It lets companies pay less tax than cash accounting would.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Accrual is the standard for company reporting under both IFRS and US GAAP. Small businesses and individuals are the ones more likely to use cash basis.">It is a simplified method used mainly by small businesses.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — Which three questions do the three statements answer, one each?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Exactly — income statement, balance sheet, cash flow statement, in that order. Everything else on this page is those three questions in more detail.">Did it make a profit? What does it own and owe? Did real money move?</button>
+          <button type="button" class="opt" data-correct="false" data-why="None of the three statements makes a forecast or values the company. They record what has already happened; valuation is a separate judgement built on top of them.">What is it worth? What will it earn? Is the price fair?</button>
+          <button type="button" class="opt" data-correct="false" data-why="Ownership and dividend policy appear in the notes and the equity statement, but they are not what the three main statements are organised around.">Who owns it? Who runs it? What does it pay out?</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — A retailer's fiscal year ends in late January rather than in December. Why should you notice?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right. Comparing its year to a December-year competitor lines up different trading periods — and watch for the occasional 53-week year, which quietly adds a week of sales.">Its reporting year covers a different stretch of trading, so like-for-like comparisons need care.</button>
+          <button type="button" class="opt" data-correct="false" data-why="A fiscal year end is an ordinary and usually practical choice — for a retailer, closing after the Christmas trade has settled. It is not evidence of anything.">A non-calendar year end is a warning sign about the accounting.</button>
+          <button type="button" class="opt" data-correct="false" data-why="It has no such effect. The year end sets the reporting period; it does not change how revenue is recognised within it.">It means revenue is recognised on a cash basis instead.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LESSON 2 ============ -->
+<section class="stage locked" data-stage="2">
+  <div class="stage-head"><span class="num">02</span><h2>The income statement, line by line</h2></div>
+  <p class="lockquiz">Locked — answer all five questions in lesson 01 to open this.</p>
+  <div class="stage-body" hidden>
+    <p class="key">The income statement starts with everything that came in the door over a period and subtracts its way down. Each subtraction has a name, and each leftover has a name. That is the whole document.</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 306" role="img" aria-labelledby="a2t a2d">
+        <title id="a2t">An income statement from revenue down to net income</title>
+        <desc id="a2d">Revenue of one hundred million, less cost of revenue of forty-two, gives gross profit of fifty-eight. Less research and development of eighteen and selling and administrative costs of eighteen gives operating profit of twenty-two. Less interest and tax of six gives net income of sixteen.</desc>
+
+        <rect x="16" y="26" width="628" height="26" rx="4" class="s-box"/>
+        <text x="24" y="44" class="s-ttl">REVENUE</text>
+        <text x="560" y="44" text-anchor="end" class="s-lab">$100.0</text>
+
+        <text x="44" y="76" class="s-lab">− cost of revenue</text>
+        <text x="560" y="76" text-anchor="end" class="s-lab">$42.0</text>
+
+        <rect x="16" y="90" width="628" height="26" rx="4" class="s-box"/>
+        <text x="24" y="108" class="s-ttl">GROSS PROFIT</text>
+        <text x="560" y="108" text-anchor="end" class="s-lab">$58.0</text>
+        <text x="636" y="108" text-anchor="end" class="s-lab-s">58%</text>
+
+        <text x="44" y="140" class="s-lab">− research &amp; development</text>
+        <text x="560" y="140" text-anchor="end" class="s-lab">$18.0</text>
+        <text x="44" y="172" class="s-lab">− selling, general &amp; admin</text>
+        <text x="560" y="172" text-anchor="end" class="s-lab">$18.0</text>
+
+        <rect x="16" y="186" width="628" height="26" rx="4" class="s-box"/>
+        <text x="24" y="204" class="s-ttl">OPERATING PROFIT</text>
+        <text x="560" y="204" text-anchor="end" class="s-lab">$22.0</text>
+        <text x="636" y="204" text-anchor="end" class="s-lab-s">22%</text>
+
+        <text x="44" y="236" class="s-lab">− interest &amp; tax</text>
+        <text x="560" y="236" text-anchor="end" class="s-lab">$6.0</text>
+
+        <rect x="16" y="250" width="628" height="26" rx="4" fill="var(--up-soft)" stroke="var(--up)"/>
+        <text x="24" y="268" class="s-ttl">NET INCOME</text>
+        <text x="560" y="268" text-anchor="end" class="s-lab">$16.0</text>
+        <text x="636" y="268" text-anchor="end" class="s-lab-s">16%</text>
+
+        <text x="24" y="296" class="s-lab-s">EVERY LEFTOVER DIVIDED BY REVENUE IS A MARGIN</text>
+      </svg>
+      <figcaption>Revenue is the top line and net income is the bottom line. Everything between them is a cost wearing a label.</figcaption>
+    </figure>
+
+    <h3>What each line is actually telling you</h3>
+    <div class="tblwrap">
+      <table class="tbl">
+        <thead><tr><th>Line</th><th>What it is</th><th>What a change in it says</th></tr></thead>
+        <tbody>
+          <tr><td>Revenue</td><td>Everything sold over the period, whether or not it has been paid for</td><td>The business is getting bigger or smaller</td></tr>
+          <tr><td>Cost of revenue</td><td>The direct cost of producing what was sold — materials, manufacturing, hosting</td><td>Input costs, or the price it can charge, are moving</td></tr>
+          <tr><td>Gross profit</td><td>Revenue minus cost of revenue</td><td>How much room the product itself leaves</td></tr>
+          <tr><td>R&amp;D</td><td>What it spends inventing the next thing</td><td>Investment in the future, expensed today</td></tr>
+          <tr><td>SG&amp;A</td><td>Selling, general and administrative — sales teams, marketing, head office</td><td>Whether overheads are growing faster than sales</td></tr>
+          <tr><td>Operating profit</td><td>What the business itself earns, before financing and tax</td><td>The cleanest measure of the trading operation</td></tr>
+          <tr><td>Interest</td><td>The cost of the money it has borrowed</td><td>How heavily debt is weighing on the result</td></tr>
+          <tr><td>Net income</td><td>What is left for shareholders</td><td>The bottom line, and the one that feeds EPS</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Three details that matter more than they look</h3>
+    <ul class="plain">
+      <li><strong>Operating profit is the honest trading number.</strong> It sits above interest and tax, so it describes the business rather than how it happens to be financed or where it is domiciled. Two identical companies with different debt loads show the same operating profit and very different net income.</li>
+      <li><strong>EPS comes in two versions.</strong> <em>Basic</em> divides net income by the shares in issue. <em>Diluted</em> divides it by the shares that would exist if every option and convertible were exercised. Diluted is the conservative one, and it is the one to use.</li>
+      <li><strong>Depreciation and amortisation are in here somewhere.</strong> Sometimes on their own line, often buried inside cost of revenue and SG&amp;A. They are real costs but no money moves, which is why the cash flow statement adds them straight back — lesson 04.</li>
+    </ul>
+
+    <div class="tieback">
+      <span class="tag">Why this matters</span>
+      <p>The three margins answer three different questions. Gross margin is about the <em>product</em> — can it be sold for meaningfully more than it costs to make? Operating margin is about the <em>company</em> — is it disciplined about its own overheads? Net margin is about the <em>whole structure</em>, including debt and tax. A company can be strong on one and weak on another, and knowing which tells you where to look next.</p>
+    </div>
+
+    <div class="checks" data-checks="2">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — Revenue is $100m and cost of revenue is $42m. What is gross profit, and what does it describe?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right — $58m, a 58% gross margin. It is the room the product itself leaves before any overhead, and it is largely a statement about pricing power.">$58m — the room left by the product itself, before any overheads.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That is what is left after overheads, interest and tax as well. Gross profit sits right at the top, immediately after the direct cost of what was sold.">$58m — what is left for shareholders after everything else.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Gross profit is a subtraction, not a division. $42m divided by $100m is the cost ratio; the leftover is what gets the name.">$42m — the cost of revenue expressed against sales.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q2 — Why is operating profit often described as the cleanest measure of the trading business?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Exactly. Two identical businesses with different debt loads report the same operating profit and very different net income, which is why comparisons usually start here.">It sits above interest and tax, so it is not distorted by how the company is financed or taxed.</button>
+          <button type="button" class="opt" data-correct="false" data-why="It is not a cash figure at all — it still contains depreciation and every other accrual. The cash flow statement is where cash gets measured.">It is the only line on the statement measured in actual cash.</button>
+          <button type="button" class="opt" data-correct="false" data-why="It is smaller than gross profit, because operating expenses have been taken out. Size is not what makes it useful.">It is the largest profit figure, so it is the least likely to mislead.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — What is the difference between basic and diluted earnings per share?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Yes — diluted counts the shares that would exist if outstanding options and convertibles were exercised. It is the conservative figure, and the one worth using.">Basic uses the shares in issue; diluted also counts shares that options and convertibles could create.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Both use the same net income. The difference is entirely in the denominator — how many shares that profit is divided among.">Basic uses net income; diluted uses operating profit instead.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Neither is a forecast. Both are calculated from the period that has just been reported.">Basic is the reported year; diluted is next year's estimate.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — A company's gross margin is steady at 58% but its operating margin has slipped from 24% to 18% over three years. Where is the problem?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct — the product economics are unchanged, so the erosion is between gross and operating profit: R&amp;D and SG&amp;A growing faster than revenue.">In operating expenses — overheads are growing faster than sales.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Steady gross margin says the direct cost of what it sells is keeping pace with pricing. That part of the statement is behaving.">In the cost of what it sells — input costs are rising.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Interest and tax sit below operating profit, so they cannot explain a fall in it. They would show up between operating profit and net income.">In interest and tax — the debt load must have grown.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — Where do depreciation and amortisation appear on the income statement?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right. Sometimes they get their own line, often they are folded into cost of revenue and SG&amp;A. Either way they reduce profit while no money moves — which is why cash flow adds them back.">Sometimes on their own line, often folded into cost of revenue and SG&amp;A.</button>
+          <button type="button" class="opt" data-correct="false" data-why="They are genuine costs and do reduce reported profit. What they do not do is move any cash, which is a different thing entirely.">They do not appear — they are not costs, so they never reduce profit.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Depreciation of operating assets sits in operating costs, above operating profit. Only interest and tax sit below it.">Always below operating profit, alongside interest and tax.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LESSON 3 ============ -->
+<section class="stage locked" data-stage="3">
+  <div class="stage-head"><span class="num">03</span><h2>The balance sheet, line by line</h2></div>
+  <p class="lockquiz">Locked — answer all five questions in lesson 02 to open this.</p>
+  <div class="stage-body" hidden>
+    <p class="key">The income statement covers a stretch of time. The balance sheet is a photograph of one single day — usually the last day of the period — showing what the company controls and who has a claim on it.</p>
+
+    <p>One equation holds, always, by construction: <strong>assets = liabilities + equity</strong>. Everything the company controls was funded either by borrowing it or by the owners. Equity is simply the leftover, which is why it is sometimes called the residual claim.</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 330" role="img" aria-labelledby="a3t a3d">
+        <title id="a3t">A balance sheet as two equal stacks</title>
+        <desc id="a3d">On the left, current assets of one hundred and fifty and non-current assets of two hundred and fifty. On the right, current liabilities of one hundred, long-term debt of one hundred and twenty and equity of one hundred and eighty. Both sides total four hundred.</desc>
+
+        <text x="24" y="40" class="s-ttl">ASSETS</text>
+        <text x="356" y="40" class="s-ttl">LIABILITIES + EQUITY</text>
+
+        <rect x="24" y="56" width="280" height="90" fill="var(--accent-soft)" stroke="var(--accent)"/>
+        <text x="40" y="82" class="s-lab">Current assets</text>
+        <text x="288" y="82" text-anchor="end" class="s-lab">$150</text>
+        <text x="40" y="104" class="s-lab-s">CASH · RECEIVABLES</text>
+        <text x="40" y="122" class="s-lab-s">· INVENTORY</text>
+
+        <rect x="24" y="146" width="280" height="150" fill="var(--accent-soft)" stroke="var(--accent)"/>
+        <text x="40" y="172" class="s-lab">Non-current assets</text>
+        <text x="288" y="172" text-anchor="end" class="s-lab">$250</text>
+        <text x="40" y="194" class="s-lab-s">PROPERTY · PLANT</text>
+        <text x="40" y="212" class="s-lab-s">· GOODWILL</text>
+
+        <text x="330" y="182" text-anchor="middle" class="s-ttl">=</text>
+
+        <rect x="356" y="56" width="280" height="60" fill="var(--down-soft)" stroke="var(--down)"/>
+        <text x="372" y="82" class="s-lab">Current liabilities</text>
+        <text x="620" y="82" text-anchor="end" class="s-lab">$100</text>
+        <text x="372" y="104" class="s-lab-s">PAYABLES · DEFERRED REVENUE</text>
+
+        <rect x="356" y="116" width="280" height="72" fill="var(--down-soft)" stroke="var(--down)"/>
+        <text x="372" y="142" class="s-lab">Long-term debt</text>
+        <text x="620" y="142" text-anchor="end" class="s-lab">$120</text>
+        <text x="372" y="164" class="s-lab-s">A PROMISE WITH A DATE</text>
+
+        <rect x="356" y="188" width="280" height="108" fill="var(--up-soft)" stroke="var(--up)"/>
+        <text x="372" y="214" class="s-lab">Equity</text>
+        <text x="620" y="214" text-anchor="end" class="s-lab">$180</text>
+        <text x="372" y="236" class="s-lab-s">SHARE CAPITAL PLUS</text>
+        <text x="372" y="254" class="s-lab-s">RETAINED EARNINGS</text>
+
+        <text x="24" y="322" class="s-lab-s">BOTH SIDES ARE THE SAME BUSINESS, COUNTED TWO WAYS</text>
+      </svg>
+      <figcaption>The two stacks are the same height because they have to be. Equity is whatever is left once everybody else has been counted.</figcaption>
+    </figure>
+
+    <h3>Current and non-current: the split that does the work</h3>
+    <p>Both sides are divided into <strong>current</strong> — expected to turn into cash, or fall due, within twelve months — and <strong>non-current</strong>, meaning everything longer-dated. That single split is what lets you ask the only question that really matters here: if the next year is bad, does this company have a problem?</p>
+
+    <ul class="plain">
+      <li><strong>Current assets</strong> — cash, receivables (invoices customers have not paid), inventory, prepaid expenses.</li>
+      <li><strong>Non-current assets</strong> — property, plant and equipment; intangibles such as patents and software; goodwill; long-term investments.</li>
+      <li><strong>Current liabilities</strong> — payables (bills not yet paid), accrued expenses, deferred revenue, and any debt falling due within the year.</li>
+      <li><strong>Non-current liabilities</strong> — long-term borrowings, lease obligations, pension deficits.</li>
+      <li><strong>Equity</strong> — share capital and share premium (what shareholders originally put in), plus <strong>retained earnings</strong>: every dollar of profit the company has ever made and not paid out, accumulated since it began.</li>
+    </ul>
+
+    <p><strong>Working capital</strong> is current assets minus current liabilities, and it is the buffer between the two. Its cousin, the <strong>current ratio</strong>, is the same thing as a division: $150m of current assets against $100m of current liabilities is 1.5. Comfortably above 1 is ordinary; well below 1 for a business that is not collecting cash up front is worth understanding.</p>
+
+    <h3>Two entries that confuse everybody at first</h3>
+    <ul class="plain">
+      <li><strong>Goodwill</strong> is not a measure of reputation. It appears only when a company buys another one and pays more than the fair value of the identifiable net assets it acquired. The excess has to go somewhere, and it goes here. Large goodwill is not a fault, but it is a record of prices paid, and if those acquisitions disappoint it gets written off in one lump — an <em>impairment</em>.</li>
+      <li><strong>Deferred revenue</strong> is a liability, which feels backwards. A customer has paid for something not yet delivered, so the company owes them the service. It is generally a <em>good</em> sign: the customer funded the business before receiving anything, which is the opposite of a receivable.</li>
+    </ul>
+
+    <div class="tieback">
+      <span class="tag">Why this matters</span>
+      <p>The income statement can look excellent during the year in which a company runs out of room. The balance sheet is the only one of the three that tells you whether a bad year is survivable — how much is owed, how soon, and how much cushion sits behind it.</p>
+    </div>
+
+    <div class="checks" data-checks="3">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — A company has $400m of assets and $220m of liabilities. What is equity, and what does it represent?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right — $180m, the residual. Everything the company controls was funded by lenders or by owners, and equity is whatever is left once the lenders have been counted.">$180m — the shareholders' leftover claim once everybody else has been counted.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Adding them would describe nothing. The equation is assets = liabilities + equity, so equity is assets minus liabilities.">$620m — the assets and liabilities added together.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Equity is a balance sheet figure built from what shareholders put in plus accumulated profits. It is not the market's price for the company, which is market capitalisation and usually a very different number.">$180m — the price the market is putting on the company.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q2 — What does the current versus non-current split let you ask?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Exactly. Current means within twelve months, on both sides. Comparing the two is how you judge whether a bad year is survivable.">Whether what falls due within a year is covered by what turns into cash within a year.</button>
+          <button type="button" class="opt" data-correct="false" data-why="The split is about timing, not about how recently something was bought. A ten-year-old building and a new one are both non-current.">Which assets were acquired recently and which are old.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Profitability lives on the income statement. The balance sheet split is a question about timing and solvency.">Which parts of the business are profitable and which are not.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — What are retained earnings?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Yes — the accumulated total of every profit the company has ever made and not paid out. It is the link between the income statement and the balance sheet, which is lesson 05.">Every dollar of profit the company has ever made and not distributed, accumulated since it began.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Retained earnings are not a pot of money. The cash may long since have been spent on machinery, acquisitions or wages — the balance sheet has a separate cash line for actual cash.">Cash the company is holding back for a rainy day.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That would be this year's net income alone. Retained earnings are cumulative across the company's entire life.">The profit made in the year just reported.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — Where does goodwill on a balance sheet come from?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct — it is the excess paid in an acquisition over the fair value of the identifiable net assets. It is a record of prices paid, and it gets impaired if those deals disappoint.">Buying another company and paying more than its identifiable net assets were worth.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Reputation and brand strength are real, but they only reach the balance sheet if somebody paid for them in an acquisition. A brand built internally does not appear.">The strength of the company's brand and reputation with customers.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Rising share prices never touch the balance sheet. It records what the company controls, not what the market thinks the company is worth.">An increase in the company's share price over the year.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — A software company shows a large and growing deferred revenue balance. How should you read it?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right. It is a liability because the service is still owed — but customers funding the business before delivery is the opposite of a receivable, and generally a strong position.">It is a liability, but usually a good sign: customers have paid up front for something not yet delivered.</button>
+          <button type="button" class="opt" data-correct="false" data-why="It sits on the liabilities side, not among the assets. The company holds the cash but still owes the service.">It is an asset, since the company is holding the customers' cash.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Deferred revenue is not a debt to a lender and carries no interest. It is settled by delivering the service that was already paid for.">It is a form of borrowing, so it should be counted alongside debt.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LESSON 4 ============ -->
+<section class="stage locked" data-stage="4">
+  <div class="stage-head"><span class="num">04</span><h2>The cash flow statement, line by line</h2></div>
+  <p class="lockquiz">Locked — answer all five questions in lesson 03 to open this.</p>
+  <div class="stage-body" hidden>
+    <p class="key">This is the statement that tracks money rather than judgement, and it is organised into three sections: what the business generated, what it spent on long-lived things, and what it did with owners and lenders.</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 316" role="img" aria-labelledby="a4t a4d">
+        <title id="a4t">A bridge from net income to the change in cash</title>
+        <desc id="a4d">Net income of sixteen, plus nine of depreciation added back, less five absorbed by working capital, gives operating cash of twenty. Capital expenditure of twelve and financing outflows of four leave a change in cash of four.</desc>
+
+        <line x1="34" y1="40" x2="364" y2="40" class="s-arrow"/>
+        <text x="199" y="30" text-anchor="middle" class="s-lab-s">OPERATING</text>
+        <line x1="386" y1="40" x2="452" y2="40" class="s-arrow"/>
+        <text x="419" y="30" text-anchor="middle" class="s-lab-s">INVESTING</text>
+        <line x1="474" y1="40" x2="540" y2="40" class="s-arrow"/>
+        <text x="507" y="30" text-anchor="middle" class="s-lab-s">FINANCING</text>
+
+        <rect x="34" y="154" width="66" height="96" rx="2" class="s-fill-acc"/>
+        <text x="67" y="146" text-anchor="middle" class="s-lab">$16</text>
+        <rect x="122" y="100" width="66" height="54" rx="2" class="s-fill-acc"/>
+        <text x="155" y="92" text-anchor="middle" class="s-lab">+$9</text>
+        <rect x="210" y="100" width="66" height="30" rx="2" class="s-fill-down"/>
+        <text x="243" y="92" text-anchor="middle" class="s-lab">−$5</text>
+        <rect x="298" y="130" width="66" height="120" rx="2" class="s-fill-acc"/>
+        <text x="331" y="122" text-anchor="middle" class="s-lab">$20</text>
+        <rect x="386" y="130" width="66" height="72" rx="2" class="s-fill-down"/>
+        <text x="419" y="122" text-anchor="middle" class="s-lab">−$12</text>
+        <rect x="474" y="178" width="66" height="24" rx="2" class="s-fill-down"/>
+        <text x="507" y="170" text-anchor="middle" class="s-lab">−$4</text>
+        <rect x="562" y="226" width="66" height="24" rx="2" class="s-fill-up"/>
+        <text x="595" y="218" text-anchor="middle" class="s-lab">$4</text>
+
+        <line x1="24" y1="250" x2="636" y2="250" class="s-axis"/>
+
+        <text x="67" y="272" text-anchor="middle" class="s-lab-s">NET</text>
+        <text x="67" y="288" text-anchor="middle" class="s-lab-s">INCOME</text>
+        <text x="155" y="272" text-anchor="middle" class="s-lab-s">ADD BACK</text>
+        <text x="155" y="288" text-anchor="middle" class="s-lab-s">D&amp;A</text>
+        <text x="243" y="272" text-anchor="middle" class="s-lab-s">WORKING</text>
+        <text x="243" y="288" text-anchor="middle" class="s-lab-s">CAPITAL</text>
+        <text x="331" y="272" text-anchor="middle" class="s-lab-s">OPERATING</text>
+        <text x="331" y="288" text-anchor="middle" class="s-lab-s">CASH</text>
+        <text x="419" y="272" text-anchor="middle" class="s-lab-s">CAPEX</text>
+        <text x="419" y="288" text-anchor="middle" class="s-lab-s">SPENT</text>
+        <text x="507" y="272" text-anchor="middle" class="s-lab-s">DEBT &amp;</text>
+        <text x="507" y="288" text-anchor="middle" class="s-lab-s">DIVIDENDS</text>
+        <text x="595" y="272" text-anchor="middle" class="s-lab-s">CHANGE</text>
+        <text x="595" y="288" text-anchor="middle" class="s-lab-s">IN CASH</text>
+
+        <text x="24" y="310" class="s-lab-s">FREE CASH FLOW IS THE FOURTH BAR MINUS THE FIFTH — HERE, $8</text>
+      </svg>
+      <figcaption>It starts at net income and unwinds every accrual until only money is left. That is why it is the check on the other two.</figcaption>
+    </figure>
+
+    <h3>The three sections</h3>
+    <div class="tblwrap">
+      <table class="tbl">
+        <thead><tr><th>Section</th><th>What sits in it</th><th>What it tells you</th></tr></thead>
+        <tbody>
+          <tr><td>Operating</td><td>Net income, non-cash add-backs, changes in working capital</td><td>Whether the business itself produces money</td></tr>
+          <tr><td>Investing</td><td>Capital expenditure, acquisitions, purchases and sales of securities</td><td>What it is spending to stay alive and to grow</td></tr>
+          <tr><td>Financing</td><td>Debt raised or repaid, shares issued or bought back, dividends paid</td><td>Its dealings with lenders and owners</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Why it starts at net income</h3>
+    <p>Almost every company uses the <strong>indirect method</strong>, which looks strange the first time. Rather than listing money in and money out, it starts with net income from the income statement and then undoes every accrual until only cash remains:</p>
+    <ul class="plain">
+      <li><strong>Add back non-cash charges.</strong> Depreciation, amortisation and stock-based compensation reduced profit but moved no money, so they go straight back on.</li>
+      <li><strong>Adjust for changes in working capital.</strong> Receivables up means sales were booked but not collected — subtract. Inventory up means cash went into stock — subtract. Payables up means suppliers are still waiting — add.</li>
+      <li><strong>What is left is cash from operations</strong>: the money the trading business actually produced.</li>
+    </ul>
+
+    <p><strong>Free cash flow</strong> is then operating cash flow minus capital expenditure — the money genuinely available to repay debt, buy back shares, pay a dividend or reinvest. It is not a defined line on the statement; you calculate it yourself from two that are.</p>
+
+    <p>One caution about capex. Some of it is <em>maintenance</em> — replacing what wears out just to keep going — and some is <em>growth</em>. Companies rarely split the two, and a business whose free cash flow only looks healthy because it has stopped replacing its equipment is borrowing from its own future.</p>
+
+    <div class="tieback">
+      <span class="tag">Why this matters</span>
+      <p>Operating cash flow that persistently trails net income is the single most useful thing an amateur can notice in a set of accounts. It does not prove anything on its own — a fast-growing business consumes cash for perfectly good reasons, which is lesson 06. But it is the question that leads to every other question worth asking.</p>
+    </div>
+
+    <div class="checks" data-checks="4">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — Why is depreciation added back at the top of the cash flow statement?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Exactly. It reduced reported profit, but no money left the building — the money left years earlier when the asset was bought. The add-back removes an accrual, it does not deny the cost.">It reduced net income but no money moved, so it has to come back out to get to cash.</button>
+          <button type="button" class="opt" data-correct="false" data-why="It is a genuine cost — assets really do wear out. What makes it special is only that the cash left in an earlier period, when the asset was purchased.">Because it is not a real cost, so it should never have been deducted.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Nothing is being reversed for tax here. The cash flow statement is simply unwinding accruals to arrive at money.">To reverse the tax deduction the company claimed on it.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q2 — A company buys a new factory. Which section of the cash flow statement does that appear in?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right — investing. Buying long-lived assets is capital expenditure, and it is the figure you subtract from operating cash flow to get free cash flow.">Investing.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Operating covers the day-to-day trading. Buying a long-lived asset is not day-to-day, however routine the company considers it.">Operating.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Financing covers dealings with lenders and shareholders. If it borrowed to fund the factory, the borrowing sits in financing — but the factory itself sits in investing.">Financing.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — Operating cash flow is $20m and capital expenditure is $12m. What is free cash flow, and where do you find it?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct — $8m, and you calculate it yourself. It is not a defined line on the statement, which is one reason different sources quote different figures for it.">$8m, and you work it out yourself — it is not a line on the statement.</button>
+          <button type="button" class="opt" data-correct="false" data-why="$20m is operating cash flow before the cost of keeping the assets running. Free cash flow is what remains after capex.">$20m, and it is the operating section total.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Free cash flow is a subtraction, not a sum. Adding capex back would count the same money twice.">$32m, adding the capex back to operating cash.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — Receivables rose sharply over the year. What does the operating section do with that?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Yes — subtract it. Sales were booked into net income but the money has not arrived, so the cash figure has to be reduced by the amount still outstanding.">Subtracts it — sales were recorded but the cash has not been collected.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Rising receivables consume cash rather than produce it. It is rising payables — money you have not yet handed over — that adds.">Adds it — receivables are an asset, so they increase cash.</button>
+          <button type="button" class="opt" data-correct="false" data-why="It is precisely the working capital adjustments that turn net income into cash. Ignoring them would leave the statement measuring nothing.">Ignores it — receivables are a balance sheet item.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — A company's free cash flow improved sharply while its capital expenditure fell to a third of its usual level. What should you check?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right. Cutting maintenance capex flatters free cash flow now and defers the cost, and companies rarely split maintenance from growth spending — so it takes a look at the notes and the trend.">Whether it has stopped replacing worn-out assets, which improves cash now and defers the cost.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Lower capex mechanically raises free cash flow, so the improvement is not evidence of anything about the trading business. The question is why the spending stopped.">Nothing — higher free cash flow with lower spending is unambiguously good.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Capex is an investing item and does not touch net income at all, so it cannot have been misclassified out of the income statement.">Whether the capex was wrongly moved out of the income statement.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LESSON 5 ============ -->
+<section class="stage locked" data-stage="5">
+  <div class="stage-head"><span class="num">05</span><h2>How the three lock together</h2></div>
+  <p class="lockquiz">Locked — answer all five questions in lesson 04 to open this.</p>
+  <div class="stage-body" hidden>
+    <p class="key">This is the lesson that turns three documents into one model. The statements are not three separate reports that happen to be printed together — they are three views of the same set of events, and they are wired to each other at four points.</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 326" role="img" aria-labelledby="a5t a5d">
+        <title id="a5t">The four links between the three statements</title>
+        <desc id="a5d">Net income and depreciation each touch all three statements. Working capital changes and the ending cash balance link the cash flow statement to the balance sheet.</desc>
+
+        <text x="330" y="44" text-anchor="middle" class="s-ttl">INCOME</text>
+        <text x="450" y="44" text-anchor="middle" class="s-ttl">CASH FLOW</text>
+        <text x="570" y="44" text-anchor="middle" class="s-ttl">BALANCE</text>
+
+        <line x1="330" y1="56" x2="330" y2="292" class="s-lead"/>
+        <line x1="450" y1="56" x2="450" y2="292" class="s-lead"/>
+        <line x1="570" y1="56" x2="570" y2="292" class="s-lead"/>
+
+        <text x="16" y="84" class="s-lab">Net income appears in</text>
+        <text x="16" y="102" class="s-lab">all three statements</text>
+        <line x1="330" y1="90" x2="570" y2="90" class="s-line-thin"/>
+        <circle cx="330" cy="90" r="6" class="s-dot"/>
+        <circle cx="450" cy="90" r="6" class="s-dot"/>
+        <circle cx="570" cy="90" r="6" class="s-dot"/>
+
+        <text x="16" y="144" class="s-lab">Depreciation cuts profit</text>
+        <text x="16" y="162" class="s-lab">but moves no money</text>
+        <line x1="330" y1="150" x2="570" y2="150" class="s-line-thin"/>
+        <circle cx="330" cy="150" r="6" class="s-dot"/>
+        <circle cx="450" cy="150" r="6" class="s-dot"/>
+        <circle cx="570" cy="150" r="6" class="s-dot"/>
+
+        <text x="16" y="204" class="s-lab">Working capital moves</text>
+        <text x="16" y="222" class="s-lab">explain the difference</text>
+        <line x1="450" y1="210" x2="570" y2="210" class="s-line-thin"/>
+        <circle cx="450" cy="210" r="6" class="s-dot"/>
+        <circle cx="570" cy="210" r="6" class="s-dot"/>
+
+        <text x="16" y="264" class="s-lab">Ending cash is the</text>
+        <text x="16" y="282" class="s-lab">balance sheet cash line</text>
+        <line x1="450" y1="270" x2="570" y2="270" class="s-line-thin"/>
+        <circle cx="450" cy="270" r="6" class="s-dot"/>
+        <circle cx="570" cy="270" r="6" class="s-dot"/>
+
+        <text x="24" y="318" class="s-lab-s">CHANGE ONE NUMBER AND IT MUST MOVE IN AT LEAST TWO PLACES</text>
+      </svg>
+      <figcaption>The cash flow statement is the bridge. It begins where the income statement ends and finishes on a line of the balance sheet.</figcaption>
+    </figure>
+
+    <h3>The four links, in words</h3>
+    <ul class="plain">
+      <li><strong>Net income.</strong> It is the last line of the income statement, the first line of the cash flow statement, and — after any dividend — the amount added to retained earnings on the balance sheet.</li>
+      <li><strong>Depreciation.</strong> It reduces profit on the income statement, is added straight back on the cash flow statement because no money moved, and reduces the carrying value of property and equipment on the balance sheet.</li>
+      <li><strong>Working capital.</strong> The year-on-year changes in receivables, inventory and payables on the balance sheet <em>are</em> the working capital adjustments in the operating section.</li>
+      <li><strong>Ending cash.</strong> The final line of the cash flow statement is the cash line on the balance sheet. Not similar to it — the same number.</li>
+    </ul>
+
+    <h3>One year, tied together</h3>
+    <p>Take the figures from the last three lessons: net income $16m, depreciation $9m, $5m absorbed by working capital, $12m of capital expenditure, and a $4m dividend. Here is what the balance sheet has to do about it.</p>
+
+    <div class="tblwrap">
+      <table class="tbl">
+        <thead><tr><th>Balance sheet line</th><th>Start</th><th>Change</th><th>End</th><th>Where the change came from</th></tr></thead>
+        <tbody>
+          <tr><td>Cash</td><td>$30m</td><td>+$4m</td><td>$34m</td><td>The bottom line of the cash flow statement</td></tr>
+          <tr><td>Property &amp; equipment</td><td>$150m</td><td>+$3m</td><td>$153m</td><td>$12m of capex, less $9m of depreciation</td></tr>
+          <tr><td>Retained earnings</td><td>$100m</td><td>+$12m</td><td>$112m</td><td>$16m of net income, less the $4m dividend</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Notice that not one of those three changes is a number you can invent independently. Each is forced by something on another statement. That is the whole reason the model is difficult to distort for long: a flattering figure in one place has to be paid for somewhere else, and the somewhere else is usually cash.</p>
+
+    <div class="tieback">
+      <span class="tag">Why this matters</span>
+      <p>This is the practical test to run on any set of accounts. Take net income, follow it to the top of the cash flow statement, and see how far apart the two ends are. Then take the ending cash and check it against the balance sheet. If profit is growing and cash is not, the difference is sitting in working capital or in non-cash charges — and the accounts will tell you which, if you ask them in this order.</p>
+    </div>
+
+    <div class="checks" data-checks="5">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — Net income for the year is $16m and the company pays a $4m dividend. What happens to retained earnings?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right — profit kept rather than distributed is added to the accumulated total. That is the link between the income statement and the balance sheet.">They rise by $12m — the profit that was not paid out.</button>
+          <button type="button" class="opt" data-correct="false" data-why="The dividend is a distribution to shareholders and reduces what is retained. Only the $12m kept back is added.">They rise by $16m — the full net income for the year.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Retained earnings are cumulative. They are not reset to the year's profit; each year's kept profit is added to everything kept before it.">They are replaced by $16m, the latest year's figure.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q2 — The cash flow statement ends with a cash balance of $34m. What relationship does that have to the balance sheet?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Exactly — it is the same number, not merely a similar one. It is the easiest of the four links to check yourself, and it always ties.">It is the cash line on the balance sheet, exactly.</button>
+          <button type="button" class="opt" data-correct="false" data-why="They are the same figure by construction. The cash flow statement exists to explain how the balance sheet's cash line got from where it started to where it ended.">It is an estimate that should be close to the balance sheet figure.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Cash flow does not run on a different basis. It is measuring the same cash the balance sheet reports, on the same date.">It is unrelated — the two statements are prepared separately.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — Property and equipment started at $150m. The company spent $12m on capex and charged $9m of depreciation. Where does it end?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct — $153m. Capex adds to the asset, depreciation writes it down, and both figures come from other statements. Nothing here is freely chosen.">$153m — up by the capex and down by the depreciation.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Depreciation reduces the carrying value of the asset on the balance sheet. Ignoring it would leave assets on the books at their original cost forever.">$162m — capex added, with depreciation affecting only profit.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Capex increases the asset rather than reducing it. Both movements are applied, in opposite directions.">$129m — both the capex and the depreciation taken off.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — Why is a set of accounts hard to distort for very long?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Yes. A flattering figure in one place has to be paid for somewhere else, and the somewhere else is usually cash — which is the hardest of the three to argue with.">A change in one place is forced to appear in at least two others, and cash is the hardest to argue with.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Auditors check the accounts against the rules, but the rules leave real room for judgement. The structural linkage between the statements is the more reliable constraint.">Because auditors verify every number independently before publication.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Judgement runs through all three — useful lives, provisions, revenue recognition. What constrains it is that the three have to agree with each other.">Because the statements contain no judgement, only verified facts.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — Profit has grown steadily for three years while operating cash flow has been flat. Where should you look first?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right — those are the only two places the gap can be. The operating section names both, so the accounts will tell you which one it is.">At working capital and the non-cash charges — the operating section names both.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Financing describes dealings with lenders and shareholders. It cannot explain a gap between profit and the cash the trading business produced.">At the financing section, since the gap must be a funding issue.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Profit and operating cash flow diverge constantly, for good reasons and bad ones. The gap is a question worth asking, not an error to report.">Nowhere — the two figures are calculated differently and never agree.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LESSON 6 ============ -->
+<section class="stage locked" data-stage="6">
+  <div class="stage-head"><span class="num">06</span><h2>Working capital: where profit and cash separate</h2></div>
+  <p class="lockquiz">Locked — answer all five questions in lesson 05 to open this.</p>
+  <div class="stage-body" hidden>
+    <p class="key">Working capital is the reason a profitable company can run out of money. It is not an accounting trick — it is the ordinary consequence of paying for things before your customers pay you.</p>
+
+    <ul class="plain">
+      <li><strong>Receivables</strong> — you delivered and booked the sale; the customer has not paid. Rising receivables <em>consume</em> cash.</li>
+      <li><strong>Inventory</strong> — you spent money on stock that has not been sold. Rising inventory <em>consumes</em> cash.</li>
+      <li><strong>Payables</strong> — your suppliers have delivered and you have not paid them. Rising payables <em>release</em> cash: you are using their money.</li>
+      <li><strong>Deferred revenue</strong> — customers paid before delivery. Also <em>releases</em> cash, which is why subscription businesses can grow without needing much of it.</li>
+    </ul>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 268" role="img" aria-labelledby="a6t a6d">
+        <title id="a6t">The cash conversion cycle as a timeline</title>
+        <desc id="a6d">Sixty days of inventory followed by forty-five days of receivables, less thirty days of supplier credit, leaves seventy-five days during which the company's own cash is tied up.</desc>
+        <text x="24" y="32" class="s-ttl">CASH LEAVES LONG BEFORE IT COMES BACK</text>
+
+        <text x="190" y="96" text-anchor="middle" class="s-lab-s">INVENTORY · 60 DAYS</text>
+        <text x="430" y="96" text-anchor="middle" class="s-lab-s">RECEIVABLES · 45 DAYS</text>
+        <rect x="60" y="110" width="260" height="40" fill="var(--accent-soft)" stroke="var(--accent)"/>
+        <rect x="320" y="110" width="220" height="40" fill="var(--down-soft)" stroke="var(--down)"/>
+        <line x1="60" y1="104" x2="60" y2="162" class="s-lead"/>
+        <line x1="320" y1="104" x2="320" y2="162" class="s-lead"/>
+        <line x1="540" y1="104" x2="540" y2="162" class="s-lead"/>
+
+        <text x="40" y="178" class="s-lab-s">MONEY LEAVES</text>
+        <text x="320" y="178" text-anchor="middle" class="s-lab-s">SALE BOOKED</text>
+        <text x="620" y="178" text-anchor="end" class="s-lab-s">MONEY ARRIVES</text>
+
+        <rect x="60" y="196" width="130" height="24" fill="var(--up-soft)" stroke="var(--up)"/>
+        <text x="200" y="212" class="s-lab-s">SUPPLIER CREDIT · 30 DAYS</text>
+
+        <text x="24" y="240" class="s-lab-s">60 DAYS OF INVENTORY + 45 DAYS OF RECEIVABLES</text>
+        <text x="24" y="258" class="s-lab-s">− 30 DAYS OF SUPPLIER CREDIT = 75 DAYS OF CASH TIED UP</text>
+      </svg>
+      <figcaption>The gap between the money going out and the money coming back has to be funded by somebody. Usually that somebody is you.</figcaption>
+    </figure>
+
+    <h3>The cash conversion cycle</h3>
+    <p>Those three numbers have names, and together they form the <strong>cash conversion cycle</strong>: days of inventory, plus days of receivables, minus days of payables. Here that is 60 + 45 − 30 = 75 days during which the company's own money is out of the door and has not come back.</p>
+
+    <p>The figure itself matters less than its direction. A cycle stretching from 60 days to 90 over three years means the business is funding progressively more, and something is being given away — longer payment terms to win sales, or stock that is not moving as it used to.</p>
+
+    <p>Some businesses run a <em>negative</em> cycle. A supermarket sells for cash in days and pays its suppliers in weeks; a subscription business collects a year up front. Those companies are funded by their own customers and suppliers, which is a structural advantage that never shows up on the income statement.</p>
+
+    <h3>The growth trap</h3>
+    <p>Here is the case that catches people out. A product business is genuinely profitable and growing 40% a year. Every additional sale needs stock bought in advance and gets paid for 45 days late. So every dollar of growth consumes cash <em>before</em> it produces any — and the faster it grows, the wider the hole gets.</p>
+
+    <p>That company is not failing. It may be an excellent business. But it must fund the gap from somewhere: existing cash, borrowing, or issuing shares. Growth on the income statement with cash draining on the cash flow statement is the signature, and it is why the two have to be read together rather than one after the other.</p>
+
+    <div class="tieback">
+      <span class="tag">Why this matters</span>
+      <p>This is the honest version of "profit is an opinion, cash is a fact". The gap between them is usually not deception at all — it is working capital doing exactly what working capital does. Knowing that stops you from treating every divergence as a scandal, and lets you concentrate on the ones that have no innocent explanation.</p>
+    </div>
+
+    <div class="checks" data-checks="6">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — Inventory rose by $8m over the year. What did that do to cash?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right — consumed $8m. Money went out to buy stock that has not yet been sold, so the operating section subtracts the increase.">Consumed $8m — money went into stock that has not been sold.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Inventory is an asset, but building it up costs money. Assets rising is not the same as cash rising — often it is the opposite.">Released $8m — inventory is an asset, so more of it means more cash.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Inventory changes are one of the main working capital adjustments in the operating section, so they very much affect the cash figure.">Nothing — inventory only affects the balance sheet.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q2 — Days of inventory are 60, days of receivables 45 and days of payables 30. What is the cash conversion cycle, and what does it mean?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct — 60 + 45 − 30 = 75 days during which the company's own money is out and has not come back. Its direction over several years matters more than the number itself.">75 days — how long the company's own cash is tied up before it returns.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Payables are subtracted, not added. Supplier credit funds part of the cycle, so it shortens the period you have to cover yourself.">135 days — all three periods added together.</button>
+          <button type="button" class="opt" data-correct="false" data-why="The order is inventory plus receivables minus payables. Receivables are days you are waiting to be paid, so they lengthen the cycle.">45 days — inventory less receivables less payables.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — A supermarket sells for cash within days and pays suppliers after six weeks. What does that give it?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Yes — a negative cash conversion cycle. Its suppliers and customers fund the working capital, which is a structural advantage that never appears on the income statement.">A negative cycle — its suppliers and customers fund it, rather than the other way round.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Margin is about price against cost. The cycle is about timing, and the two are independent — grocery famously runs thin margins with an excellent cycle.">High margins, since it is collecting money so quickly.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Paying suppliers late releases cash rather than consuming it. It is money the supermarket gets to use in the meantime.">A cash problem, since it owes suppliers for six weeks of stock.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — A product business is genuinely profitable, growing 40% a year, and its cash balance keeps falling. What is the most likely explanation?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right — the growth trap. Every extra sale needs stock bought in advance and is paid for late, so growth consumes cash before it produces any. Real, ordinary, and it still has to be funded.">Growth is consuming working capital — each new sale needs stock up front and is paid late.</button>
+          <button type="button" class="opt" data-correct="false" data-why="It is a possibility worth ruling out, but working capital is by far the more common explanation and the accounts will show it plainly in the operating section.">The reported profit is almost certainly fabricated.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Growth and falling cash are entirely compatible — that is the whole point of this lesson. The company just has to fund the gap from cash, borrowing or new shares.">Impossible — a growing, profitable business cannot lose cash.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — A company's cash conversion cycle has stretched from 60 days to 95 over three years. What does that suggest?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct. Longer terms offered to win sales, or stock moving more slowly, both show up here — and both mean the business is funding more than it used to.">It is funding progressively more — perhaps longer payment terms, perhaps slower-moving stock.</button>
+          <button type="button" class="opt" data-correct="false" data-why="A lengthening cycle absorbs more cash rather than releasing it. Improvement would mean the cycle getting shorter.">Its cash position is improving, since the cycle is getting longer.</button>
+          <button type="button" class="opt" data-correct="false" data-why="It is one of the more informative trends in a set of accounts, precisely because it moves before the headline numbers do.">Nothing — the cycle is an arbitrary figure with no real meaning.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LESSON 7 ============ -->
+<section class="stage locked" data-stage="7">
+  <div class="stage-head"><span class="num">07</span><h2>The judgement calls</h2></div>
+  <p class="lockquiz">Locked — answer all five questions in lesson 06 to open this.</p>
+  <div class="stage-body" hidden>
+    <p class="key">Accrual accounting requires somebody to decide things. Those decisions are legitimate, disclosed, and capable of changing reported profit substantially without a single dollar moving differently. Here are the ones worth knowing.</p>
+
+    <h3>Depreciation, amortisation and useful life</h3>
+    <p>A machine costing $90m that will last nine years is charged at $10m a year. Decide it will last fifteen and the charge becomes $6m — and reported profit is $4m higher every year, on identical cash. <em>Amortisation</em> is the same idea applied to intangibles such as software and patents. Useful life is an estimate, disclosed in the notes, and comparing it to what competitors assume is a quick and revealing check.</p>
+
+    <h3>Capitalising versus expensing</h3>
+    <p>When a company spends money building something long-lived, it can either <strong>expense</strong> it — take the whole hit now — or <strong>capitalise</strong> it, putting it on the balance sheet as an asset and depreciating it over several years. The cash is identical. The reported profit is not.</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 306" role="img" aria-labelledby="a7t a7d">
+        <title id="a7t">The same ninety million spent, expensed or capitalised</title>
+        <desc id="a7d">Expensing the whole cost in year one produces a reported loss of thirty million followed by two years of sixty million profit. Capitalising it over three years produces thirty million of profit in each of the three years. Both total ninety million.</desc>
+
+        <text x="24" y="36" class="s-ttl">EXPENSED IMMEDIATELY</text>
+        <text x="24" y="54" class="s-lab-s">ALL $90M HITS YEAR ONE</text>
+        <text x="356" y="36" class="s-ttl">CAPITALISED OVER 3 YEARS</text>
+        <text x="356" y="54" class="s-lab-s">$30M A YEAR FOR THREE YEARS</text>
+        <line x1="336" y1="24" x2="336" y2="250" class="s-lead"/>
+
+        <rect x="44" y="180" width="60" height="48" rx="2" class="s-fill-down"/>
+        <text x="74" y="244" text-anchor="middle" class="s-lab">−$30M</text>
+        <rect x="130" y="84" width="60" height="96" rx="2" class="s-fill-acc"/>
+        <text x="160" y="76" text-anchor="middle" class="s-lab">$60M</text>
+        <rect x="216" y="84" width="60" height="96" rx="2" class="s-fill-acc"/>
+        <text x="246" y="76" text-anchor="middle" class="s-lab">$60M</text>
+
+        <rect x="368" y="132" width="60" height="48" rx="2" class="s-fill-acc"/>
+        <text x="398" y="124" text-anchor="middle" class="s-lab">$30M</text>
+        <rect x="454" y="132" width="60" height="48" rx="2" class="s-fill-acc"/>
+        <text x="484" y="124" text-anchor="middle" class="s-lab">$30M</text>
+        <rect x="540" y="132" width="60" height="48" rx="2" class="s-fill-acc"/>
+        <text x="570" y="124" text-anchor="middle" class="s-lab">$30M</text>
+
+        <line x1="24" y1="180" x2="636" y2="180" class="s-axis"/>
+
+        <text x="74" y="264" text-anchor="middle" class="s-lab-s">Y1</text>
+        <text x="160" y="264" text-anchor="middle" class="s-lab-s">Y2</text>
+        <text x="246" y="264" text-anchor="middle" class="s-lab-s">Y3</text>
+        <text x="398" y="264" text-anchor="middle" class="s-lab-s">Y1</text>
+        <text x="484" y="264" text-anchor="middle" class="s-lab-s">Y2</text>
+        <text x="570" y="264" text-anchor="middle" class="s-lab-s">Y3</text>
+
+        <text x="24" y="292" class="s-lab-s">SAME $90M SPENT. SAME BUSINESS. TWO VERY DIFFERENT PROFIT LINES.</text>
+      </svg>
+      <figcaption>Both paths total $90m of profit across the three years. Only the shape differs — and the shape is what gets reported each quarter.</figcaption>
+    </figure>
+
+    <p>Neither treatment is dishonest. The rules permit capitalising development costs once a project meets certain tests, and the tests involve judgement. What is worth noticing is a company that capitalises what its direct competitors expense, and whether that policy changed in a year when profit needed help.</p>
+
+    <h3>Stock-based compensation</h3>
+    <p>Paying staff in shares is a genuine cost — it is part of what the work cost the company — but no cash leaves. So it reduces profit on the income statement and is then added back on the cash flow statement, exactly like depreciation. The effect is that free cash flow looks better than the economics warrant, while the real cost shows up somewhere else entirely: in a rising share count, diluting every existing shareholder. This is the single most common way a technology company can look far more cash-generative than it is.</p>
+
+    <h3>Impairments and "one-off" items</h3>
+    <p>An <strong>impairment</strong> is a company admitting an asset is worth less than the books say — usually goodwill from an acquisition that has not worked. It is non-cash and backward-looking; the money was spent years ago. A single large impairment is information about a past decision. A company that takes one most years is telling you something about how it buys things.</p>
+
+    <p>Which leads to <strong>adjusted</strong> or <strong>non-GAAP</strong> earnings — management's version of profit, with selected items removed. Sometimes that is fair: a genuine one-off legal settlement really does obscure the trend. Sometimes the same category of cost is excluded as exceptional every year for a decade, at which point it is not exceptional, it is the business. Read what has been excluded, and check whether it is the same list as last year.</p>
+
+    <div class="tieback">
+      <span class="tag">Why this matters</span>
+      <p>None of this is fraud, and treating it as such will just make you cynical about ordinary reporting. These are choices, made within the rules and disclosed in the notes. Your job is only to know which choices were made, whether they are consistent with the industry, and whether they changed at a convenient moment.</p>
+    </div>
+
+    <div class="checks" data-checks="7">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — A company extends the assumed useful life of its equipment from nine years to fifteen. What happens?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right — the annual depreciation charge falls, so reported profit rises, while the cash position is completely unchanged. Useful life is an estimate, and it is disclosed in the notes.">Reported profit rises, because the annual depreciation charge falls — with no change in cash.</button>
+          <button type="button" class="opt" data-correct="false" data-why="No money moves. Depreciation is the spreading of a cost that was paid when the asset was bought, so changing the spread cannot change the cash.">Cash flow improves, because less money is spent on depreciation.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Depreciation is a real charge against profit, so changing the assumption changes reported earnings — often materially.">Nothing changes — useful life is only a note in the accounts.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q2 — Two identical companies each spend $90m building software. One expenses it, one capitalises it over three years. What differs?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Exactly — the shape of reported profit, not the total and not the cash. Expensing gives a loss then two strong years; capitalising gives three even ones. Both total $90m.">The shape of reported profit year by year. The cash and the three-year total are identical.</button>
+          <button type="button" class="opt" data-correct="false" data-why="The money left the business either way, in exactly the same amounts at the same times. Accounting treatment does not move cash.">The capitalising company spends less cash over the three years.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Both totals come to $90m of profit across the three years. Only the distribution between the years is different.">The expensing company earns less in total across the three years.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — Stock-based compensation is added back on the cash flow statement. Where does its real cost show up?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Yes — in a rising share count, which dilutes every existing holder. It is the most common reason a technology company looks more cash-generative than it really is.">In a rising share count, which quietly shrinks every existing shareholder's slice.</button>
+          <button type="button" class="opt" data-correct="false" data-why="No cash leaves at all — that is precisely why it gets added back. The cost is paid in ownership rather than in money.">In the financing section, as cash paid out to employees.</button>
+          <button type="button" class="opt" data-correct="false" data-why="It is a genuine cost of the work performed. It is just settled in shares instead of cash, which is why it needs following into the share count.">Nowhere — it is not a real cost, which is why it is added back.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — A company has reported a large "exceptional" restructuring charge in each of the last eight years. How should you read that?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right. A cost incurred every year for eight years is an ordinary cost of running this business, whatever it is labelled. Adjusted earnings that exclude it are overstating the run rate.">If it happens every year, it is not exceptional — it is a normal cost of this business.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Excluding it is exactly what makes adjusted earnings misleading here. The pattern is the information.">Exclude it as management suggests, since each charge is separately disclosed.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Restructuring charges are legitimate and common. What is questionable is calling a recurring cost exceptional, not the charge itself.">As evidence of accounting fraud requiring no further checking.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — What is a goodwill impairment actually telling you?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct — it is non-cash and backward-looking. The money left when the acquisition was made; the impairment is the admission that it bought less than was hoped.">That an acquisition made in the past has not worked out as hoped. No cash moves now.</button>
+          <button type="button" class="opt" data-correct="false" data-why="No money moves at the point of impairment. The cash went out when the acquisition was paid for, possibly years earlier.">That the company has just paid out a large sum of cash.</button>
+          <button type="button" class="opt" data-correct="false" data-why="It says nothing about the current trading operation. It is a write-down of a past purchase price, which is why it is usually excluded from operating comparisons — legitimately, if it is genuinely rare.">That the current year's trading has deteriorated sharply.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LESSON 8 ============ -->
+<section class="stage locked" data-stage="8">
+  <div class="stage-head"><span class="num">08</span><h2>The notes, and what trouble looks like</h2></div>
+  <p class="lockquiz">Locked — answer all five questions in lesson 07 to open this.</p>
+  <div class="stage-body" hidden>
+    <p class="key">The three statements are the summary. The notes are the terms and conditions, and they are where every judgement from lesson 07 is actually disclosed. They are longer than the statements by a wide margin, and nobody reads all of them — but a handful repay the effort every time.</p>
+
+    <ul class="plain">
+      <li><strong>Revenue recognition policy</strong> — when the company decides a sale counts. The first note worth reading in any business with long contracts.</li>
+      <li><strong>Segment reporting</strong> — revenue and profit broken out by division or region. Frequently reveals that one healthy segment is carrying a struggling one.</li>
+      <li><strong>Debt maturities</strong> — how much falls due, and when. A schedule with a large repayment next year is a fact about next year.</li>
+      <li><strong>Leases and other commitments</strong> — obligations that are real whether or not they sit on the balance sheet.</li>
+      <li><strong>Share-based payment</strong> — how many shares have been promised and at what prices.</li>
+      <li><strong>Contingencies and litigation</strong> — what might go wrong that has not yet.</li>
+      <li><strong>Related-party transactions</strong> — business done with people connected to the company. Usually innocuous. Occasionally the most important page in the document.</li>
+    </ul>
+
+    <h3>What trouble tends to look like</h3>
+    <p>The pattern below is the classic one, and it is visible from the outside long before anything is announced. Revenue keeps climbing; the unpaid invoices climb faster.</p>
+
+    <figure class="figure">
+      <svg viewBox="0 0 660 296" role="img" aria-labelledby="a8t a8d">
+        <title id="a8t">Receivables growing faster than revenue over five years</title>
+        <desc id="a8d">Indexed to one hundred in year one, revenue rises to one hundred and fifty over five years while receivables rise to two hundred and fifty.</desc>
+        <text x="24" y="44" class="s-lab-s">INDEXED TO 100 AT YEAR ONE</text>
+
+        <polyline points="60,210 200,187 340,156 480,117 620,70" class="s-warn"/>
+        <polyline points="60,210 200,199 340,187 480,175 620,163" class="s-price"/>
+        <line x1="40" y1="230" x2="636" y2="230" class="s-axis"/>
+
+        <text x="616" y="58" text-anchor="end" class="s-lab-s">RECEIVABLES +150%</text>
+        <text x="616" y="152" text-anchor="end" class="s-lab-s">REVENUE +50%</text>
+
+        <text x="60" y="252" text-anchor="middle" class="s-lab-s">YEAR 1</text>
+        <text x="200" y="252" text-anchor="middle" class="s-lab-s">YEAR 2</text>
+        <text x="340" y="252" text-anchor="middle" class="s-lab-s">YEAR 3</text>
+        <text x="480" y="252" text-anchor="middle" class="s-lab-s">YEAR 4</text>
+        <text x="620" y="252" text-anchor="middle" class="s-lab-s">YEAR 5</text>
+
+        <text x="24" y="284" class="s-lab-s">SALES GREW. THE UNPAID BILLS GREW THREE TIMES FASTER.</text>
+      </svg>
+      <figcaption>Sales are being booked that customers are slower and slower to pay for. There are innocent explanations — and there are others.</figcaption>
+    </figure>
+
+    <div class="tblwrap">
+      <table class="tbl">
+        <thead><tr><th>What you see</th><th>What it might mean</th><th>The innocent version</th></tr></thead>
+        <tbody>
+          <tr><td>Receivables outgrowing revenue</td><td>Sales booked that customers are slow to pay, or terms loosened to hit targets</td><td>A shift towards larger enterprise customers who simply pay slower</td></tr>
+          <tr><td>Inventory outgrowing revenue</td><td>Stock that is not selling and may need writing down</td><td>Deliberate stock-building ahead of a launch or a supply squeeze</td></tr>
+          <tr><td>Cash flow below profit for years</td><td>Reported profit is not converting into money</td><td>Genuine growth absorbing working capital, as in lesson 06</td></tr>
+          <tr><td>Repeated "one-off" charges</td><td>An ordinary cost being presented as exceptional</td><td>A long restructuring genuinely executed in stages</td></tr>
+          <tr><td>Goodwill rising, returns falling</td><td>Acquisitions bought growth at prices that have not paid off</td><td>Recent deals that have not had time to contribute yet</td></tr>
+          <tr><td>Capitalising what peers expense</td><td>Profit flattered by an accounting choice</td><td>A genuinely different mix of work that meets the tests</td></tr>
+          <tr><td>Auditor or CFO leaving abruptly</td><td>A disagreement that did not reach the public</td><td>Ordinary turnover, which is most of the time</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>How to use that table honestly</h3>
+    <p>Note that every row has a plausible innocent explanation, and most of the time the innocent explanation is the right one. That is why the third column exists. A single flag is a question, not a verdict.</p>
+
+    <p>What carries weight is a <em>pattern</em>: several flags at once, pointing the same way, persisting across years, in a company whose management keeps directing you to an adjusted figure. The disciplined habit is to ask "what would explain this that isn't a problem?" first — and then to notice when you cannot find an answer.</p>
+
+    <div class="tieback">
+      <span class="tag">Why this matters</span>
+      <p>You are not auditing anybody, and you will not detect fraud from a public filing. What you can do is far more useful: describe what the accounts say, notice when the description does not match the story being told about the company, and decline to own the ones where those two things keep diverging. That is a low bar, it costs nothing, and it rules out most of the disasters.</p>
+    </div>
+
+    <div class="checks" data-checks="8">
+      <p class="checks-h">Check yourself · five questions · all five open the final quiz</p>
+      <div class="check">
+        <p class="check-q">Q1 — Over five years revenue rose 50% while receivables rose 150%. What is the question to ask?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right — that is the disciplined order. There are innocent explanations, such as a shift to enterprise customers who pay slower. The point is to look for one and notice if you cannot find it.">Why are customers taking so much longer to pay — and is there an innocent explanation?</button>
+          <button type="button" class="opt" data-correct="false" data-why="Far too strong from one ratio. It is a question worth answering, not a verdict, and most of the time the answer is mundane.">Nothing to ask — this pattern proves the revenue is fabricated.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Receivables growing three times faster than the sales that create them is exactly the kind of divergence worth investigating. Both rising is not the relevant fact.">Nothing to ask — both are rising, which is what growth looks like.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q2 — What is segment reporting, and why is it worth reading?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Yes. It frequently shows that one healthy division is carrying a struggling one — something the consolidated figures hide completely.">Revenue and profit split by division or region, which often reveals one part carrying another.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That is the share register and the ownership disclosures, a different part of the report entirely.">A breakdown of who owns the company's shares.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Debt maturities are their own note. Segment reporting is about splitting the trading results into their parts.">A schedule of when the company's borrowings fall due.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — A company's inventory has grown much faster than its sales. What are the two readings?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct — and the notes, the segment split and the following year will usually tell you which. Holding both readings at once is the habit worth building.">Either stock is not selling and may need writing down, or it is deliberate build-up ahead of demand.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Rising inventory consumes cash and can end in a write-down. More stock is not the same as more strength.">It can only be good — more inventory means the company is ready to sell more.</button>
+          <button type="button" class="opt" data-correct="false" data-why="There are perfectly ordinary reasons to build stock: a launch, a supply squeeze, seasonal timing. Treating it as automatic bad news is as unhelpful as ignoring it.">It can only be bad — inventory growth is always a sign of failing demand.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — What actually gives a red flag weight?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Exactly. Several flags at once, pointing the same way, persisting across years, in a company that keeps directing you to an adjusted figure. One flag on its own is a question.">Several of them at once, pointing the same way, and persisting across years.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Any single flag has innocent explanations, which is why the third column of that table exists. Acting on one in isolation will have you avoiding perfectly sound companies.">Any single one of them appearing in a single year.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Share price movements are not evidence about the accounts. Plenty of companies with clean books fall, and plenty with problems rise for years first.">Confirmation from a falling share price.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — What is the realistic goal of reading a set of accounts as a private investor?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right — a low bar, costing nothing, that rules out most of the disasters. Detecting fraud from a public filing is not on the table and pretending otherwise just breeds false confidence.">To describe what the accounts say, and notice when that does not match the story being told.</button>
+          <button type="button" class="opt" data-correct="false" data-why="You will not detect fraud from a published filing — auditors with full access frequently miss it. What you can do is notice when a description and a story keep diverging.">To detect fraud before the auditors and the regulator do.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Nothing in a set of accounts forecasts a share price. They record what has already happened, which is a different and more reliable kind of information.">To work out where the share price is going next quarter.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section class="stage locked" data-stage="9">
+  <div class="stage-head"><span class="num">09</span><h2>Twelve questions to finish</h2></div>
+  <p class="lockquiz">Locked — answer all five questions in lesson 08 to open this.</p>
+  <div class="stage-body" hidden>
+    <p>No time limit, nothing riding on it. Pick an answer for each, then score it. Anything you miss, the explanation will tell you exactly why.</p>
+
+    <div class="qz" data-qz="1">
+      <p class="qz-q">1. Under accrual accounting, revenue is recorded when:</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Right — earned, not received. The cash arriving later settles a receivable that was created at the point of delivery.">It is earned — when the goods or service have been delivered.</button>
+        <button type="button" class="opt" data-correct="false" data-why="That is cash accounting. It is simpler and more verifiable, and it describes the underlying trade badly, which is why company reporting does not use it.">The customer's payment lands in the bank account.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Signing a contract is a promise, not a delivery. Revenue follows performance, not the signature.">The contract is signed, whenever delivery happens.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="2">
+      <p class="qz-q">2. Which profit figure sits above interest and tax, and therefore describes the trading business rather than how it is financed?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Yes. Two identical businesses with different debt loads report the same operating profit and very different net income — which is why comparisons usually start here.">Operating profit.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Net income is the bottom line, after interest and tax. It is the shareholders' figure, but it mixes the trading operation with the financing structure.">Net income.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Gross profit sits higher still, but it is only revenue less the direct cost of what was sold — it says nothing about the company's own overheads.">Gross profit.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="3">
+      <p class="qz-q">3. A company has $400m of assets and $220m of liabilities. Equity is:</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Correct — $180m, the residual claim. Everything the company controls was funded either by lenders or by owners, and equity is whatever is left.">$180m.</button>
+        <button type="button" class="opt" data-correct="false" data-why="That adds the two sides together. The equation is assets = liabilities + equity, so equity is assets minus liabilities.">$620m.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Equity is not what the market thinks the company is worth — that is market capitalisation, and the two are usually very different numbers.">Whatever the market says the company is worth.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="4">
+      <p class="qz-q">4. Retained earnings on the balance sheet represent:</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Yes — cumulative, across the company's whole life. It is the link that carries net income from the income statement onto the balance sheet.">Every profit the company has ever made and not paid out, added up.</button>
+        <button type="button" class="opt" data-correct="false" data-why="They are not a pot of money. The cash may long since have gone into machinery or wages — the balance sheet has a separate line for actual cash.">Cash the company is holding in reserve.</button>
+        <button type="button" class="opt" data-correct="false" data-why="That is this year's net income alone. Retained earnings accumulate every year that came before it too.">The profit made in the most recent year.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="5">
+      <p class="qz-q">5. Deferred revenue appears as a liability. Why, and how should you read it?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Right — a liability because the service is still owed, but generally a strong sign. The customer funded the business before receiving anything, which is the opposite of a receivable.">Customers have paid for something not yet delivered — usually a good sign.</button>
+        <button type="button" class="opt" data-correct="false" data-why="It carries no interest and is owed to customers, not lenders. It is settled by delivering the service that was already paid for.">It is a form of borrowing and should be counted alongside debt.</button>
+        <button type="button" class="opt" data-correct="false" data-why="It sits firmly on the liabilities side. The company holds the cash but still owes the work.">It is really an asset, since the company is holding the cash.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="6">
+      <p class="qz-q">6. Why does the cash flow statement add depreciation back at the top?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Exactly. It reduced profit but moved no money — the cash left when the asset was bought. Adding it back removes an accrual; it does not deny that the cost is real.">It reduced net income but no cash moved, so it has to come back out.</button>
+        <button type="button" class="opt" data-correct="false" data-why="It is a genuine cost — assets really do wear out. What is unusual about it is only the timing of the cash, not whether the cost exists.">Because it is not a real cost and should never have been deducted.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Nothing is being reversed for tax. The statement is simply unwinding accruals until only money is left.">To reverse the tax relief claimed on the asset.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="7">
+      <p class="qz-q">7. Operating cash flow is $20m and capital expenditure is $12m. Free cash flow is:</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Correct — $8m, and note that you calculate it yourself. It is not a defined line on the statement, which is why different sources quote different figures for it.">$8m.</button>
+        <button type="button" class="opt" data-correct="false" data-why="$20m is operating cash flow before the cost of keeping the assets running. Free cash flow is what survives capex.">$20m.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Adding capex back would count the same money twice. Free cash flow is a subtraction.">$32m.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="8">
+      <p class="qz-q">8. The last line of the cash flow statement is the closing cash balance. What is its relationship to the balance sheet?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Yes — the same figure, not a similar one. The cash flow statement exists to explain how the balance sheet's cash line got from where it started to where it ended.">It is the balance sheet's cash line, exactly.</button>
+        <button type="button" class="opt" data-correct="false" data-why="They tie by construction. If they did not, the accounts would not balance.">It is an approximation that should be close to it.</button>
+        <button type="button" class="opt" data-correct="false" data-why="They are measuring the same cash on the same date. The three statements are one model, not three separate reports.">There is none — they are prepared on different bases.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="9">
+      <p class="qz-q">9. Net income is $16m, the dividend is $4m, capex is $12m and depreciation is $9m. What happens to property and equipment on the balance sheet?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Right — up $3m. Capex adds, depreciation writes down, and neither figure is freely chosen: both are forced by other statements.">It rises by $3m.</button>
+        <button type="button" class="opt" data-correct="false" data-why="That ignores depreciation, which reduces the carrying value. Otherwise assets would sit at original cost forever.">It rises by $12m.</button>
+        <button type="button" class="opt" data-correct="false" data-why="The dividend affects retained earnings and cash, not the value of the equipment. Different link, different line.">It falls by $4m, the dividend paid.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="10">
+      <p class="qz-q">10. A genuinely profitable product business, growing 40% a year, keeps running its cash balance down. The most likely explanation is:</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Yes — the growth trap. Each extra sale needs stock bought in advance and is paid for late, so growth consumes cash before it produces any. Ordinary, real, and it still has to be funded.">Growth is consuming working capital — stock up front, payment late.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Possible, but working capital is far more common and the operating section will show it plainly. Reaching for fraud first is a good way to misread most growing companies.">The reported profit is fabricated.</button>
+        <button type="button" class="opt" data-correct="false" data-why="They are entirely compatible, which is the whole point of the working capital lesson. Profit and cash are different measurements.">Impossible — profit and falling cash cannot coexist.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="11">
+      <p class="qz-q">11. Two identical companies each spend $90m on software. One expenses it immediately, the other capitalises it over three years. Across those three years:</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Correct — same cash, same total profit, very different shape. The expensing company shows a loss then two strong years; the other shows three even ones.">Total profit and total cash are the same; only the year-by-year shape differs.</button>
+        <button type="button" class="opt" data-correct="false" data-why="The money left the business in exactly the same amounts at the same times. Accounting treatment never moves cash.">The capitalising company spends less cash.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Both total $90m of profit over the three years. Only the distribution between them changes.">The expensing company earns less in total.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="12">
+      <p class="qz-q">12. Over five years, revenue rose 50% and receivables rose 150%. The disciplined response is:</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Right, and in that order. There are innocent explanations — a shift to enterprise customers who pay slower is a common one. The signal is failing to find any.">Ask why customers are paying more slowly, and look hard for an innocent explanation.</button>
+        <button type="button" class="opt" data-correct="false" data-why="One ratio does not prove anything, and treating every flag as a verdict will have you avoiding perfectly sound companies.">Conclude the revenue is fabricated and move on.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Unpaid bills growing three times faster than the sales that create them is exactly the divergence worth chasing down. That both rise is not the relevant fact.">Ignore it — both figures are rising, which is what growth looks like.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="btnrow">
+      <button type="button" class="btn" id="scoreBtn">Score my quiz</button>
+      <button type="button" class="btn ghost" id="resetBtn" hidden>Clear and try again</button>
+      <span class="nudge" id="nudge" hidden>Pick an answer for every question first.</span>
+    </div>
+    <div class="score" id="score" hidden>
+      <span class="n" id="scoreN">0 / 12</span>
+      <p id="scoreMsg"></p>
+    </div>
+  </div>
+</section>
+
+<nav class="pathnav one" aria-label="Continue">
+  <a class="card" href="index.html">
+    <span class="k">Next</span>
+    <span class="t">Technical analysis →</span>
+    <span class="d">The other half of the course: candles, trend structure, levels, volume, moving averages, momentum, patterns — and how to size a position so being wrong stays survivable.</span>
+  </a>
+</nav>
+
+<footer>
+  <p><strong>What to do next:</strong> take one company you already understand and open its most recent annual report. Find the three statements, then do exactly one thing with them: start at net income, follow it to the top of the cash flow statement, and see how far apart those two ends are. Then check the closing cash against the balance sheet. That single exercise, on five companies, will teach you more than reading about accounting ever will.</p>
+  <p class="disc">Educational material only. Nothing here is financial advice, a recommendation, or a signal to buy or sell anything. All company names, figures and scenarios are illustrations chosen to teach the concept — they are not real financial data and not predictions. Accounting standards differ between jurisdictions and change over time; check the rules that apply to the accounts in front of you. Investing involves real risk of loss, including loss of the full amount invested.</p>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var lastStage = document.querySelectorAll(".stage").length;
+
+  /* ---- shuffle every set of options, so the answers sit in a different place each load ---- */
+  Array.prototype.forEach.call(document.querySelectorAll(".opts"), function (box) {
+    var opts = Array.prototype.slice.call(box.children);
+    for (var i = opts.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = opts[i]; opts[i] = opts[j]; opts[j] = t;
+    }
+    opts.forEach(function (o) { box.appendChild(o); });
+  });
+
+  function rail(n, cls) {
+    var li = document.querySelector('.rail li[data-rail="' + n + '"]');
+    if (li) { li.classList.remove("on", "done"); li.classList.add(cls); }
+  }
+
+  function unlock(n) {
+    var stage = document.querySelector('.stage[data-stage="' + n + '"]');
+    if (!stage || !stage.classList.contains("locked")) return;
+    stage.classList.remove("locked");
+    var note = stage.querySelector(".lockquiz");
+    if (note) note.parentNode.removeChild(note);
+    var body = stage.querySelector(".stage-body");
+    if (body) body.hidden = false;
+    rail(n, "on");
+    window.setTimeout(function () {
+      stage.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    }, 150);
+  }
+
+  function say(el, kind, label, text) {
+    el.className = "feedback " + kind;
+    el.innerHTML = "";
+    var b = document.createElement("b");
+    b.textContent = label;
+    var span = document.createElement("span");
+    span.textContent = text;
+    el.appendChild(b);
+    el.appendChild(span);
+  }
+
+  /* ---- lesson checks: must be right to advance ---- */
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest ? e.target.closest(".check .opt") : null;
+    if (!btn || btn.disabled) return;
+
+    var check = btn.closest(".check");
+    var fb = check.querySelector(".feedback");
+    var correct = btn.getAttribute("data-correct") === "true";
+    var why = btn.getAttribute("data-why") || "";
+
+    if (correct) {
+      btn.classList.add("ok");
+      Array.prototype.forEach.call(check.querySelectorAll(".opt"), function (o) { o.disabled = true; });
+      say(fb, "good", "Correct", why);
+      check.classList.add("passed");
+      var group = check.closest("[data-checks]");
+      if (group && group.querySelectorAll(".check").length === group.querySelectorAll(".check.passed").length) {
+        var n = parseInt(group.getAttribute("data-checks"), 10);
+        rail(n, "done");
+        unlock(n + 1);
+      }
+    } else {
+      btn.classList.add("no");
+      btn.disabled = true;
+      say(fb, "bad", "Not quite — try again", why);
+    }
+  });
+
+  /* ---- quiz ---- */
+  var scoreBtn = document.getElementById("scoreBtn");
+  var resetBtn = document.getElementById("resetBtn");
+  var scoreBox = document.getElementById("score");
+  var scoreN = document.getElementById("scoreN");
+  var scoreMsg = document.getElementById("scoreMsg");
+  var nudge = document.getElementById("nudge");
+  var blocks = Array.prototype.slice.call(document.querySelectorAll(".qz"));
+  var total = blocks.length;
+
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest ? e.target.closest(".qz .opt") : null;
+    if (!btn || btn.disabled) return;
+    var block = btn.closest(".qz");
+    Array.prototype.forEach.call(block.querySelectorAll(".opt"), function (o) { o.classList.remove("sel"); });
+    btn.classList.add("sel");
+    nudge.hidden = true;
+  });
+
+  scoreBtn.addEventListener("click", function () {
+    var unanswered = blocks.filter(function (b) { return !b.querySelector(".opt.sel"); });
+    if (unanswered.length) {
+      nudge.hidden = false;
+      unanswered[0].scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+      return;
+    }
+    nudge.hidden = true;
+
+    var score = 0;
+    blocks.forEach(function (block) {
+      var picked = block.querySelector(".opt.sel");
+      var right = block.querySelector('.opt[data-correct="true"]');
+      var why = block.querySelector(".qz-why");
+      var ok = picked === right;
+      if (ok) score++;
+
+      Array.prototype.forEach.call(block.querySelectorAll(".opt"), function (o) {
+        o.disabled = true;
+        o.classList.remove("sel");
+      });
+      picked.classList.add(ok ? "ok" : "no");
+      if (!ok) right.classList.add("ok");
+
+      why.hidden = false;
+      why.textContent = ok
+        ? "Correct. " + picked.getAttribute("data-why")
+        : "Not this one. " + picked.getAttribute("data-why") + " The right answer is highlighted above.";
+    });
+
+    var msg;
+    if (score === total) {
+      msg = "Full marks. You can now open an annual report, read all three statements, and — the part almost nobody bothers with — check that they agree with each other. That is the whole skill. Go and do it on a real company, starting with one whose product you already use.";
+    } else if (score >= Math.ceil(total * 0.6)) {
+      msg = "Solid. Read the explanations under the ones you missed — the gap is usually one specific definition rather than the whole idea. If any of them were in lesson 05, reread that one: the linkage is what makes the rest hold together.";
+    } else {
+      msg = "Worth another pass. Scroll back up through the lessons, especially the linkage diagram in lesson 05, and come back to this. Getting it wrong here is free, which is the entire point of learning it this way first.";
+    }
+    scoreN.textContent = score + " / " + total;
+    scoreMsg.textContent = msg;
+    scoreBox.hidden = false;
+    resetBtn.hidden = false;
+    scoreBtn.hidden = true;
+    rail(lastStage, "done");
+    scoreBox.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+  });
+
+  resetBtn.addEventListener("click", function () {
+    blocks.forEach(function (block) {
+      Array.prototype.forEach.call(block.querySelectorAll(".opt"), function (o) {
+        o.disabled = false;
+        o.classList.remove("ok", "no", "sel");
+      });
+      var why = block.querySelector(".qz-why");
+      why.hidden = true;
+      why.textContent = "";
+    });
+    scoreBox.hidden = true;
+    resetBtn.hidden = true;
+    scoreBtn.hidden = false;
+    rail(lastStage, "on");
+    blocks[0].scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+  });
+})();
+</script>
+</body>
+</html>
