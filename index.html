@@ -281,13 +281,10 @@ figcaption{
 .tieback.warn .tag{color:var(--down)}
 
 /* ---------- checks ---------- */
-.check{
-  border-top:1px solid var(--rule);
-  padding-top:1.1rem;
-  display:flex;
-  flex-direction:column;
-  gap:.75rem;
-}
+.checks{border-top:1px solid var(--rule);padding-top:1.1rem;display:flex;flex-direction:column;gap:1.25rem}
+.checks-h{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)!important}
+.check{display:flex;flex-direction:column;gap:.75rem}
+.check + .check{border-top:1px solid var(--rule-soft);padding-top:1.25rem}
 .check-q{font-weight:600;color:var(--ink)!important}
 .opts{display:flex;flex-direction:column;gap:.5rem}
 .opt{
@@ -375,6 +372,31 @@ footer .disc{
 @media (prefers-reduced-motion: reduce){
   *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
 }
+/* ---------- mobile: fit the diagrams to the screen rather than scrolling them ---------- */
+@media (max-width:640px){
+  .wrap{padding-left:.55rem;padding-right:.55rem}
+  .stage{padding:1rem .75rem}
+  .figure{
+    margin-left:-.75rem;margin-right:-.75rem;
+    padding:.4rem .3rem;
+    border-left:0;border-right:0;border-radius:0;
+    overflow:visible;
+  }
+  .figure svg{min-width:0;overflow:visible}
+  figcaption{padding:0 .5rem}
+  /* scale the in-diagram type up to offset the diagram being scaled down */
+  .s-lab{font-size:15px}
+  .s-lab-s{font-size:13px}
+  .s-ttl{font-size:15px}
+  .s-lead{stroke-width:1.4}
+  .s-axis{stroke-width:1.4}
+  /* tables wrap instead of scrolling sideways */
+  .tbl{min-width:0;font-size:.84rem}
+  .tbl th,.tbl td{padding:.45rem .5rem}
+  .tbl td:first-child,.tbl td.mono{white-space:normal}
+  .rail ol{flex-wrap:wrap}
+  .worry{padding:.8rem .85rem}
+}
 @media (max-width:520px){
   body{font-size:16px}
   .rail li{font-size:0;gap:0}
@@ -447,14 +469,14 @@ footer .disc{
         <line x1="180" y1="50" x2="180" y2="270" class="s-up"/>
         <rect x="158" y="110" width="44" height="115" rx="2" class="s-up"/>
         <!-- leaders -->
-        <line x1="96" y1="50" x2="174" y2="50" class="s-lead"/>
-        <line x1="96" y1="110" x2="154" y2="110" class="s-lead"/>
-        <line x1="96" y1="225" x2="154" y2="225" class="s-lead"/>
-        <line x1="96" y1="270" x2="174" y2="270" class="s-lead"/>
-        <text x="90" y="54" text-anchor="end" class="s-lab">high $186</text>
-        <text x="90" y="114" text-anchor="end" class="s-lab">close $184</text>
-        <text x="90" y="229" text-anchor="end" class="s-lab">open $180</text>
-        <text x="90" y="274" text-anchor="end" class="s-lab">low $178</text>
+        <line x1="102" y1="50" x2="174" y2="50" class="s-lead"/>
+        <line x1="102" y1="110" x2="154" y2="110" class="s-lead"/>
+        <line x1="102" y1="225" x2="154" y2="225" class="s-lead"/>
+        <line x1="102" y1="270" x2="174" y2="270" class="s-lead"/>
+        <text x="96" y="54" text-anchor="end" class="s-lab">high $186</text>
+        <text x="96" y="114" text-anchor="end" class="s-lab">close $184</text>
+        <text x="96" y="229" text-anchor="end" class="s-lab">open $180</text>
+        <text x="96" y="274" text-anchor="end" class="s-lab">low $178</text>
         <!-- body / wick callouts -->
         <line x1="240" y1="76" x2="188" y2="66" class="s-lead"/>
         <text x="246" y="80" class="s-lab-s">WICK</text>
@@ -487,14 +509,53 @@ footer .disc{
       <p>Hype talks in stories — "this stock is going to the moon." A candle is not a story. It's four numbers that already happened. Learning to read them is how you replace someone else's excitement with your own observation.</p>
     </div>
 
-    <div class="check" data-check="1">
-      <p class="check-q">Check 1 — A daily candle for Microsoft <span class="tk">MSFT</span> opens at $410, trades as high as $418, dips to $405, and closes at $407. What does that candle look like?</p>
-      <div class="opts">
-        <button type="button" class="opt" data-correct="false" data-why="The high is $418, but the close is only $407 — the candle finished below where it started, so it's a down candle, not an up one. The $418 is the tip of the upper wick, not the top of the body.">A green candle with the body from $410 to $418.</button>
-        <button type="button" class="opt" data-correct="true" data-why="Close ($407) is below open ($410), so it's a down candle. The body runs open to close — $410 down to $407 — and the wicks stretch out to the high ($418) and the low ($405). That long upper wick is price getting pushed up and rejected.">A red candle with a small body from $410 down to $407, a long wick up to $418 and a short wick down to $405.</button>
-        <button type="button" class="opt" data-correct="false" data-why="The body is never drawn from the high to the low — that's what the wicks are for. The body only ever runs from the open to the close.">A red candle with the body running the whole way from $418 to $405.</button>
+    <div class="checks" data-checks="1">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — A daily candle for Microsoft <span class="tk">MSFT</span> opens at $410, trades as high as $418, dips to $405, and closes at $407. What does that candle look like?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="false" data-why="The high is $418, but the close is only $407 — the candle finished below where it started, so it's a down candle, not an up one. The $418 is the tip of the upper wick, not the top of the body.">A green candle with the body from $410 to $418.</button>
+          <button type="button" class="opt" data-correct="true" data-why="Close ($407) is below open ($410), so it's a down candle. The body runs open to close — $410 down to $407 — and the wicks stretch out to the high ($418) and the low ($405). That long upper wick is price getting pushed up and rejected.">A red candle with a small body from $410 down to $407, a long wick up to $418 and a short wick down to $405.</button>
+          <button type="button" class="opt" data-correct="false" data-why="The body is never drawn from the high to the low — that's what the wicks are for. The body only ever runs from the open to the close.">A red candle with the body running the whole way from $418 to $405.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
       </div>
-      <p class="feedback" role="status" aria-live="polite"></p>
+      <div class="check">
+        <p class="check-q">Q2 — On a daily candle for <span class="tk">AAPL</span> the open is $50 and the close is $50.40, but the upper wick reaches $56. What is that wick telling you?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Exactly. A wick marks somewhere price went and didn't stay. Somebody was willing to pay $56, and by the close nobody was.">Price traded up to $56 at some point in the day and was pushed all the way back before the close — the attempt was rejected.</button>
+          <button type="button" class="opt" data-correct="false" data-why="The close is $50.40 — it's one end of the body. A wick never marks the open or the close, only the extremes reached in between.">The stock closed at $56.</button>
+          <button type="button" class="opt" data-correct="false" data-why="The open is $50, and like the close it's an end of the body. Wicks only ever reach out to the high and the low.">$56 was the opening price.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — On a 1-hour chart, how much time does a single candle cover?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right. Daily chart, one candle per day; 15-minute chart, one candle per fifteen minutes. The four prices are the open, high, low and close of that slice.">One hour — the timeframe of the chart is the timeframe of each candle.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That's a daily candle. On an hourly chart each candle covers exactly one hour.">One full trading day, compressed.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Length on the screen varies with the price range, but the time each candle covers is fixed by the chart's timeframe.">It varies — busier hours produce longer candles.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — Which single comparison decides whether a candle is drawn green or red?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Yes. Close above open is an up candle, close below open is a down candle. Nothing else is involved.">The close against the open, within that same candle.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That's a real convention on some bar charts, but a candle's colour comes from its own open and close — not from the candle before it.">The close against the previous candle's close.</button>
+          <button type="button" class="opt" data-correct="false" data-why="The high is always above the low, so that comparison would colour every candle the same. Colour comes from open versus close.">The high against the low.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — A candle has almost no body and only short wicks either side. What does that describe?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct. Buyers and sellers finished level and neither pushed price anywhere. On its own it's a small piece of information, but that is what it says.">A period that finished about where it started, without travelling far — indecision.</button>
+          <button type="button" class="opt" data-correct="false" data-why="A strong up day leaves a long body: the close finishes well above the open. A tiny body is the opposite of that.">A very strong up day.</button>
+          <button type="button" class="opt" data-correct="false" data-why="No trading means no candle. A tiny body means plenty may have happened — it just ended where it began.">A day on which the stock didn't trade at all.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
     </div>
   </div>
 </section>
@@ -502,7 +563,7 @@ footer .disc{
 <!-- ============ LESSON 2 ============ -->
 <section class="stage locked" data-stage="2">
   <div class="stage-head"><span class="num">02</span><h2>Market structure: what the chart is doing</h2></div>
-  <p class="lockquiz">Locked — answer Check 1 correctly to open this.</p>
+  <p class="lockquiz">Locked — answer all five questions in lesson 01 to open this.</p>
   <div class="stage-body" hidden>
     <p class="key">One candle is a moment. Zoom out and the candles form a shape, and that shape has a name. There are only three, and every stock chart you ever look at is doing one of them.</p>
     <p>To see it, ignore the individual candles and look only at the turning points — the peaks (swing highs) and the dips (swing lows).</p>
@@ -557,14 +618,53 @@ footer .disc{
       <p>Most of the money beginners lose is lost buying a stock that's already making lower highs and lower lows, because a headline said it was cheap. Structure gives you one calm question to ask before anything else: <em>which of the three is this?</em> Sometimes the honest answer is "sideways and unclear", and the correct response to that is to do nothing.</p>
     </div>
 
-    <div class="check" data-check="2">
-      <p class="check-q">Check 2 — Over a few weeks, Nvidia <span class="tk">NVDA</span> peaks at $120, dips to $102, rallies to $115, then dips to $96. What structure is that?</p>
-      <div class="opts">
-        <button type="button" class="opt" data-correct="false" data-why="An uptrend needs the peaks and the dips both climbing. Here the second peak ($115) is below the first ($120) and the second dip ($96) is below the first ($102) — everything is stepping down, not up.">An uptrend — it's rallying $19 off the low, so buyers are in control.</button>
-        <button type="button" class="opt" data-correct="true" data-why="Peak $120 then $115 is a lower high. Dip $102 then $96 is a lower low. Lower highs plus lower lows is the definition of a downtrend — sellers are in control, whatever the news happens to be saying.">A downtrend — lower high ($115 after $120) and lower low ($96 after $102).</button>
-        <button type="button" class="opt" data-correct="false" data-why="A range needs the peaks stopping around the same level and the dips stopping around the same level. These are clearly stepping lower each time — $120 to $115, $102 to $96 — so it's trending down, not going sideways.">A range — price is bouncing up and down between roughly $96 and $120.</button>
+    <div class="checks" data-checks="2">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — Over a few weeks, Nvidia <span class="tk">NVDA</span> peaks at $120, dips to $102, rallies to $115, then dips to $96. What structure is that?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="false" data-why="An uptrend needs the peaks and the dips both climbing. Here the second peak ($115) is below the first ($120) and the second dip ($96) is below the first ($102) — everything is stepping down, not up.">An uptrend — it's rallying $19 off the low, so buyers are in control.</button>
+          <button type="button" class="opt" data-correct="true" data-why="Peak $120 then $115 is a lower high. Dip $102 then $96 is a lower low. Lower highs plus lower lows is the definition of a downtrend — sellers are in control, whatever the news happens to be saying.">A downtrend — lower high ($115 after $120) and lower low ($96 after $102).</button>
+          <button type="button" class="opt" data-correct="false" data-why="A range needs the peaks stopping around the same level and the dips stopping around the same level. These are clearly stepping lower each time — $120 to $115, $102 to $96 — so it's trending down, not going sideways.">A range — price is bouncing up and down between roughly $96 and $120.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
       </div>
-      <p class="feedback" role="status" aria-live="polite"></p>
+      <div class="check">
+        <p class="check-q">Q2 — A stock has been in a clear uptrend. Which single event tells you the uptrend has actually broken, rather than merely looking stretched?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="That's the definition. An uptrend is higher highs and higher lows; it ends when a dip fails to hold above the last one, not when it feels high.">Price makes a lower low — it takes out the previous dip.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Looking expensive isn't a structural event, and it's one of the most common reasons beginners sell into a trend that carries on for months.">Price has risen a long way and looks expensive.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Red candles appear constantly inside healthy uptrends. One candle is a moment; structure is about the turning points.">A red candle appears.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — Peaks keep stopping around $74 and dips keep stopping around $66, repeatedly, for two months. What structure is that?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Yes. The peaks are flat and the dips are flat, so nobody is winning. This is the structure that makes most trend tools useless, which is lesson 06.">A range — neither side is in control.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Bouncing isn't enough — an uptrend needs each peak and each dip to be higher than the last. These are level.">An uptrend, because it keeps bouncing off $66.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Failing at the same price repeatedly isn't a downtrend. A downtrend needs lower highs and lower lows; these are flat.">A downtrend, because it keeps failing at $74.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — <span class="tk">AAPL</span> is in an uptrend on the weekly chart and a downtrend on the hourly. Which reading is correct?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct, and it is worth getting comfortable with early. Neither chart is lying. Lesson 04 is entirely about deciding which one you are acting on.">Both. Structure is a property of the timeframe you are looking at.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Recency doesn't outrank the higher timeframe. If it did, the 1-minute chart would be the truest chart on the screen, which it plainly isn't.">Only the hourly — it is built from the most recent data.</button>
+          <button type="button" class="opt" data-correct="false" data-why="It isn't a contradiction. Both statements are true about different slices of time, and describing both is the whole skill.">Neither — a contradiction means the chart is unreadable.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — When you read structure, what are you supposed to be looking at?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right. Ignore the individual candles entirely and ask whether the peaks and dips are climbing, falling, or flat.">The swing highs and swing lows — the turning points.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Colour is a one-candle fact. Structure is about where price turned, which is a different scale of question.">The colour of the last few candles.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Counting candles tells you nothing about structure. A downtrend can contain more green candles than red ones and still make lower lows.">Whether there are more green candles than red ones.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
     </div>
   </div>
 </section>
@@ -572,7 +672,7 @@ footer .disc{
 <!-- ============ LESSON 3 ============ -->
 <section class="stage locked" data-stage="3">
   <div class="stage-head"><span class="num">03</span><h2>Support and resistance: floors and ceilings</h2></div>
-  <p class="lockquiz">Locked — answer Check 2 correctly to open this.</p>
+  <p class="lockquiz">Locked — answer all five questions in lesson 02 to open this.</p>
   <div class="stage-body" hidden>
     <p class="key">Now the last piece of the basics. Price doesn't wander randomly — it keeps reacting at the same prices, over and over. Those prices have names.</p>
     <ul class="plain">
@@ -619,14 +719,53 @@ footer .disc{
       <p>This is the piece that most directly protects your money. Levels give you a place where you'd be provably wrong. If you thought $400 was the floor and price closes well below it, the idea was wrong — that's information, not a disaster, and it's a decision you made in advance rather than in a panic. Deciding where you're wrong <em>before</em> you're in is most of the difference between trading and stress. Lesson 09 turns that into arithmetic.</p>
     </div>
 
-    <div class="check" data-check="3">
-      <p class="check-q">Check 3 — Amazon <span class="tk">AMZN</span> has stalled at roughly $185 four times over two months. It finally closes at $191, then a week later drifts back to $185 and starts pushing up from there. What just happened?</p>
-      <div class="opts">
-        <button type="button" class="opt" data-correct="false" data-why="Resistance is a ceiling that caps rallies. Price closed above $185 and is now bouncing up off it — it's acting as a floor, not a ceiling. When behaviour changes like that, the label changes with it.">$185 is still resistance, so the stock can't get past it.</button>
-        <button type="button" class="opt" data-correct="false" data-why="Four reactions at the same price isn't chance — that's exactly what makes a level worth watching. The one thing you can say for sure is that a lot of buying and selling decisions are being made around $185.">$185 was a coincidence; four touches don't mean anything.</button>
-        <button type="button" class="opt" data-correct="true" data-why="Exactly — that's the flip. $185 capped four rallies as resistance, price closed above it, and on the return visit the same level held price up instead of pushing it down. Old ceiling, new floor.">$185 was resistance, price broke above it, and it's now acting as support.</button>
+    <div class="checks" data-checks="3">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — Amazon <span class="tk">AMZN</span> has stalled at roughly $185 four times over two months. It finally closes at $191, then a week later drifts back to $185 and starts pushing up from there. What just happened?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="false" data-why="Resistance is a ceiling that caps rallies. Price closed above $185 and is now bouncing up off it — it's acting as a floor, not a ceiling. When behaviour changes like that, the label changes with it.">$185 is still resistance, so the stock can't get past it.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Four reactions at the same price isn't chance — that's exactly what makes a level worth watching. The one thing you can say for sure is that a lot of buying and selling decisions are being made around $185.">$185 was a coincidence; four touches don't mean anything.</button>
+          <button type="button" class="opt" data-correct="true" data-why="Exactly — that's the flip. $185 capped four rallies as resistance, price closed above it, and on the return visit the same level held price up instead of pushing it down. Old ceiling, new floor.">$185 was resistance, price broke above it, and it's now acting as support.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
       </div>
-      <p class="feedback" role="status" aria-live="polite"></p>
+      <div class="check">
+        <p class="check-q">Q2 — Why do support and resistance levels exist at all?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="That's the whole mechanism. Nothing mystical: real orders sitting at a remembered price, and price reacting when it arrives there.">Enough participants remember that price and leave orders around it — buyers who missed out, sellers waiting to get back to break-even.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Round numbers get attention because people remember them, not because the arithmetic matters. The memory is the cause; the roundness is a coincidence.">Because those prices are mathematically significant round numbers.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Exchanges do halt trading after extreme moves, but that has nothing to do with the levels a chart keeps reacting at.">Because exchanges cap how far a stock is allowed to move.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — <span class="tk">MSFT</span> support is described as &quot;$400&quot;. What is the more accurate way to hold that in your head?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Yes. Draw levels as bands. Treating them as hairlines is how people get stopped out by a two-cent overshoot that meant nothing.">A zone of roughly $398–$402 — price reacts around a level, not to the exact cent.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That precision doesn't exist in a real order book. A level is an area where enough interest sits, not a single price.">Exactly $400.00, so a trade at $399.98 has broken it.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Nothing on a chart guarantees anything. Support is where buyers have shown up before — and every level breaks eventually.">A guarantee that price cannot go below $400.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — A stock climbs above a ceiling it had failed at three times, drifts back down to it, and starts rising again from there. What is that behaviour called?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct, and it's one of the more reliable things on a chart. The sellers who defended it are gone; the buyers who missed out are taking the retest.">A role reversal — the old resistance is now acting as support.</button>
+          <button type="button" class="opt" data-correct="false" data-why="A double top is two failed attempts at a ceiling followed by a break downward. Here the ceiling was cleared and then held from above.">A double top.</button>
+          <button type="button" class="opt" data-correct="false" data-why="A false breakout closes back inside the range. Here price stayed above the old level and used it as a floor — the opposite outcome.">A false breakout.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — Why do levels matter for your money, and not just for your reading of the chart?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="That's the point of the whole lesson, and lesson 09 turns it into arithmetic. Deciding where you're wrong before you're in is most of the difference between trading and stress.">They give you a specific price at which the idea is provably wrong, decided in advance rather than in a panic.</button>
+          <button type="button" class="opt" data-correct="false" data-why="They don't. A level describes where price has reacted before; it says nothing about the size of the next move.">They tell you how high the stock is going to go.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Levels break all the time — which is exactly why you need a plan for when this one does.">They guarantee a bounce, so you can buy support with confidence.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
     </div>
   </div>
 </section>
@@ -634,7 +773,7 @@ footer .disc{
 <!-- ============ LESSON 4 ============ -->
 <section class="stage locked" data-stage="4">
   <div class="stage-head"><span class="num">04</span><h2>Timeframes: the same chart, three answers</h2></div>
-  <p class="lockquiz">Locked — answer Check 3 correctly to open this.</p>
+  <p class="lockquiz">Locked — answer all five questions in lesson 03 to open this.</p>
   <div class="stage-body" hidden>
     <p class="key">You've now got the three basics: candles, structure, levels. Everything from here refines them — starting with the question that has to be settled before any of it means anything. <em>Which timeframe am I looking at, and does it match how long I intend to hold?</em></p>
     <p>A chart's timeframe is how much time each candle covers. On a weekly chart each candle is a week; on a 15-minute chart each candle is fifteen minutes. Lesson 02 mentioned this in passing — here's what it actually looks like. Change the timeframe and the same stock can be in an uptrend, a downtrend and a range simultaneously, and all three readings are correct.</p>
@@ -688,14 +827,53 @@ footer .disc{
       <p>Decide your timeframe before you open the chart, not after. Choosing it afterwards is how people end up justifying a position they already hold by scrolling until they find a timeframe that agrees with them — which is stress dressed up as analysis.</p>
     </div>
 
-    <div class="check" data-check="4">
-      <p class="check-q">Check 4 — A stock is in a clear uptrend on the weekly chart. On the hourly chart it's been making lower highs and lower lows for two days. What's the most sensible read?</p>
-      <div class="opts">
-        <button type="button" class="opt" data-correct="false" data-why="Two days of hourly candles is a very small slice of a weekly trend. It might turn into the start of a reversal, but on its own it's the sort of pullback that happens repeatedly inside every uptrend that ever existed.">The uptrend is over — the hourly chart is more current, so it wins.</button>
-        <button type="button" class="opt" data-correct="true" data-why="Right. Pullbacks are how uptrends work; they're not a contradiction of it. The weekly trend sets the bias and the hourly shows a normal countertrend move. What would change the weekly read is a lower low on the weekly chart — not on the hourly.">Both are true: it's a short-term pullback inside a longer uptrend, which is completely normal.</button>
-        <button type="button" class="opt" data-correct="false" data-why="They don't actually contradict each other — they're measuring different lengths of time. Treating disagreement between timeframes as noise-to-be-ignored throws away the most useful bit of context you have.">The timeframes contradict each other, so the chart is unreadable right now.</button>
+    <div class="checks" data-checks="4">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — A stock is in a clear uptrend on the weekly chart. On the hourly chart it's been making lower highs and lower lows for two days. What's the most sensible read?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="false" data-why="Two days of hourly candles is a very small slice of a weekly trend. It might turn into the start of a reversal, but on its own it's the sort of pullback that happens repeatedly inside every uptrend that ever existed.">The uptrend is over — the hourly chart is more current, so it wins.</button>
+          <button type="button" class="opt" data-correct="true" data-why="Right. Pullbacks are how uptrends work; they're not a contradiction of it. The weekly trend sets the bias and the hourly shows a normal countertrend move. What would change the weekly read is a lower low on the weekly chart — not on the hourly.">Both are true: it's a short-term pullback inside a longer uptrend, which is completely normal.</button>
+          <button type="button" class="opt" data-correct="false" data-why="They don't actually contradict each other — they're measuring different lengths of time. Treating disagreement between timeframes as noise-to-be-ignored throws away the most useful bit of context you have.">The timeframes contradict each other, so the chart is unreadable right now.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
       </div>
-      <p class="feedback" role="status" aria-live="polite"></p>
+      <div class="check">
+        <p class="check-q">Q2 — You intend to hold for months to years. Which timeframe should be setting your context?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="That's the top-down rule: establish the trend well above the timeframe you act on, then drop down for the detail.">Monthly and weekly, with the daily chart for detail.</button>
+          <button type="button" class="opt" data-correct="false" data-why="A five-minute candle contains almost nothing relevant to a multi-year hold. Matching the chart to the holding period is the point of the lesson.">The 5-minute chart, because it is the most current.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That's the exact failure mode the lesson warns about — scrolling through timeframes until one agrees with you is stress dressed up as analysis.">Whichever timeframe currently agrees with the view you already hold.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — What does zooming into a shorter timeframe actually give you?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right. It's the same data at higher resolution. More detail is not more truth, and it usually arrives with more noise.">A smaller slice of the same chart in more detail — not a truer one.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Backwards. Longer timeframes aren't hiding anything — they are the same trades grouped differently.">The real chart, with the long timeframes smoothing away what's really happening.</button>
+          <button type="button" class="opt" data-correct="false" data-why="No timeframe predicts another. A shorter chart shows you the same move in finer grain, after it happens.">An early warning of what the daily chart is about to do.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — Why does this course steer beginners away from timeframes under an hour?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="All three, and they compound. Almost nobody's first chart should be a 1-minute chart.">More randomness relative to signal, higher costs from spreads and fees, and decisions demanded faster than a beginner can make them well.</button>
+          <button type="button" class="opt" data-correct="false" data-why="They're widely available — availability isn't the problem. Signal-to-noise, costs and decision speed are.">Because most brokers don't offer them to retail accounts.</button>
+          <button type="button" class="opt" data-correct="false" data-why="They aren't wrong, they're noisy. The moves are real; there are just far more meaningless ones per hour.">Because short timeframes are systematically wrong about direction.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — You formed a view from the weekly chart. A frightening 5-minute candle appears. What is the disciplined response?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct. Your exit was defined on the timeframe you took the position on. Letting a lower timeframe overrule it means you never really had a plan.">Ignore it — it isn't information about a weekly idea, and candles like it were always going to occur.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Newest isn't most relevant. That candle is a few minutes of noise inside a thesis measured in weeks.">Close the position — the newest candle is the most relevant information you have.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Changing timeframe mid-position is how a considered idea turns into improvisation. Pick the timeframe before you open the chart.">Switch to the 5-minute chart and manage the position from there.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
     </div>
   </div>
 </section>
@@ -703,7 +881,7 @@ footer .disc{
 <!-- ============ LESSON 5 ============ -->
 <section class="stage locked" data-stage="5">
   <div class="stage-head"><span class="num">05</span><h2>Volume: how much conviction is behind the move</h2></div>
-  <p class="lockquiz">Locked — answer Check 4 correctly to open this.</p>
+  <p class="lockquiz">Locked — answer all five questions in lesson 04 to open this.</p>
   <div class="stage-body" hidden>
     <p class="key">Volume is the number of shares traded in each period, drawn as bars under the price. Price tells you <em>where</em>; volume tells you <em>how many people cared</em>.</p>
     <p>The single most useful application is at a level — exactly the levels from lesson 03. When price finally pushes through a resistance that has held several times, the volume on that push is your conviction check. A breakout on heavy volume means real participation: a lot of buyers were willing to pay above the old ceiling. A breakout on thin volume means very few people were involved, and those tend to fall back inside the range.</p>
@@ -759,14 +937,53 @@ footer .disc{
       <p>Ask "who else was involved?" before believing any move. A price that jumps 8% on almost no volume is not the same event as one that jumps 8% on the heaviest day of the year, even though both look identical if you only read the price — and the first is exactly the kind of move that gets hyped.</p>
     </div>
 
-    <div class="check" data-check="5">
-      <p class="check-q">Check 5 — A stock has stalled at $50 four times over three months. Today it closes at $51.20, on the lightest volume of the entire quarter. How much weight should you give that breakout?</p>
-      <div class="opts">
-        <button type="button" class="opt" data-correct="false" data-why="The close above the level is real, but the point of volume is to ask how many people stood behind it. On the quarter's lightest volume, very few did — which is exactly the profile of a breakout that gets given back.">A lot — a close above resistance is a close above resistance, whatever the volume.</button>
-        <button type="button" class="opt" data-correct="true" data-why="Correct. Light volume means the level was cleared without meaningful participation, so the sellers who defended $50 four times may simply not have shown up today. It's a breakout worth watching rather than trusting — waiting for it to hold on decent volume costs you a little upside and avoids a lot of false starts.">Not much on its own — the level was cleared without participation, so treat it as unconfirmed.</button>
-        <button type="button" class="opt" data-correct="false" data-why="Low volume isn't a bearish signal in itself — it's an absence of evidence rather than evidence against. The correct posture is 'unconfirmed', not 'reverse'.">It's a bearish signal — low volume means the stock is about to fall.</button>
+    <div class="checks" data-checks="5">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — A stock has stalled at $50 four times over three months. Today it closes at $51.20, on the lightest volume of the entire quarter. How much weight should you give that breakout?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="false" data-why="The close above the level is real, but the point of volume is to ask how many people stood behind it. On the quarter's lightest volume, very few did — which is exactly the profile of a breakout that gets given back.">A lot — a close above resistance is a close above resistance, whatever the volume.</button>
+          <button type="button" class="opt" data-correct="true" data-why="Correct. Light volume means the level was cleared without meaningful participation, so the sellers who defended $50 four times may simply not have shown up today. It's a breakout worth watching rather than trusting — waiting for it to hold on decent volume costs you a little upside and avoids a lot of false starts.">Not much on its own — the level was cleared without participation, so treat it as unconfirmed.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Low volume isn't a bearish signal in itself — it's an absence of evidence rather than evidence against. The correct posture is 'unconfirmed', not 'reverse'.">It's a bearish signal — low volume means the stock is about to fall.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
       </div>
-      <p class="feedback" role="status" aria-live="polite"></p>
+      <div class="check">
+        <p class="check-q">Q2 — What does volume actually measure?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Yes — drawn as bars under the price. Price tells you where; volume tells you how many people were involved.">The number of shares traded in each period.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That's the candle's range. A large move can happen on tiny volume, and that difference is the entire point of the lesson.">The size of the price move in that period.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Volume counts shares changing hands during the period, not holders. A stock can have millions of holders and almost no daily volume.">The number of people who own the stock.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — Price has been rising for weeks while volume falls steadily. What is the fair read?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="That's the calibrated version. Fewer participants are needed to move price up, which is a statement about the move's health, not about its end.">The move is running out of new buyers — a reason to stop adding, not a signal to sell.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Too strong. Trends can drift higher on falling volume for a long time. It's a caution, not a trigger.">A confirmed sell signal.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Breakouts are the clearest use, but rising price on shrinking volume is one of the standard readings worth knowing.">Nothing at all — volume only matters at breakouts.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — A stock has run up for months and then prints its heaviest volume day in years. What does that often — not always — indicate?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct, and note the hedging. It's a well-known tendency, not a rule, and plenty of huge volume days are simply continuation.">A late rush of arrivals; spikes like this frequently mark a turning point rather than a continuation.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Nothing on a chart guarantees anything, and after a long move a volume spike more often marks exhaustion than acceleration.">A guarantee that the trend is about to accelerate.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Enormous volume days are entirely normal around news, index changes and capitulation. They are information, not glitches.">A data error, since volume that high is implausible.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — Why is volume less trustworthy on spot foreign exchange than on stocks?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Exactly. It's a sample of unknown size, which makes comparisons across days much weaker than on an exchange-traded stock.">There's no central exchange, so the figure shown is only what your broker saw — not the whole market.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Spot FX trades around the clock on weekdays. The problem is the absence of a central exchange, not the hours.">Currency markets are closed for most of the day.</button>
+          <button type="button" class="opt" data-correct="false" data-why="There's nothing to conceal — no single venue has the full picture, so no complete figure exists to publish.">FX platforms deliberately conceal volume from retail traders.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
     </div>
   </div>
 </section>
@@ -774,7 +991,7 @@ footer .disc{
 <!-- ============ LESSON 6 ============ -->
 <section class="stage locked" data-stage="6">
   <div class="stage-head"><span class="num">06</span><h2>Moving averages: the trend with the noise removed</h2></div>
-  <p class="lockquiz">Locked — answer Check 5 correctly to open this.</p>
+  <p class="lockquiz">Locked — answer all five questions in lesson 05 to open this.</p>
   <div class="stage-body" hidden>
     <p class="key">A moving average is the average closing price over the last N periods, recalculated each period and drawn as a line. That's the entire idea. A 50-day moving average on a daily chart is simply the average of the last 50 closes.</p>
     <p>It does one job well: it strips out the day-to-day jitter so the structure you learned in lesson 02 becomes visible at a glance. The trade-off is built in and unavoidable — an average of the past always <strong>lags</strong> the present. A long average is smooth but slow; a short one is responsive but noisy. There's no setting that avoids this, which is why arguments about the "best" length are mostly wasted breath.</p>
@@ -820,14 +1037,53 @@ footer .disc{
 
     <p>On the endless SMA-versus-EMA debate: a simple moving average weights every period equally; an exponential one weights recent periods more heavily, so it turns faster. Pick one and stay consistent. The difference between them is far smaller than the difference between having a plan and not having one.</p>
 
-    <div class="check" data-check="6">
-      <p class="check-q">Check 6 — A stock has traded sideways between $30 and $34 for four months. Its 20-day and 50-day averages have crossed each other six times in that stretch. What's happening?</p>
-      <div class="opts">
-        <button type="button" class="opt" data-correct="false" data-why="Six crosses in four months isn't six signals — it's the same non-signal repeating. In a range, price oscillates around its own average by definition, so crossovers fire constantly and mean nothing.">Six trend changes — the stock is extremely volatile and each cross is a signal.</button>
-        <button type="button" class="opt" data-correct="true" data-why="Exactly. Crossovers are a trend tool, and there's no trend here. In a range they whipsaw endlessly and each one loses a little money in fees and small losses. The structure — a range — is the thing to read, and the averages have nothing useful to add to it.">There's no trend, so the crossover signal is meaningless here — this is classic whipsaw.</button>
-        <button type="button" class="opt" data-correct="false" data-why="Shortening the averages makes them more sensitive, which in a sideways market means more false crosses, not fewer. The problem isn't the settings — it's that a trend tool is being used where there's no trend.">The averages are set wrong — shorter settings would fix the false signals.</button>
+    <div class="checks" data-checks="6">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — A stock has traded sideways between $30 and $34 for four months. Its 20-day and 50-day averages have crossed each other six times in that stretch. What's happening?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="false" data-why="Six crosses in four months isn't six signals — it's the same non-signal repeating. In a range, price oscillates around its own average by definition, so crossovers fire constantly and mean nothing.">Six trend changes — the stock is extremely volatile and each cross is a signal.</button>
+          <button type="button" class="opt" data-correct="true" data-why="Exactly. Crossovers are a trend tool, and there's no trend here. In a range they whipsaw endlessly and each one loses a little money in fees and small losses. The structure — a range — is the thing to read, and the averages have nothing useful to add to it.">There's no trend, so the crossover signal is meaningless here — this is classic whipsaw.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Shortening the averages makes them more sensitive, which in a sideways market means more false crosses, not fewer. The problem isn't the settings — it's that a trend tool is being used where there's no trend.">The averages are set wrong — shorter settings would fix the false signals.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
       </div>
-      <p class="feedback" role="status" aria-live="polite"></p>
+      <div class="check">
+        <p class="check-q">Q2 — What is a 50-day moving average, precisely?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="That's the whole idea. It's arithmetic on data that has already happened — which is why it can only ever lag.">The average of the last 50 closing prices, recalculated each day and drawn as a line.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Averages don't forecast anything. Every value on that line is built entirely from closes that have already printed.">A forecast of where price will be in 50 days.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Standard moving averages are built from closes. Variants exist, but the default everyone means is closes.">The average of the highs and the lows over the last 50 days.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — You want a smoother, less twitchy average. What do you give up?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right, and that's why arguments about the best length are mostly wasted breath. You're choosing a point on a fixed trade-off, not finding a free lunch.">Responsiveness — a longer average lags further behind the present, and the trade-off can't be tuned away.</button>
+          <button type="button" class="opt" data-correct="false" data-why="They filter more noise and more signal. By the time a very slow average turns, a lot of the move has already happened.">Nothing — longer averages are strictly better because they filter out noise.</button>
+          <button type="button" class="opt" data-correct="false" data-why="The arithmetic is exact either way. What changes is how quickly it responds, not whether it's correct.">Accuracy — long averages compute the wrong number.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — What is the honest description of a golden cross — a fast average crossing above a slow one?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct. They're famous precisely because they're easy to spot after the fact, which is the least useful moment.">A lagging description of a change that has already happened; it doesn't call the move in advance.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Nothing built from past closes can lead price. By the time two averages cross, a good part of the move is behind you.">A leading signal that a new uptrend is about to begin.</button>
+          <button type="button" class="opt" data-correct="false" data-why="It gets coverage because it's simple and has a memorable name. Crosses fail routinely, especially in ranges.">A guarantee of a rally, which is why it gets so much coverage.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — SMA or EMA — how much should you agonise over the choice?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Yes. The difference between them is far smaller than the difference between having a plan and not having one.">Barely. An EMA weights recent periods more heavily so it turns faster; pick one and stay consistent.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Neither is obsolete. Turning faster cuts both ways: more responsive in trends, more whipsaw in ranges.">A lot — the EMA is objectively better and the SMA is obsolete.</button>
+          <button type="button" class="opt" data-correct="false" data-why="They're computed from the same closes, so they agree nearly all the time. Waiting for agreement adds delay rather than information.">Run both, and only act when the two agree.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
     </div>
   </div>
 </section>
@@ -835,7 +1091,7 @@ footer .disc{
 <!-- ============ LESSON 7 ============ -->
 <section class="stage locked" data-stage="7">
   <div class="stage-head"><span class="num">07</span><h2>Momentum: how hard price is being pushed</h2></div>
-  <p class="lockquiz">Locked — answer Check 6 correctly to open this.</p>
+  <p class="lockquiz">Locked — answer all five questions in lesson 06 to open this.</p>
   <div class="stage-body" hidden>
     <p class="key">Momentum indicators measure the <em>speed</em> of price movement rather than its direction. The useful question they answer is: is this move still accelerating, or is it running on fumes?</p>
 
@@ -845,7 +1101,7 @@ footer .disc{
     <p>The more informative use is <strong>divergence</strong>: price makes a higher high, but RSI makes a lower high. Buyers got price to a new peak with noticeably less force behind it. That's a warning about the health of the move, not a signal to reverse — divergences can persist for a long time before anything happens, and plenty resolve by simply going away.</p>
 
     <figure class="figure">
-      <svg viewBox="0 0 660 320" role="img" aria-labelledby="f4t f4d">
+      <svg viewBox="0 0 660 338" role="img" aria-labelledby="f4t f4d">
         <title id="f4t">Bearish divergence between price and RSI</title>
         <desc id="f4d">Price makes two peaks, the second higher than the first. Underneath, the RSI panel shows two corresponding peaks, but the second RSI peak is lower than the first, and it falls back below the seventy line.</desc>
 
@@ -868,7 +1124,8 @@ footer .disc{
         <circle cx="530" cy="214" r="4.5" class="s-dot"/>
         <line x1="282" y1="196" x2="530" y2="214" class="s-warn" stroke-dasharray="6 4"/>
         <text x="300" y="182" class="s-lab-s">LOWER HIGH IN RSI</text>
-        <text x="34" y="310" class="s-lab-s">SAME NEW HIGH IN PRICE, LESS FORCE BEHIND IT — A CAUTION, NOT A SELL SIGNAL</text>
+        <text x="34" y="306" class="s-lab-s">SAME NEW HIGH IN PRICE, LESS FORCE BEHIND IT —</text>
+        <text x="34" y="324" class="s-lab-s">A CAUTION, NOT A SELL SIGNAL</text>
       </svg>
       <figcaption>Divergence is a statement about the quality of a move. It says "this is getting tired", not "this ends now".</figcaption>
     </figure>
@@ -882,14 +1139,53 @@ footer .disc{
       <p>Indicators are derived from price. They cannot know anything price doesn't already contain — they only reshape it into something easier to read. This is why stacking eight of them on one chart adds no information: they're all reading the same numbers. Two, understood properly, beat eight glanced at. Anyone selling you a proprietary indicator is selling you rearranged arithmetic.</p>
     </div>
 
-    <div class="check" data-check="7">
-      <p class="check-q">Check 7 — A stock has been in a strong uptrend for three months and its RSI has been above 70 for the last five weeks. What does that tell you?</p>
-      <div class="opts">
-        <button type="button" class="opt" data-correct="false" data-why="This is the single most common misuse of RSI. In a strong trend, sustained readings above 70 are what strength looks like — a persistent overbought reading confirms the trend rather than contradicting it.">It's overbought and due to fall — that's a sell signal.</button>
-        <button type="button" class="opt" data-correct="true" data-why="Right. Five weeks above 70 means gains have consistently dominated losses, which is a description of a strong trend. RSI would become interesting here if it started making lower highs while price made higher highs, or if it broke back below 70 — but a high reading alone is not a signal.">It confirms the trend is strong — sustained high readings are normal in powerful uptrends.</button>
-        <button type="button" class="opt" data-correct="false" data-why="It isn't broken — it's doing exactly what it's built to do, which is measure the balance of recent gains against recent losses. The mistake is in the interpretation of 70 as a threshold rather than as a description.">The RSI is broken — it should have reset below 70 by now.</button>
+    <div class="checks" data-checks="7">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — A stock has been in a strong uptrend for three months and its RSI has been above 70 for the last five weeks. What does that tell you?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="false" data-why="This is the single most common misuse of RSI. In a strong trend, sustained readings above 70 are what strength looks like — a persistent overbought reading confirms the trend rather than contradicting it.">It's overbought and due to fall — that's a sell signal.</button>
+          <button type="button" class="opt" data-correct="true" data-why="Right. Five weeks above 70 means gains have consistently dominated losses, which is a description of a strong trend. RSI would become interesting here if it started making lower highs while price made higher highs, or if it broke back below 70 — but a high reading alone is not a signal.">It confirms the trend is strong — sustained high readings are normal in powerful uptrends.</button>
+          <button type="button" class="opt" data-correct="false" data-why="It isn't broken — it's doing exactly what it's built to do, which is measure the balance of recent gains against recent losses. The mistake is in the interpretation of 70 as a threshold rather than as a description.">The RSI is broken — it should have reset below 70 by now.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
       </div>
-      <p class="feedback" role="status" aria-live="polite"></p>
+      <div class="check">
+        <p class="check-q">Q2 — What does RSI measure?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="That's it — 14 periods by default. High readings mean gains have dominated recently, not that price is too high.">The size of recent gains against the size of recent losses, scaled from 0 to 100.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That's volume. RSI is computed purely from price changes.">How many shares changed hands over the lookback period.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That's MACD. RSI compares the magnitude of up moves to down moves.">The distance between a fast and a slow moving average.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — Price makes a higher high but RSI makes a lower high. What is that, and what does it mean?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct, and the hedging matters. Divergences can persist for a long time, and plenty simply go away without anything happening.">Bearish divergence — the new peak came with less force behind it. It's a comment on the move's health, not an instruction to reverse.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Divergence says this is getting tired, not this ends now. Trading every divergence as a reversal is expensive.">A guaranteed top — sell immediately.</button>
+          <button type="button" class="opt" data-correct="false" data-why="It's working exactly as designed. Price and RSI disagreeing is the signal, not a fault.">A broken indicator that needs its settings reset.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — MACD histogram bars are getting wider. What is that showing you?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right. And shrinking bars mean it's decelerating, which can happen while price is still rising.">The fast average is pulling away from the slow one — the move is accelerating.</button>
+          <button type="button" class="opt" data-correct="false" data-why="MACD contains no volume at all. It's built entirely from two exponential averages of price.">Volume is increasing behind the move.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Widening bars mean the opposite of stalling. And in any case MACD inherits every weakness of the averages it's made from.">A reversal is imminent.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — Why doesn't stacking eight indicators on one chart help?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Exactly. Two indicators understood properly beat eight glanced at, and anyone selling a proprietary indicator is selling rearranged arithmetic.">They're all derived from the same price data — they reshape it, they don't add information.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Performance isn't the problem. The problem is that none of them know anything price doesn't already contain.">Because charting software slows down with too many overlays.</button>
+          <button type="button" class="opt" data-correct="false" data-why="They don't cancel — they mostly agree, because they're reading the same numbers. That agreement feels like confirmation and isn't.">Because indicators cancel each other out mathematically.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
     </div>
   </div>
 </section>
@@ -897,7 +1193,7 @@ footer .disc{
 <!-- ============ LESSON 8 ============ -->
 <section class="stage locked" data-stage="8">
   <div class="stage-head"><span class="num">08</span><h2>Patterns: what they actually represent</h2></div>
-  <p class="lockquiz">Locked — answer Check 7 correctly to open this.</p>
+  <p class="lockquiz">Locked — answer all five questions in lesson 07 to open this.</p>
   <div class="stage-body" hidden>
     <p class="key">Chart patterns have exotic names and a reputation for mysticism they don't deserve. Every one of them is a picture of the same two things you already know from lesson 03: a level that keeps holding, and what happens when it stops holding.</p>
 
@@ -914,7 +1210,7 @@ footer .disc{
         <polyline class="s-line" points="22,190 60,68 98,148 136,70 174,152 204,200"/>
         <text x="20" y="58" class="s-lab-s">CEILING, TWICE</text>
         <text x="20" y="168" class="s-lab-s">NECKLINE</text>
-        <text x="16" y="216" class="s-lab-s">FAILS TWICE, THEN GIVES WAY</text>
+        <text x="16" y="216" class="s-lab-s">FAILS TWICE, THEN DROPS</text>
 
         <text x="238" y="28" class="s-ttl">DOUBLE BOTTOM</text>
         <line x1="242" y1="170" x2="428" y2="170" class="s-level"/>
@@ -922,7 +1218,7 @@ footer .disc{
         <polyline class="s-line" points="244,44 282,168 320,90 358,166 396,86 424,40"/>
         <text x="242" y="188" class="s-lab-s">FLOOR, TWICE</text>
         <text x="242" y="80" class="s-lab-s">NECKLINE</text>
-        <text x="238" y="216" class="s-lab-s">HOLDS TWICE, THEN BREAKS UP</text>
+        <text x="238" y="216" class="s-lab-s">HOLDS TWICE, THEN RISES</text>
 
         <text x="458" y="28" class="s-ttl">CONSOLIDATION</text>
         <rect x="510" y="96" width="70" height="44" class="s-zone"/>
@@ -954,14 +1250,53 @@ footer .disc{
       <p>The retrospective trap: on a chart of the past, every pattern that worked is obvious and every one that failed is invisible, because you weren't looking for it. Any pattern only counts if you named it on the right-hand edge of the chart, before the outcome was known. That's a completely different exercise, and it's far harder. It's also why screenshots of perfect setups prove nothing.</p>
     </div>
 
-    <div class="check" data-check="8">
-      <p class="check-q">Check 8 — Price breaks above a two-month range on Monday, then closes back inside the range on Wednesday. What has most likely happened?</p>
-      <div class="opts">
-        <button type="button" class="opt" data-correct="false" data-why="Being briefly above the level isn't the same as holding above it. A move that immediately gives itself back tells you the buying that pushed it up wasn't sustained — which is the opposite of what the breakout was supposed to demonstrate.">The breakout is still valid — price got above the level, and that's what matters.</button>
-        <button type="button" class="opt" data-correct="true" data-why="Correct. That's a false breakout, and it's a genuinely informative event: buyers pushed above the ceiling and failed to hold it. The range is back in charge, and anyone who bought the breakout is now underwater — which can add selling pressure of its own.">A false breakout — the move didn't hold, so the range is still the dominant structure.</button>
-        <button type="button" class="opt" data-correct="false" data-why="Two months of range plus a failed attempt to leave it is a lot of information. It just isn't the bullish information the initial breakout suggested. 'The range still holds' is a conclusion, not an absence of one.">Nothing readable — two days is too short to conclude anything at all.</button>
+    <div class="checks" data-checks="8">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — Price breaks above a two-month range on Monday, then closes back inside the range on Wednesday. What has most likely happened?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="false" data-why="Being briefly above the level isn't the same as holding above it. A move that immediately gives itself back tells you the buying that pushed it up wasn't sustained — which is the opposite of what the breakout was supposed to demonstrate.">The breakout is still valid — price got above the level, and that's what matters.</button>
+          <button type="button" class="opt" data-correct="true" data-why="Correct. That's a false breakout, and it's a genuinely informative event: buyers pushed above the ceiling and failed to hold it. The range is back in charge, and anyone who bought the breakout is now underwater — which can add selling pressure of its own.">A false breakout — the move didn't hold, so the range is still the dominant structure.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Two months of range plus a failed attempt to leave it is a lot of information. It just isn't the bullish information the initial breakout suggested. 'The range still holds' is a conclusion, not an absence of one.">Nothing readable — two days is too short to conclude anything at all.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
       </div>
-      <p class="feedback" role="status" aria-live="polite"></p>
+      <div class="check">
+        <p class="check-q">Q2 — Strip the name off any chart pattern. What are you always actually looking at?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="That's every one of them — double tops, head and shoulders, flags, triangles. Lesson 03 with different labels attached.">A level being tested repeatedly, plus what happens when the test finally fails.</button>
+          <button type="button" class="opt" data-correct="false" data-why="The shape isn't the cause of anything. It's a picture of supply and demand meeting at a price, which is what actually matters.">A shape that carries predictive power of its own.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Nobody is drawing shapes on purpose. Patterns form because orders cluster at remembered prices.">A signature left behind by large institutions.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — What is a double top's neckline, and why does breaking it matter?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct. Read as a story about who is now losing money, the pattern makes sense without needing the name at all.">The low between the two failed attempts — breaking it puts everyone who bought expecting a third try offside.</button>
+          <button type="button" class="opt" data-correct="false" data-why="The neckline sits below both peaks. Breaking above the peaks would undo the pattern rather than confirm it.">The higher of the two peaks; breaking it confirms an uptrend.</button>
+          <button type="button" class="opt" data-correct="false" data-why="The relevant level is the dip between the attempts, and it very much has significance — it's where the buyers' assumption fails.">The average of the two peaks, which carries no particular significance.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — A tight sideways drift follows a strong move up. What does that usually mean?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right — and usually is doing real work in that sentence. Consolidations break both ways often enough that you still need a level where you'd be wrong.">Nobody is forcing the issue and the market is digesting; these usually resolve in the direction of the move before them.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Too absolute. A pause after a strong move is more often continuation, though never reliably enough to skip a stop.">It's always a reversal — the buyers have finished.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Nothing on a chart is close to free. Usually is not always, and the failures are what a stop is for.">It's always a continuation, which makes it close to a free trade.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — Why do screenshots of perfect setups prove nothing?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="That's the retrospective trap, and it's the single biggest reason pattern trading looks easier than it is.">On a chart of the past, every pattern that worked is obvious and every failure is invisible. It only counts if you named it on the right-hand edge, before the outcome.</button>
+          <button type="button" class="opt" data-correct="false" data-why="They rarely need to be. Genuine screenshots of genuine winners are trivial to find on any chart, which is exactly the problem.">Because the screenshots are usually fabricated.</button>
+          <button type="button" class="opt" data-correct="false" data-why="The selection isn't by stock, it's by hindsight — the failures on the same chart simply never get screenshotted.">Because patterns only work on certain stocks.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
     </div>
   </div>
 </section>
@@ -969,7 +1304,7 @@ footer .disc{
 <!-- ============ LESSON 9 ============ -->
 <section class="stage locked" data-stage="9">
   <div class="stage-head"><span class="num">09</span><h2>Risk: the only part that protects you</h2></div>
-  <p class="lockquiz">Locked — answer Check 8 correctly to open this.</p>
+  <p class="lockquiz">Locked — answer all five questions in lesson 08 to open this.</p>
   <div class="stage-body" hidden>
     <p class="key">Everything above this lesson is analysis. This lesson is the one that decides whether you're still solvent in a year, and it's the direct answer to the worry you started with. If you take one section from this page, take this one.</p>
     <p>The reason risk management belongs in a technical analysis course is that charts are what make it possible. A level from lesson 03 gives you a specific price at which your idea is demonstrably wrong — and once you have that, you can size the position so that being wrong costs a known, survivable amount.</p>
@@ -1024,22 +1359,61 @@ footer .disc{
 
     <p>Two more practical points. Costs are real: spreads, commissions and slippage come out of every result, and strategies that look profitable on paper often aren't after them. And leverage — trading with borrowed money, including CFDs and most crypto perpetuals — multiplies both directions. It is not a way to make a small account grow faster; it is a way to make a small mistake final.</p>
 
-    <div class="check" data-check="9">
-      <p class="check-q">Check 9 — You have a $10,000 account and cap your risk at 1% per idea. You want to buy at $80 with a stop at $76. How many shares?</p>
-      <div class="opts">
-        <button type="button" class="opt" data-correct="false" data-why="That's what your cash could buy, which is a different question entirely. Spending your whole account on one position means a move to your stop costs 5% of everything — five times the risk you said you'd take.">125 shares — that's what $10,000 buys at $80.</button>
-        <button type="button" class="opt" data-correct="true" data-why="Correct. 1% of $10,000 is $100 of risk. Risk per share is $80 − $76 = $4. $100 ÷ $4 = 25 shares, a position of $2,000. Notice the size came out of the arithmetic, not out of how good the setup felt.">25 shares — $100 of risk divided by $4 of risk per share.</button>
-        <button type="button" class="opt" data-correct="false" data-why="That's 1% of the account spent, not 1% of the account risked. The two are only the same if your stop is at zero. Sizing by cash outlay ignores the stop entirely, which is the one number that makes the risk knowable.">1.25 shares — 1% of the account is $100, which buys one share at $80.</button>
+    <div class="checks" data-checks="9">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — You have a $10,000 account and cap your risk at 1% per idea. You want to buy at $80 with a stop at $76. How many shares?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="false" data-why="That's what your cash could buy, which is a different question entirely. Spending your whole account on one position means a move to your stop costs 5% of everything — five times the risk you said you'd take.">125 shares — that's what $10,000 buys at $80.</button>
+          <button type="button" class="opt" data-correct="true" data-why="Correct. 1% of $10,000 is $100 of risk. Risk per share is $80 − $76 = $4. $100 ÷ $4 = 25 shares, a position of $2,000. Notice the size came out of the arithmetic, not out of how good the setup felt.">25 shares — $100 of risk divided by $4 of risk per share.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That's 1% of the account spent, not 1% of the account risked. The two are only the same if your stop is at zero. Sizing by cash outlay ignores the stop entirely, which is the one number that makes the risk knowable.">1.25 shares — 1% of the account is $100, which buys one share at $80.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
       </div>
-      <p class="feedback" role="status" aria-live="polite"></p>
+      <div class="check">
+        <p class="check-q">Q2 — In what order do you decide the three numbers?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="That's the whole discipline. Doing it the other way round — size first, stop fitted to it — is how accounts get wrecked.">Stop first, from the chart; then risk per share; then position size falls out of the arithmetic.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That's sizing on excitement, which the lesson names as the first of the three ways beginners lose. The stop comes from the chart, not from the size.">Position size first, based on how confident you feel, then a stop that fits it.</button>
+          <button type="button" class="opt" data-correct="false" data-why="A target is a hope. The stop is the only one of the three that's forced on you by the chart, so it goes first.">Target first, then work backwards to the entry and the stop.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — A strategy is right 70% of the time, but its losses are twice the size of its wins. What happens over many attempts?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct. Seven wins at +1R against three losses at −2R is +1R before costs, and costs are real. Nudge the hit rate down a little and it's plainly negative. You have to multiply frequency by size.">It can easily lose money — hit rate alone tells you nothing without the size of wins against losses.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Only if wins and losses are the same size. Being right often with large losses is one of the most common ways to go broke slowly.">It's reliably profitable — anything above a 50% hit rate wins over time.</button>
+          <button type="button" class="opt" data-correct="false" data-why="There's no rule that makes those offset. The result depends entirely on the two numbers multiplied together, and nothing guarantees they cancel.">It's guaranteed to break even, because the higher hit rate offsets the bigger losses.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — Price is approaching your stop and you move the stop lower to give the idea more room. What have you actually done?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Yes. And notice it's a decision made after entering, at the moment your judgement is worst. That's what deciding beforehand protects you from.">Converted a planned small loss into an unplanned large one — one of the three standard ways beginners lose.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That's the story it tells itself. If the level was worth choosing, it was worth respecting — otherwise it was never a stop, just a hope with a number attached.">Managed the trade sensibly by avoiding a random shakeout.</button>
+          <button type="button" class="opt" data-correct="false" data-why="A stop you'll move isn't a stop. The commitment is the entire mechanism by which the loss stays survivable.">Nothing meaningful — a stop is a guideline rather than a commitment.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — What does leverage do to a small account?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="That's the honest framing. Borrowed money, including CFDs and most crypto perpetuals, scales the outcome you were going to get either way.">Multiplies both directions — it doesn't make a small account grow faster so much as make a small mistake final.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Less money committed, same exposure — and the loss is still measured against the full position. The risk is identical or worse.">Reduces risk, because you control the same exposure with less money committed.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Being right more often doesn't help if one leveraged loss removes the account. Financing costs come out of every result too.">Is effectively free money as long as you're right more often than you're wrong.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- ============ QUIZ ============ -->
 <section class="stage locked" data-stage="10">
-  <div class="stage-head"><span class="num">10</span><h2>Twelve questions to finish</h2></div>
-  <p class="lockquiz">Locked — answer Check 9 correctly to open this.</p>
+  <div class="stage-head"><span class="num">10</span><h2>Sixteen questions to finish</h2></div>
+  <p class="lockquiz">Locked — answer all five questions in lesson 09 to open this.</p>
   <div class="stage-body" hidden>
     <p>No time limit, nothing riding on it. Pick an answer for each, then score it. Anything you miss, the explanation will tell you exactly why.</p>
 
@@ -1163,6 +1537,46 @@ footer .disc{
       <p class="qz-why" hidden></p>
     </div>
 
+    <div class="qz" data-qz="13">
+      <p class="qz-q">13. A stock is in a downtrend on the daily chart and an uptrend on the 15-minute chart. You intend to hold for several weeks. Which one sets your bias?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="That's the top-down rule. The 15-minute chart is where you'd look for detail once the daily has told you what environment you're in — it doesn't get a vote on the direction.">The daily — you establish the trend well above the timeframe you act on, then drop down for detail.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Recency doesn't outrank the timeframe that matches your holding period. A few hours of buying inside a multi-month downtrend is noise relative to a several-week idea.">The 15-minute, because it reflects what buyers and sellers are doing right now.</button>
+        <button type="button" class="opt" data-correct="false" data-why="They aren't disagreeing, they're describing different slices of time and both are accurate. The question is only which slice matches how long you intend to hold.">Neither — when timeframes disagree the chart has no readable answer.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="14">
+      <p class="qz-q">14. A stock has climbed steadily for two months while daily volume has shrunk the whole way. What does that add to your read?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Right, and note how carefully hedged that is. Trends drift higher on falling volume for a long time. It's a comment on the health of the move, not a signal.">Fewer people are needed to move it higher — the move is running low on new buyers, which is a reason to stop adding rather than to sell.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Breakouts are the clearest use, but rising price on shrinking volume is one of the standard readings, and it's the one that flags a trend quietly thinning out.">Nothing — volume is only meaningful at a breakout.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Far too strong. Nothing here says the trend is over; it says fewer participants are involved than there were.">A sell signal — falling volume means the trend has ended.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="15">
+      <p class="qz-q">15. Someone posts a chart of the past covered in textbook patterns, every one of which worked. What does that actually demonstrate?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="That's the retrospective trap. A pattern only counts if you named it on the right-hand edge of the chart, before the outcome was known — a completely different and much harder exercise.">Almost nothing — on a finished chart the patterns that worked are obvious and the ones that failed are invisible.</button>
+        <button type="button" class="opt" data-correct="false" data-why="The evidence is selected after the fact. The same chart contains failed patterns that simply never got circled.">That the patterns are reliable, since the evidence is right there on the chart.</button>
+        <button type="button" class="opt" data-correct="false" data-why="It rarely needs to be. Genuine examples of patterns that worked are trivial to find on any real chart, which is exactly what makes them such weak evidence.">That the chart was probably faked.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="16">
+      <p class="qz-q">16. A broker offers you 10× leverage on a $2,000 account. What does taking it actually do?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="That's the honest description, and it applies equally to CFDs and most crypto perpetuals. Financing costs come out of every result as well.">Multiplies the outcome in both directions — it doesn't make a small account grow faster so much as make a small mistake final.</button>
+        <button type="button" class="opt" data-correct="false" data-why="The loss is still measured against the full position, not against what you put up. Same exposure with less cushion behind it is more risk, not less.">Reduces your risk, since you commit less of your own money for the same exposure.</button>
+        <button type="button" class="opt" data-correct="false" data-why="A stop caps the loss in price terms, but leverage sets how much money that price move is worth. Ten times the size is ten times the loss at the same stop.">Makes no real difference as long as you use a stop.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
     <div class="btnrow">
       <button type="button" class="btn" id="scoreBtn">Score my quiz</button>
       <button type="button" class="btn ghost" id="resetBtn" hidden>Clear and try again</button>
@@ -1196,6 +1610,16 @@ footer .disc{
 
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var lastStage = document.querySelectorAll(".stage").length;
+
+  /* ---- shuffle every set of options, so the answers sit in a different place each load ---- */
+  Array.prototype.forEach.call(document.querySelectorAll(".opts"), function (box) {
+    var opts = Array.prototype.slice.call(box.children);
+    for (var i = opts.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = opts[i]; opts[i] = opts[j]; opts[j] = t;
+    }
+    opts.forEach(function (o) { box.appendChild(o); });
+  });
 
   function rail(n, cls) {
     var li = document.querySelector('.rail li[data-rail="' + n + '"]');
@@ -1241,9 +1665,13 @@ footer .disc{
       btn.classList.add("ok");
       Array.prototype.forEach.call(check.querySelectorAll(".opt"), function (o) { o.disabled = true; });
       say(fb, "good", "Correct", why);
-      var n = parseInt(check.getAttribute("data-check"), 10);
-      rail(n, "done");
-      unlock(n + 1);
+      check.classList.add("passed");
+      var group = check.closest("[data-checks]");
+      if (group && group.querySelectorAll(".check").length === group.querySelectorAll(".check.passed").length) {
+        var n = parseInt(group.getAttribute("data-checks"), 10);
+        rail(n, "done");
+        unlock(n + 1);
+      }
     } else {
       btn.classList.add("no");
       btn.disabled = true;

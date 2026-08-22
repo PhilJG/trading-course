@@ -188,7 +188,10 @@ figcaption{margin-top:.6rem;font-size:.85rem;color:var(--ink-3);font-family:var(
 .tieback.warn .tag{color:var(--down)}
 
 /* ---------- checks ---------- */
-.check{border-top:1px solid var(--rule);padding-top:1.1rem;display:flex;flex-direction:column;gap:.75rem}
+.checks{border-top:1px solid var(--rule);padding-top:1.1rem;display:flex;flex-direction:column;gap:1.25rem}
+.checks-h{font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)!important}
+.check{display:flex;flex-direction:column;gap:.75rem}
+.check + .check{border-top:1px solid var(--rule-soft);padding-top:1.25rem}
 .check-q{font-weight:600;color:var(--ink)!important}
 .opts{display:flex;flex-direction:column;gap:.5rem}
 .opt{
@@ -241,6 +244,31 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
 [hidden]{display:none!important}
 @media (prefers-reduced-motion: reduce){
   *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}
+/* ---------- mobile: fit the diagrams to the screen rather than scrolling them ---------- */
+@media (max-width:640px){
+  .wrap{padding-left:.55rem;padding-right:.55rem}
+  .stage{padding:1rem .75rem}
+  .figure{
+    margin-left:-.75rem;margin-right:-.75rem;
+    padding:.4rem .3rem;
+    border-left:0;border-right:0;border-radius:0;
+    overflow:visible;
+  }
+  .figure svg{min-width:0;overflow:visible}
+  figcaption{padding:0 .5rem}
+  /* scale the in-diagram type up to offset the diagram being scaled down */
+  .s-lab{font-size:15px}
+  .s-lab-s{font-size:13px}
+  .s-ttl{font-size:15px}
+  .s-lead{stroke-width:1.4}
+  .s-axis{stroke-width:1.4}
+  /* tables wrap instead of scrolling sideways */
+  .tbl{min-width:0;font-size:.84rem}
+  .tbl th,.tbl td{padding:.45rem .5rem}
+  .tbl td:first-child,.tbl td.mono{white-space:normal}
+  .rail ol{flex-wrap:wrap}
+  .worry{padding:.8rem .85rem}
 }
 @media (max-width:520px){
   body{font-size:16px}
@@ -313,11 +341,13 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
         <text x="390" y="98" text-anchor="middle" class="s-ttl">=</text>
         <rect x="412" y="44" width="224" height="92" rx="8" fill="var(--accent-soft)" stroke="var(--accent)"/>
         <text x="524" y="80" text-anchor="middle" class="s-ttl">$2,000,000,000</text>
-        <text x="524" y="102" text-anchor="middle" class="s-lab-s">MARKET CAP — THE WHOLE COMPANY</text>
+        <text x="524" y="98" text-anchor="middle" class="s-lab-s">MARKET CAP —</text>
+        <text x="524" y="116" text-anchor="middle" class="s-lab-s">THE WHOLE COMPANY</text>
         <line x1="524" y1="140" x2="524" y2="168" class="s-arrow"/>
         <path d="M519 162 L524 172 L529 162" class="s-arrow"/>
-        <text x="524" y="196" text-anchor="middle" class="s-lab">"…for a business earning how much?"</text>
-        <text x="524" y="222" text-anchor="middle" class="s-lab-s">THAT IS THE ENTIRE QUESTION</text>
+        <text x="524" y="192" text-anchor="middle" class="s-lab">"…for a business earning</text>
+        <text x="524" y="212" text-anchor="middle" class="s-lab">how much?"</text>
+        <text x="524" y="236" text-anchor="middle" class="s-lab-s">THAT IS THE ENTIRE QUESTION</text>
         <text x="24" y="196" class="s-lab-s">PRICE = A FACT</text>
         <text x="24" y="218" class="s-lab-s">VALUE = YOUR ESTIMATE</text>
       </svg>
@@ -329,14 +359,53 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
       <p>Whenever someone quotes you a share price, it means nothing on its own. A $900 share isn't "expensive" and a $3 share isn't "cheap" — those are just the results of how many slices the pie was cut into. Price per share is meaningless until you pair it with earnings per share.</p>
     </div>
 
-    <div class="check" data-check="1">
-      <p class="check-q">Check 1 — Company A trades at $400 a share; Company B trades at $4. Which is the more expensive business?</p>
-      <div class="opts">
-        <button type="button" class="opt" data-correct="false" data-why="Share price alone tells you nothing about expensiveness. A company can do a 100-for-1 stock split tomorrow, turning a $400 share into a hundred $4 shares, and absolutely nothing about the business would have changed.">Company A — a $400 share is obviously pricier than a $4 one.</button>
-        <button type="button" class="opt" data-correct="false" data-why="Not necessarily. A very low share price is often a company that has fallen a long way, but plenty of large healthy businesses trade in single digits simply because of how many shares they issued.">Company B — cheap share prices usually mean a troubled company.</button>
-        <button type="button" class="opt" data-correct="true" data-why="Exactly. You need the market cap (price × share count) and something to compare it against — earnings, cash flow, assets. Share price on its own is an arbitrary number set by how finely the company sliced itself up.">You can't tell — you need the share count and the profits before either number means anything.</button>
+    <div class="checks" data-checks="1">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — Company A trades at $400 a share; Company B trades at $4. Which is the more expensive business?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="false" data-why="Share price alone tells you nothing about expensiveness. A company can do a 100-for-1 stock split tomorrow, turning a $400 share into a hundred $4 shares, and absolutely nothing about the business would have changed.">Company A — a $400 share is obviously pricier than a $4 one.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Not necessarily. A very low share price is often a company that has fallen a long way, but plenty of large healthy businesses trade in single digits simply because of how many shares they issued.">Company B — cheap share prices usually mean a troubled company.</button>
+          <button type="button" class="opt" data-correct="true" data-why="Exactly. You need the market cap (price × share count) and something to compare it against — earnings, cash flow, assets. Share price on its own is an arbitrary number set by how finely the company sliced itself up.">You can't tell — you need the share count and the profits before either number means anything.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
       </div>
-      <p class="feedback" role="status" aria-live="polite"></p>
+      <div class="check">
+        <p class="check-q">Q2 — How do you calculate market capitalisation?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Yes — $20 × 100 million shares = $2 billion. That's the price the market is putting on the whole company today.">Share price multiplied by the number of shares outstanding.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Those are unrelated quantities. Market cap is entirely about price and share count; revenue comes in when you go to compare against it.">Share price multiplied by annual revenue.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That's equity, or book value — what the accounts say the business is worth. Market cap is what the market is currently charging for it, usually a very different number.">Total assets minus total liabilities.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — <span class="tk">Northwind Coffee</span> has 100 million shares at $20. It splits two-for-one, leaving 200 million shares at $10. What happened to the business?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Exactly. A split changes the share price and nothing about the company — the clearest possible demonstration that a share price on its own means nothing.">Nothing. The pie was cut into more slices; market cap is still $2 billion.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Each share is a smaller slice of the same business. Multiply price by count and you get the same $2 billion.">It halved in value, because each share is worth half as much.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Issuing more slices doesn't create more pie. Here the price halved at the same moment the count doubled.">It doubled, because there are twice as many shares.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — What is the difference between price and value?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right, and note that value is an estimate — yours will differ from mine. The useful goal is a range you can defend, then noticing when price is far outside it.">Price is a fact visible on any screen; value is your estimate of the cash the business can produce over its lifetime.</button>
+          <button type="button" class="opt" data-correct="false" data-why="If they were, there'd be nothing for fundamental analysis to do. The whole discipline lives in the gap between them.">They're two words for the same number.</button>
+          <button type="button" class="opt" data-correct="false" data-why="An analyst's target is just someone else's estimate. Value is something you have to reason about yourself, from the cash the business produces.">Value is what analysts publish; price is what you actually pay.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — Two companies both carry a $2 billion market cap. One earns $200 million a year, the other $5 million. What does that tell you?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct. The charts might look identical. The propositions are nothing alike, and only the second number reveals it.">You'd be paying the same price for very different amounts of profit — and that comparison is the entire point.</button>
+          <button type="button" class="opt" data-correct="false" data-why="$2 billion is what they cost, not what they're worth. Price only means something once you pair it with what the business produces.">Nothing useful — both are worth $2 billion, so they're equivalent.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Room to grow is a story, and it may well be true — but it isn't established by the earnings being small. Low earnings against a high price is a reason to ask harder questions, not an argument in its favour.">The one earning $5 million is better value, because it has more room to grow.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
     </div>
   </div>
 </section>
@@ -344,41 +413,44 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
 <!-- ============ LESSON 2 ============ -->
 <section class="stage locked" data-stage="2">
   <div class="stage-head"><span class="num">02</span><h2>The three financial statements</h2></div>
-  <p class="lockquiz">Locked — answer Check 1 correctly to open this.</p>
+  <p class="lockquiz">Locked — answer all five questions in lesson 01 to open this.</p>
   <div class="stage-body" hidden>
     <p class="key">Every public company publishes the same three reports every quarter. They are free, and between them they tell you almost everything a beginner needs. Each answers a different question.</p>
 
     <figure class="figure">
-      <svg viewBox="0 0 660 240" role="img" aria-labelledby="f2t f2d">
+      <svg viewBox="0 0 660 264" role="img" aria-labelledby="f2t f2d">
         <title id="f2t">What each of the three financial statements answers</title>
         <desc id="f2d">Three panels: the income statement covers a period and asks whether the company made a profit, the balance sheet is a snapshot asking what it owns and owes, and the cash flow statement covers a period asking whether real cash came in.</desc>
-        <rect x="16" y="28" width="200" height="184" rx="10" class="s-box"/>
-        <rect x="230" y="28" width="200" height="184" rx="10" class="s-box"/>
-        <rect x="444" y="28" width="200" height="184" rx="10" class="s-box"/>
-
+        <rect x="16" y="28" width="200" height="224" rx="10" class="s-box"/>
         <text x="34" y="56" class="s-ttl">INCOME</text>
         <text x="34" y="74" class="s-ttl">STATEMENT</text>
-        <text x="34" y="98" class="s-lab-s">A PERIOD — 3 OR 12 MONTHS</text>
-        <text x="34" y="130" class="s-lab">Did it make</text>
-        <text x="34" y="150" class="s-lab">a profit?</text>
-        <text x="34" y="184" class="s-lab-s">REVENUE, COSTS,</text>
-        <text x="34" y="200" class="s-lab-s">NET INCOME, EPS</text>
+        <text x="34" y="100" class="s-lab-s">A PERIOD —</text>
+        <text x="34" y="116" class="s-lab-s">3 OR 12 MONTHS</text>
+        <text x="34" y="148" class="s-lab">Did it make</text>
+        <text x="34" y="168" class="s-lab">a profit?</text>
+        <text x="34" y="200" class="s-lab-s">REVENUE, COSTS,</text>
+        <text x="34" y="216" class="s-lab-s">NET INCOME, EPS</text>
 
+        <rect x="230" y="28" width="200" height="224" rx="10" class="s-box"/>
         <text x="248" y="56" class="s-ttl">BALANCE</text>
         <text x="248" y="74" class="s-ttl">SHEET</text>
-        <text x="248" y="98" class="s-lab-s">A SNAPSHOT — ONE DAY</text>
-        <text x="248" y="130" class="s-lab">What does it own,</text>
-        <text x="248" y="150" class="s-lab">what does it owe?</text>
-        <text x="248" y="184" class="s-lab-s">ASSETS = LIABILITIES</text>
-        <text x="248" y="200" class="s-lab-s">+ EQUITY</text>
+        <text x="248" y="100" class="s-lab-s">A SNAPSHOT —</text>
+        <text x="248" y="116" class="s-lab-s">ONE SINGLE DAY</text>
+        <text x="248" y="148" class="s-lab">What does it own,</text>
+        <text x="248" y="168" class="s-lab">what does it owe?</text>
+        <text x="248" y="200" class="s-lab-s">ASSETS = LIABILITIES</text>
+        <text x="248" y="216" class="s-lab-s">+ EQUITY</text>
 
+        <rect x="444" y="28" width="200" height="224" rx="10" class="s-box"/>
         <text x="462" y="56" class="s-ttl">CASH FLOW</text>
         <text x="462" y="74" class="s-ttl">STATEMENT</text>
-        <text x="462" y="98" class="s-lab-s">A PERIOD — 3 OR 12 MONTHS</text>
-        <text x="462" y="130" class="s-lab">Did real money</text>
-        <text x="462" y="150" class="s-lab">actually arrive?</text>
-        <text x="462" y="184" class="s-lab-s">OPERATING, INVESTING,</text>
-        <text x="462" y="200" class="s-lab-s">FINANCING, FREE CASH FLOW</text>
+        <text x="462" y="100" class="s-lab-s">A PERIOD —</text>
+        <text x="462" y="116" class="s-lab-s">3 OR 12 MONTHS</text>
+        <text x="462" y="148" class="s-lab">Did real money</text>
+        <text x="462" y="168" class="s-lab">actually arrive?</text>
+        <text x="462" y="200" class="s-lab-s">OPERATING, INVESTING,</text>
+        <text x="462" y="216" class="s-lab-s">FINANCING, AND</text>
+        <text x="462" y="232" class="s-lab-s">FREE CASH FLOW</text>
       </svg>
       <figcaption>Two of them cover a stretch of time. The balance sheet is a photograph of one single day.</figcaption>
     </figure>
@@ -387,7 +459,7 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
     <p>It starts with everything that came in the door and subtracts its way down. Each subtraction has a name, and the leftover after each one has a name too.</p>
 
     <figure class="figure">
-      <svg viewBox="0 0 660 320" role="img" aria-labelledby="f3t f3d">
+      <svg viewBox="0 0 660 336" role="img" aria-labelledby="f3t f3d">
         <title id="f3t">A margin waterfall from revenue down to net income</title>
         <desc id="f3d">A waterfall chart: revenue of one hundred dollars, minus forty-two of cost of goods sold leaves fifty-eight gross profit, minus thirty-six of operating expenses leaves twenty-two operating profit, minus six of interest and tax leaves sixteen of net income.</desc>
         <line x1="24" y1="250" x2="644" y2="250" class="s-axis"/>
@@ -405,7 +477,8 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
         <rect x="210" y="134" width="66" height="116" rx="2" class="s-fill-acc"/>
         <text x="243" y="126" text-anchor="middle" class="s-lab">$58</text>
         <text x="243" y="272" text-anchor="middle" class="s-lab-s">GROSS</text>
-        <text x="243" y="288" text-anchor="middle" class="s-lab-s">PROFIT · 58%</text>
+        <text x="243" y="288" text-anchor="middle" class="s-lab-s">PROFIT</text>
+        <text x="243" y="304" text-anchor="middle" class="s-lab-s">· 58%</text>
 
         <rect x="298" y="134" width="66" height="72" rx="2" class="s-fill-down"/>
         <text x="331" y="126" text-anchor="middle" class="s-lab">−$36</text>
@@ -415,7 +488,8 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
         <rect x="386" y="206" width="66" height="44" rx="2" class="s-fill-acc"/>
         <text x="419" y="198" text-anchor="middle" class="s-lab">$22</text>
         <text x="419" y="272" text-anchor="middle" class="s-lab-s">OPERATING</text>
-        <text x="419" y="288" text-anchor="middle" class="s-lab-s">PROFIT · 22%</text>
+        <text x="419" y="288" text-anchor="middle" class="s-lab-s">PROFIT</text>
+        <text x="419" y="304" text-anchor="middle" class="s-lab-s">· 22%</text>
 
         <rect x="474" y="206" width="66" height="12" rx="2" class="s-fill-down"/>
         <text x="507" y="198" text-anchor="middle" class="s-lab">−$6</text>
@@ -427,7 +501,7 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
         <text x="595" y="272" text-anchor="middle" class="s-lab-s">NET INCOME</text>
         <text x="595" y="288" text-anchor="middle" class="s-lab-s">· 16%</text>
 
-        <text x="24" y="310" class="s-lab-s">EVERY "MARGIN" IS JUST ONE OF THESE BARS DIVIDED BY REVENUE</text>
+        <text x="24" y="326" class="s-lab-s">EVERY "MARGIN" IS JUST ONE OF THESE BARS DIVIDED BY REVENUE</text>
       </svg>
       <figcaption>Revenue is the top line, net income is the bottom line. Everything in between is a cost with a label.</figcaption>
     </figure>
@@ -447,14 +521,53 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
       <p>Profit is an opinion; cash is a fact. When a company's story and its cash flow statement disagree, believe the cash flow statement.</p>
     </div>
 
-    <div class="check" data-check="2">
-      <p class="check-q">Check 2 — <span class="tk">Northwind Coffee</span> reports rising net income for three straight years, but operating cash flow has gone slightly negative over the same period. What's the most sensible reading?</p>
-      <div class="opts">
-        <button type="button" class="opt" data-correct="false" data-why="Net income and cash flow are genuinely different measures, and reported profit is the one built out of accounting judgements. Rising profits with falling cash is exactly the combination worth investigating, not waving through.">Fine — net income is the real profit number, so the business is healthy.</button>
-        <button type="button" class="opt" data-correct="true" data-why="Right. Profit that never turns into cash is usually sitting in receivables customers haven't paid, or inventory nobody bought. It may have an innocent explanation, but it is the question to ask before anything else.">A warning sign — the reported profit isn't converting into actual money, so it's worth finding out where it's stuck.</button>
-        <button type="button" class="opt" data-correct="false" data-why="Cash flow isn't a minor footnote — for many analysts it's the primary statement, precisely because it's the hardest to dress up. Ignoring it is how people end up holding companies that looked profitable right up until they ran out of money.">Irrelevant — cash flow is an accounting detail that doesn't affect shareholders.</button>
+    <div class="checks" data-checks="2">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — <span class="tk">Northwind Coffee</span> reports rising net income for three straight years, but operating cash flow has gone slightly negative over the same period. What's the most sensible reading?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="false" data-why="Net income and cash flow are genuinely different measures, and reported profit is the one built out of accounting judgements. Rising profits with falling cash is exactly the combination worth investigating, not waving through.">Fine — net income is the real profit number, so the business is healthy.</button>
+          <button type="button" class="opt" data-correct="true" data-why="Right. Profit that never turns into cash is usually sitting in receivables customers haven't paid, or inventory nobody bought. It may have an innocent explanation, but it is the question to ask before anything else.">A warning sign — the reported profit isn't converting into actual money, so it's worth finding out where it's stuck.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Cash flow isn't a minor footnote — for many analysts it's the primary statement, precisely because it's the hardest to dress up. Ignoring it is how people end up holding companies that looked profitable right up until they ran out of money.">Irrelevant — cash flow is an accounting detail that doesn't affect shareholders.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
       </div>
-      <p class="feedback" role="status" aria-live="polite"></p>
+      <div class="check">
+        <p class="check-q">Q2 — Which of the three statements is a photograph of a single day rather than a stretch of time?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Yes. Income and cash flow both cover a period — a quarter or a year. The balance sheet is one moment: what it owns and owes on that date.">The balance sheet.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That covers a period, three or twelve months, running from revenue down to net income.">The income statement.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Also a period. It tracks money actually moving through the business over the quarter or the year.">The cash flow statement.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — Which equation always holds on a balance sheet?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Always, by construction — which is why it's called a balance sheet. What's left after other people's claims is equity, and that's the shareholders' part.">Assets = liabilities + equity.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That's roughly the income statement's job, and it produces profit rather than assets. The balance sheet doesn't contain revenue at all.">Assets = revenue − costs.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Close, but the sign is wrong and the difference matters: liabilities are subtracted from assets to leave equity, not added to them.">Equity = assets + liabilities.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — Revenue is $100m, gross profit $58m, operating profit $22m, net income $16m. What is the operating margin?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right. Every margin is a leftover divided by revenue: gross margin 58%, operating margin 22%, net margin 16%.">22% — operating profit divided by revenue.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That's the gross margin. Operating profit sits further down the funnel, after overheads.">58% — that's the margin figure on the statement.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That gap is the operating costs, not a margin. Margins are always measured against revenue.">38% — the gap between gross profit and operating profit.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — Why is the cash flow statement described as the honest one?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Exactly. Profit is an opinion; cash is a fact. When a company's story and its cash flow statement disagree, believe the cash flow statement.">Net income involves judgement calls — when to book a sale, how fast to depreciate a machine — while cash is much harder to argue with.</button>
+          <button type="button" class="opt" data-correct="false" data-why="All three are audited together. The difference is that cash movements leave far less room for interpretation.">Because it's audited and the other two aren't.</button>
+          <button type="button" class="opt" data-correct="false" data-why="All three are required every quarter, and all three are free to read. The cash statement is simply the hardest to dress up.">Because it's the only one companies are legally required to publish.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
     </div>
   </div>
 </section>
@@ -462,7 +575,7 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
 <!-- ============ LESSON 3 ============ -->
 <section class="stage locked" data-stage="3">
   <div class="stage-head"><span class="num">03</span><h2>The handful of numbers that actually matter</h2></div>
-  <p class="lockquiz">Locked — answer Check 2 correctly to open this.</p>
+  <p class="lockquiz">Locked — answer all five questions in lesson 02 to open this.</p>
   <div class="stage-body" hidden>
     <p class="key">There are hundreds of metrics. You need about seven. Here they are, with what each one is really asking.</p>
 
@@ -521,14 +634,53 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
       <p>Always read metrics as a trend, not a snapshot. One quarter is noise. Three years of direction is information. Most company reports helpfully print several years side by side for exactly this reason.</p>
     </div>
 
-    <div class="check" data-check="3">
-      <p class="check-q">Check 3 — A company's net income rose 10% this year, but its share count rose 14%. What happened to earnings per share?</p>
-      <div class="opts">
-        <button type="button" class="opt" data-correct="false" data-why="EPS is net income divided by share count, so it depends on both. Profit growing isn't enough on its own — it has to grow faster than the number of people you're splitting it with.">It rose about 10%, in line with profits.</button>
-        <button type="button" class="opt" data-correct="true" data-why="Correct. Profits up 10% split across 14% more shares means EPS fell by roughly 3.5%. The company can honestly announce record profits while every existing shareholder is slightly worse off per share.">It fell — the profit was split among more shares than it grew by.</button>
-        <button type="button" class="opt" data-correct="false" data-why="Share issuance is very much a shareholder's concern. It's the mechanism by which your ownership stake shrinks, and it's the reason to check the share count line every single year.">It's unchanged — share count doesn't affect earnings per share.</button>
+    <div class="checks" data-checks="3">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — A company's net income rose 10% this year, but its share count rose 14%. What happened to earnings per share?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="false" data-why="EPS is net income divided by share count, so it depends on both. Profit growing isn't enough on its own — it has to grow faster than the number of people you're splitting it with.">It rose about 10%, in line with profits.</button>
+          <button type="button" class="opt" data-correct="true" data-why="Correct. Profits up 10% split across 14% more shares means EPS fell by roughly 3.5%. The company can honestly announce record profits while every existing shareholder is slightly worse off per share.">It fell — the profit was split among more shares than it grew by.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Share issuance is very much a shareholder's concern. It's the mechanism by which your ownership stake shrinks, and it's the reason to check the share count line every single year.">It's unchanged — share count doesn't affect earnings per share.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
       </div>
-      <p class="feedback" role="status" aria-live="polite"></p>
+      <div class="check">
+        <p class="check-q">Q2 — A supermarket runs a 3% net margin and a software company 30%. What is the correct conclusion?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right. A margin in isolation describes an industry. A margin falling for six straight quarters describes a company, and that's the version worth acting on.">They're different kinds of business. What matters is the direction over time and the comparison to direct competitors.</button>
+          <button type="button" class="opt" data-correct="false" data-why="It has a different cost structure, not better management. Compare a retailer to a retailer.">The software company is better run.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Grocery retail runs on thin margins and high volume by design. A 3% net margin there can be excellent.">The supermarket is being mismanaged and should fix its margins.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — How is return on equity built, and what is it really asking?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Yes. It's one of the seven numbers worth tracking, and like the others it's most informative as a trend across several years.">Net income divided by equity — how well the business turns shareholders' money into profit.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That's the P/E, and it's a valuation question rather than a quality one. Lesson 04 covers it.">Share price divided by earnings per share — whether the stock is cheap.</button>
+          <button type="button" class="opt" data-correct="false" data-why="That's closer to what net debt is for. Return on equity is about profitability measured against the shareholders' stake.">Revenue divided by total debt — whether the company can pay its bills.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — Net debt is total debt minus cash. What question is it really asking?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="That's the one. Debt isn't evil — it's how most real businesses grow — but it's a promise with a date on it, and a company that can't meet it doesn't get a second opinion.">Could a bad year kill it?</button>
+          <button type="button" class="opt" data-correct="false" data-why="That's a lesson 05 question, and it isn't answered by a balance-sheet figure.">Is management honest with shareholders?</button>
+          <button type="button" class="opt" data-correct="false" data-why="No metric answers that. Net debt tells you how much room the business has to survive a bad stretch.">Is the share price about to fall?</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — One quarter's gross margin drops from 41% to 39%. What is the disciplined response?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct, and most reports print several years side by side for exactly this reason. Read metrics as a trend, not a snapshot.">Note it and look at the trend — one quarter is noise, three years of direction is information.</button>
+          <button type="button" class="opt" data-correct="false" data-why="One quarter can move on a single contract, a currency swing, or a one-off cost. The direction over years is what carries a signal.">Sell — falling margins are always the beginning of a decline.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Revenue without margin tells you the business is getting bigger, not that it's getting better. Growth bought by cutting prices shows up here first.">Ignore margins entirely and focus on revenue growth.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
     </div>
   </div>
 </section>
@@ -536,7 +688,7 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
 <!-- ============ LESSON 4 ============ -->
 <section class="stage locked" data-stage="4">
   <div class="stage-head"><span class="num">04</span><h2>Valuation: is the price sensible?</h2></div>
-  <p class="lockquiz">Locked — answer Check 3 correctly to open this.</p>
+  <p class="lockquiz">Locked — answer all five questions in lesson 03 to open this.</p>
   <div class="stage-body" hidden>
     <p class="key">A great business at a terrible price is a bad investment. Valuation ratios exist to put price and performance on the same scale so you can compare a $2bn company with a $200bn one.</p>
 
@@ -544,7 +696,7 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
     <p>Share price divided by earnings per share. If <span class="tk">Northwind Coffee</span> trades at $20 and earned $1.00 per share last year, its P/E is 20. The most useful way to say that out loud: <em>you're paying twenty years of current earnings for one share.</em> Flip it upside down and you get the <strong>earnings yield</strong> — 1 ÷ 20 = 5% — which you can compare directly to what a savings account or a government bond pays.</p>
 
     <figure class="figure">
-      <svg viewBox="0 0 660 270" role="img" aria-labelledby="f5t f5d">
+      <svg viewBox="0 0 660 288" role="img" aria-labelledby="f5t f5d">
         <title id="f5t">Three companies with the same price and different earnings</title>
         <desc id="f5d">Three companies each trading at twenty dollars a share. The first earns two dollars per share for a P/E of ten, the second earns one dollar for a P/E of twenty, the third earns twenty cents for a P/E of one hundred.</desc>
         <text x="24" y="30" class="s-ttl">SAME $20 SHARE PRICE — VERY DIFFERENT PRICES</text>
@@ -569,7 +721,8 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
         <text x="538" y="184" text-anchor="middle" class="s-lab-s">1% EARNINGS YIELD</text>
 
         <text x="24" y="240" class="s-lab">The bar is what you get each year for the same $20 you hand over.</text>
-        <text x="24" y="260" class="s-lab-s">A HIGH P/E ISN'T WRONG — IT MEANS THE MARKET EXPECTS THAT BAR TO GROW A LOT</text>
+        <text x="24" y="258" class="s-lab-s">A HIGH P/E ISN'T WRONG — IT MEANS THE MARKET</text>
+        <text x="24" y="276" class="s-lab-s">EXPECTS THAT BAR TO GROW A LOT</text>
       </svg>
       <figcaption>P/E is a payback period in disguise. High P/E companies are being priced on future earnings, not current ones.</figcaption>
     </figure>
@@ -642,14 +795,53 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
       <figcaption>Quality and price are two separate questions. You have to answer both before you have an opinion.</figcaption>
     </figure>
 
-    <div class="check" data-check="4">
-      <p class="check-q">Check 4 — A retailer trades at a P/E of 5 while its competitors sit around 14. Revenue has fallen for four straight years and margins are shrinking. What's the most disciplined read?</p>
-      <div class="opts">
-        <button type="button" class="opt" data-correct="false" data-why="A low ratio is not automatically a discount. The market usually prices in what it can already see — and four years of falling revenue with shrinking margins is very visible.">A bargain — it's trading at a third of its sector, so the upside is obvious.</button>
-        <button type="button" class="opt" data-correct="true" data-why="Exactly right. If earnings keep falling, the P denominator falls with them and the ratio stays low forever while the share price drifts down. The low ratio is a symptom, not the opportunity — you'd need a specific reason to believe the decline stops.">Possibly a value trap — the ratio is low because earnings are shrinking, so it can stay low indefinitely.</button>
-        <button type="button" class="opt" data-correct="false" data-why="P/E is genuinely useful, just not on its own. Paired with the direction of revenue and margins it told you something important here — that's the comparison doing its job, not the ratio failing.">P/E is useless — you should ignore ratios and just look at the story.</button>
+    <div class="checks" data-checks="4">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — A retailer trades at a P/E of 5 while its competitors sit around 14. Revenue has fallen for four straight years and margins are shrinking. What's the most disciplined read?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="false" data-why="A low ratio is not automatically a discount. The market usually prices in what it can already see — and four years of falling revenue with shrinking margins is very visible.">A bargain — it's trading at a third of its sector, so the upside is obvious.</button>
+          <button type="button" class="opt" data-correct="true" data-why="Exactly right. If earnings keep falling, the P denominator falls with them and the ratio stays low forever while the share price drifts down. The low ratio is a symptom, not the opportunity — you'd need a specific reason to believe the decline stops.">Possibly a value trap — the ratio is low because earnings are shrinking, so it can stay low indefinitely.</button>
+          <button type="button" class="opt" data-correct="false" data-why="P/E is genuinely useful, just not on its own. Paired with the direction of revenue and margins it told you something important here — that's the comparison doing its job, not the ratio failing.">P/E is useless — you should ignore ratios and just look at the story.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
       </div>
-      <p class="feedback" role="status" aria-live="polite"></p>
+      <div class="check">
+        <p class="check-q">Q2 — <span class="tk">Northwind Coffee</span> trades at $20 and earned $1.00 per share last year. What is the P/E, and how would you say it out loud?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="That's the most useful way to hear it. It reframes the ratio as a payback period, which makes a P/E of 40 sound like the claim about the future that it actually is.">20 — you're paying twenty years of current earnings for one share.</button>
+          <button type="button" class="opt" data-correct="false" data-why="The yield version is the ratio flipped: 1 ÷ 20 = 5%, not 20%. And it's earnings the business makes, not cash paid to you.">20% — the return the share will pay you each year.</button>
+          <button type="button" class="opt" data-correct="false" data-why="P/E is a division, not a subtraction. Dividing is what puts a $2bn company and a $200bn one on the same scale.">$19 — the price minus the earnings per share.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — A company's P/E is 20. What is its earnings yield, and why is that useful?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Exactly. And it sets up the comparison that matters: if a government bond pays 5% with no risk, a 4% earnings yield with plenty of risk needs an argument behind it.">5% — one divided by twenty. It puts the stock on the same scale as a savings account or a government bond.</button>
+          <button type="button" class="opt" data-correct="false" data-why="The yield is the reciprocal of the ratio, not the ratio with a percent sign attached. A P/E of 20 is a 5% yield.">20% — the P/E expressed as a percentage.</button>
+          <button type="button" class="opt" data-correct="false" data-why="They're the same number upside down, which is precisely what makes the yield version so easy to compare against other places you could put money.">There's no relationship — they're separate measurements.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — Which ratio suits a young, unprofitable company with real revenue — and what is the catch?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Right. It's the workable option when P/E is unusable, provided you keep the caveat firmly attached to it.">P/S, because it doesn't need positive earnings — but it ignores whether those sales ever become profit.</button>
+          <button type="button" class="opt" data-correct="false" data-why="P/E is useless when earnings are negative or distorted by a one-off — there's nothing sensible to divide by.">P/E, which handles negative earnings without difficulty.</button>
+          <button type="button" class="opt" data-correct="false" data-why="P/B suits banks and asset-heavy businesses. Where the value isn't on the books — software, brands, people — it's close to meaningless.">P/B, which is the standard measure for young and fast-growing companies.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — One company on a P/E of 30 is growing 30% a year; another on a P/E of 30 is growing 3%. What is the lesson?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="That's the whole of valuation discipline. A number with nothing beside it is not information.">A ratio only means something next to a comparison — the company's own history, its competitors, its growth rate, or the risk-free rate.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Identical ratios describing very different futures. Thirty times earnings for 3% growth is a far bigger claim than thirty times for 30%.">They're equally expensive, since the ratio is identical.</button>
+          <button type="button" class="opt" data-correct="false" data-why="It's meaningless in isolation, which is a different statement. Anchored to history, peers and growth, it's the most useful single ratio there is.">P/E is meaningless and should be ignored.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
     </div>
   </div>
 </section>
@@ -657,7 +849,7 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
 <!-- ============ LESSON 5 ============ -->
 <section class="stage locked" data-stage="5">
   <div class="stage-head"><span class="num">05</span><h2>The part that isn't a number</h2></div>
-  <p class="lockquiz">Locked — answer Check 4 correctly to open this.</p>
+  <p class="lockquiz">Locked — answer all five questions in lesson 04 to open this.</p>
   <div class="stage-body" hidden>
     <p class="key">Numbers describe what already happened. Whether it keeps happening depends on things you have to reason about rather than calculate.</p>
 
@@ -695,22 +887,61 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
       <li>What's the one thing that would break this business?</li>
     </ul>
 
-    <div class="check" data-check="5">
-      <p class="check-q">Check 5 — A software company has run 70% gross margins for five years. A competitor launches an identical product at half the price, and customers would need six months and a costly data migration to switch. What does that tell you?</p>
-      <div class="opts">
-        <button type="button" class="opt" data-correct="false" data-why="Margins aren't defended by being high — plenty of high-margin businesses have been undercut into the ground. The defence has to come from something structural, which is exactly what the migration cost is here.">Nothing — a 70% margin is high, so the business is safe by definition.</button>
-        <button type="button" class="opt" data-correct="false" data-why="Too pessimistic. A cheaper competitor matters a great deal when switching is easy and very little when it's painful. Six months and a costly migration is real friction that buys the incumbent time to respond.">The margins will collapse — a cheaper identical product always wins.</button>
-        <button type="button" class="opt" data-correct="true" data-why="Exactly. That's a switching-cost moat, and it's why the margins have lasted. Note it's a delay rather than a guarantee — it buys time, so the thing to watch is whether new customer wins start going to the competitor while existing ones stay put.">There's a switching-cost moat protecting those margins — worth watching, but not easily taken.</button>
+    <div class="checks" data-checks="5">
+      <p class="checks-h">Check yourself · five questions · all five open the next lesson</p>
+      <div class="check">
+        <p class="check-q">Q1 — A software company has run 70% gross margins for five years. A competitor launches an identical product at half the price, and customers would need six months and a costly data migration to switch. What does that tell you?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="false" data-why="Margins aren't defended by being high — plenty of high-margin businesses have been undercut into the ground. The defence has to come from something structural, which is exactly what the migration cost is here.">Nothing — a 70% margin is high, so the business is safe by definition.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Too pessimistic. A cheaper competitor matters a great deal when switching is easy and very little when it's painful. Six months and a costly migration is real friction that buys the incumbent time to respond.">The margins will collapse — a cheaper identical product always wins.</button>
+          <button type="button" class="opt" data-correct="true" data-why="Exactly. That's a switching-cost moat, and it's why the margins have lasted. Note it's a delay rather than a guarantee — it buys time, so the thing to watch is whether new customer wins start going to the competitor while existing ones stay put.">There's a switching-cost moat protecting those margins — worth watching, but not easily taken.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
       </div>
-      <p class="feedback" role="status" aria-live="polite"></p>
+      <div class="check">
+        <p class="check-q">Q2 — A marketplace becomes more useful to every existing user each time a new one joins. Which kind of moat is that?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Yes — the classic examples are marketplaces, exchanges and social platforms. The product's value grows with its own user base, which is very hard to attack from a standing start.">Network effects.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Switching costs are about the pain of leaving — migrations, retraining, integration. Here the advantage is in the size of the network itself.">Switching costs.</button>
+          <button type="button" class="opt" data-correct="false" data-why="A cost advantage means producing more cheaply than anyone else, through scale or location or process. That's not what's happening here.">Cost advantage.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q3 — What is the test for whether a moat is real?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Correct — and if the honest answer is that they'd leave, today's high margins are borrowed rather than owned.">Ask what happens if a well-funded competitor launches an identical product tomorrow at 20% less. If most customers leave, there is no moat.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Price behaviour in a correction reflects a lot of things, most of them unrelated to the business's competitive position.">Check whether the share price held up during the last market correction.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Every annual report claims a durable advantage. The test has to be something you can reason about independently.">Check whether the company claims to have one in its annual report.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q4 — You want to judge management. What is the most informative thing you can do?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="Yes. That comparison tells you more than any interview — and incentives tell you what to expect next. Bonuses on revenue growth alone produce acquisitions and price cuts.">Read what they said they would do three years ago, check what they actually did, then check how they're paid.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Interviews are prepared. The record of promises against outcomes isn't, and it's sitting free in old reports.">Watch their most recent television interview.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Tenure alone says nothing about judgement. A long record is only useful because it gives you more promises to check.">Count how many years the chief executive has been in the job.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
+      <div class="check">
+        <p class="check-q">Q5 — Why does the course insist you write the bear case before you own anything?</p>
+        <div class="opts">
+          <button type="button" class="opt" data-correct="true" data-why="That's the reason, and it's the same instinct as a stop on a chart: decide what would change your mind while you're still calm.">If you can't articulate what would make you wrong, you don't understand the position well enough to hold it through a bad month.</button>
+          <button type="button" class="opt" data-correct="false" data-why="There's no such requirement. It's a discipline, and the fact that nobody enforces it is exactly why so few people do it.">Because it's a legal requirement for retail investors.</button>
+          <button type="button" class="opt" data-correct="false" data-why="Not usually — but you can't weigh it at all if you've never written it down, and you certainly can't weigh it fairly once you already own the shares.">Because the bear case usually turns out to be the correct one.</button>
+        </div>
+        <p class="feedback" role="status" aria-live="polite"></p>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- ============ QUIZ ============ -->
 <section class="stage locked" data-stage="6">
-  <div class="stage-head"><span class="num">06</span><h2>Six questions to finish</h2></div>
-  <p class="lockquiz">Locked — answer Check 5 correctly to open this.</p>
+  <div class="stage-head"><span class="num">06</span><h2>Ten questions to finish</h2></div>
+  <p class="lockquiz">Locked — answer all five questions in lesson 05 to open this.</p>
   <div class="stage-body" hidden>
     <p>No time limit, nothing riding on it. Pick an answer for each, then score it. Anything you miss, the explanation will tell you exactly why.</p>
 
@@ -774,6 +1005,46 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
       <p class="qz-why" hidden></p>
     </div>
 
+    <div class="qz" data-qz="7">
+      <p class="qz-q">7. A company trades on a P/E of 25 while a government bond pays 5% with no risk. What does that comparison force you to say out loud?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Exactly. Flipping the P/E (1 ÷ 25 = 4%) puts the stock on the same scale as everything else you could do with the money, and the risk-free rate is the floor that argument has to clear.">That you're accepting a 4% earnings yield with plenty of risk when 5% is available with none — so you need a real argument about growth.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Moderate against what? A ratio means nothing until it's compared to the company's own history, its peers, its growth rate, or — as here — the return you could get without taking any risk at all.">That the stock is cheap, because 25 is a moderate P/E.</button>
+        <button type="button" class="opt" data-correct="false" data-why="They're very comparable once you express the P/E as an earnings yield, which is the whole reason that flip is worth knowing.">Nothing — bond yields and share valuations aren't comparable.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="8">
+      <p class="qz-q">8. A retailer trades on a P/E of 6. Revenue and earnings have both fallen for four straight years. What is the most likely explanation for the low ratio?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="That's the value trap. The denominator falls as fast as the price does, and the screen keeps showing a bargain that never arrives.">It's cheap for a reason — the earnings underneath it keep shrinking, so the ratio can stay low indefinitely.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Reversion assumes the earnings hold still. When they're falling, a low ratio is a forecast rather than a discount.">The market has simply mispriced it, and the ratio will revert to the sector average.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Dividends don't enter the P/E at all — it's price over earnings per share. The falling earnings are the explanation sitting in plain sight.">The company must be paying a large dividend, which depresses the P/E.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="9">
+      <p class="qz-q">9. Two companies earn the same profit. One holds more cash than debt; the other has heavy debt that must be refinanced next year. What does net debt tell you about the difference?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Yes. Debt isn't evil; it's how most real businesses grow. But a company that can't meet a payment doesn't get a second opinion, and refinancing at a higher rate can quietly consume the profit.">How much room each has to survive a bad year — debt is a promise with a date on it.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Leverage can raise returns in good years and it can also end the business in bad ones. Net debt is asking about survival, not efficiency.">That the indebted one is better run, since it's using other people's money.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Identical profit with very different balance sheets is exactly the case net debt exists to separate. The same bad year hits them completely differently.">Nothing useful — both earn the same, so they're equivalent investments.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
+    <div class="qz" data-qz="10">
+      <p class="qz-q">10. Over three years a company's revenue grew 40% while its operating margin fell from 24% to 18%. What is the useful reading?</p>
+      <div class="opts">
+        <button type="button" class="opt" data-correct="true" data-why="Right, and it's the direction over several years that makes it a story rather than noise. Revenue on its own tells you the business got bigger; the margin tells you whether it got better.">Growth is being bought — worth finding out whether it's discounting, rising costs, or a shift into lower-margin business.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Revenue growth with falling margins can leave profit flat or lower. Reading the two together is the whole point of tracking margins as a trend.">Straightforwardly good news — revenue growth of 40% is the number that matters.</button>
+        <button type="button" class="opt" data-correct="false" data-why="Too absolute. Deliberately trading margin for scale can be a sound decision. The point is to notice it and go and find out which it is.">Straightforwardly bad news — falling margins always mean a business in decline.</button>
+      </div>
+      <p class="qz-why" hidden></p>
+    </div>
+
     <div class="btnrow">
       <button type="button" class="btn" id="scoreBtn">Score my quiz</button>
       <button type="button" class="btn ghost" id="resetBtn" hidden>Clear and try again</button>
@@ -807,6 +1078,16 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
 
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var lastStage = document.querySelectorAll(".stage").length;
+
+  /* ---- shuffle every set of options, so the answers sit in a different place each load ---- */
+  Array.prototype.forEach.call(document.querySelectorAll(".opts"), function (box) {
+    var opts = Array.prototype.slice.call(box.children);
+    for (var i = opts.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = opts[i]; opts[i] = opts[j]; opts[j] = t;
+    }
+    opts.forEach(function (o) { box.appendChild(o); });
+  });
 
   function rail(n, cls) {
     var li = document.querySelector('.rail li[data-rail="' + n + '"]');
@@ -852,9 +1133,13 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
       btn.classList.add("ok");
       Array.prototype.forEach.call(check.querySelectorAll(".opt"), function (o) { o.disabled = true; });
       say(fb, "good", "Correct", why);
-      var n = parseInt(check.getAttribute("data-check"), 10);
-      rail(n, "done");
-      unlock(n + 1);
+      check.classList.add("passed");
+      var group = check.closest("[data-checks]");
+      if (group && group.querySelectorAll(".check").length === group.querySelectorAll(".check.passed").length) {
+        var n = parseInt(group.getAttribute("data-checks"), 10);
+        rail(n, "done");
+        unlock(n + 1);
+      }
     } else {
       btn.classList.add("no");
       btn.disabled = true;
