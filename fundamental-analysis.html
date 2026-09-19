@@ -116,6 +116,21 @@ header{display:flex;flex-direction:column;gap:.85rem}
 .rail li.done{color:var(--up)}
 .rail li.done .bar{background:var(--up)}
 
+/* ---------- saved-progress bar ---------- */
+.resume{
+  margin-top:.9rem;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:.5rem .75rem;
+  padding:.65rem .85rem;
+  border:1px solid var(--rule);
+  border-radius:10px;
+  background:var(--surface);
+}
+.resume p{flex:1 1 15rem;margin:0;font-size:.85rem;color:var(--ink-2)}
+.resume .btn{align-self:auto;font-size:.85rem;padding:.45rem .8rem}
+
 /* ---------- stages ---------- */
 .stage{
   background:var(--surface);border:1px solid var(--rule);border-radius:12px;
@@ -319,6 +334,11 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
     <li data-rail="5"><span class="bar"></span>Quality</li>
     <li data-rail="6"><span class="bar"></span>Quiz</li>
   </ol>
+  <div class="resume" id="resume" hidden>
+    <p id="resumeTxt"></p>
+    <button type="button" class="btn" id="resumeBtn" hidden>Continue</button>
+    <button type="button" class="btn ghost" id="clearBtn" hidden>Start over</button>
+  </div>
 </nav>
 
 <!-- ============ LESSON 1 ============ -->
@@ -1086,9 +1106,54 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
   var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var lastStage = document.querySelectorAll(".stage").length;
 
-  /* ---- shuffle every set of options, so the answers sit in a different place each load ---- */
+  /* ---- where progress lives: this browser's local storage, one entry per page ---- */
+  var KEY = "trading-course:" + ((window.location.pathname.split("/").pop() || "index.html").toLowerCase()) + ":v1";
+
+  var store = (function () {
+    try {
+      window.localStorage.setItem(KEY + ":probe", "1");
+      window.localStorage.removeItem(KEY + ":probe");
+      return window.localStorage;
+    } catch (e) {
+      return null; /* private mode, storage switched off, or a browser that blocks it on file:// */
+    }
+  })();
+
+  var saved = { checks: {}, quiz: {}, scored: false };
+  var loading = true; /* stops the restore itself from writing back over what it's reading */
+
+  if (store) {
+    try {
+      var raw = store.getItem(KEY);
+      var parsed = raw ? JSON.parse(raw) : null;
+      if (parsed && typeof parsed === "object") {
+        if (parsed.checks && typeof parsed.checks === "object") saved.checks = parsed.checks;
+        if (parsed.quiz && typeof parsed.quiz === "object") saved.quiz = parsed.quiz;
+        saved.scored = parsed.scored === true;
+      }
+    } catch (e) {
+      saved = { checks: {}, quiz: {}, scored: false }; /* unreadable entry — start clean rather than break the page */
+    }
+  }
+
+  function save() {
+    if (!store || loading) return;
+    try { store.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+  }
+
+  function forget() {
+    if (!store) return;
+    try { store.removeItem(KEY); } catch (e) {}
+  }
+
+  function count(obj) { return Object.keys(obj).length; }
+
+  /* ---- shuffle every set of options, so the answers sit in a different place each load.
+         data-oi is stamped on first, before the shuffle, so a saved answer points at the
+         option itself rather than at the position it happened to be in ---- */
   Array.prototype.forEach.call(document.querySelectorAll(".opts"), function (box) {
     var opts = Array.prototype.slice.call(box.children);
+    opts.forEach(function (o, i) { o.setAttribute("data-oi", String(i)); });
     for (var i = opts.length - 1; i > 0; i--) {
       var j = Math.floor(Math.random() * (i + 1));
       var t = opts[i]; opts[i] = opts[j]; opts[j] = t;
@@ -1096,12 +1161,20 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
     opts.forEach(function (o) { box.appendChild(o); });
   });
 
+  /* ---- and a stable id for every lesson check, as "lesson.question" ---- */
+  Array.prototype.forEach.call(document.querySelectorAll("[data-checks]"), function (group) {
+    var n = group.getAttribute("data-checks");
+    Array.prototype.forEach.call(group.querySelectorAll(".check"), function (check, i) {
+      check.setAttribute("data-ck", n + "." + (i + 1));
+    });
+  });
+
   function rail(n, cls) {
     var li = document.querySelector('.rail li[data-rail="' + n + '"]');
     if (li) { li.classList.remove("on", "done"); li.classList.add(cls); }
   }
 
-  function unlock(n) {
+  function unlock(n, silent) {
     var stage = document.querySelector('.stage[data-stage="' + n + '"]');
     if (!stage || !stage.classList.contains("locked")) return;
     stage.classList.remove("locked");
@@ -1110,6 +1183,7 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
     var body = stage.querySelector(".stage-body");
     if (body) body.hidden = false;
     rail(n, "on");
+    if (silent) return;
     window.setTimeout(function () {
       stage.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
     }, 150);
@@ -1127,31 +1201,46 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
   }
 
   /* ---- lesson checks: must be right to advance ---- */
+  function record(check) {
+    var key = check.getAttribute("data-ck");
+    var rec = saved.checks[key];
+    if (!rec || typeof rec !== "object") { rec = { passed: false, wrong: [] }; saved.checks[key] = rec; }
+    if (Object.prototype.toString.call(rec.wrong) !== "[object Array]") rec.wrong = [];
+    return rec;
+  }
+
+  function markRight(check, btn, silent) {
+    btn.classList.add("ok");
+    Array.prototype.forEach.call(check.querySelectorAll(".opt"), function (o) { o.disabled = true; });
+    say(check.querySelector(".feedback"), "good", "Correct", btn.getAttribute("data-why") || "");
+    check.classList.add("passed");
+    record(check).passed = true;
+    save();
+
+    var group = check.closest("[data-checks]");
+    if (group && group.querySelectorAll(".check").length === group.querySelectorAll(".check.passed").length) {
+      var n = parseInt(group.getAttribute("data-checks"), 10);
+      rail(n, "done");
+      unlock(n + 1, silent);
+    }
+  }
+
+  function markWrong(check, btn) {
+    btn.classList.add("no");
+    btn.disabled = true;
+    say(check.querySelector(".feedback"), "bad", "Not quite — try again", btn.getAttribute("data-why") || "");
+    var rec = record(check);
+    var oi = btn.getAttribute("data-oi");
+    if (rec.wrong.indexOf(oi) < 0) rec.wrong.push(oi);
+    save();
+  }
+
   document.addEventListener("click", function (e) {
     var btn = e.target.closest ? e.target.closest(".check .opt") : null;
     if (!btn || btn.disabled) return;
-
     var check = btn.closest(".check");
-    var fb = check.querySelector(".feedback");
-    var correct = btn.getAttribute("data-correct") === "true";
-    var why = btn.getAttribute("data-why") || "";
-
-    if (correct) {
-      btn.classList.add("ok");
-      Array.prototype.forEach.call(check.querySelectorAll(".opt"), function (o) { o.disabled = true; });
-      say(fb, "good", "Correct", why);
-      check.classList.add("passed");
-      var group = check.closest("[data-checks]");
-      if (group && group.querySelectorAll(".check").length === group.querySelectorAll(".check.passed").length) {
-        var n = parseInt(group.getAttribute("data-checks"), 10);
-        rail(n, "done");
-        unlock(n + 1);
-      }
-    } else {
-      btn.classList.add("no");
-      btn.disabled = true;
-      say(fb, "bad", "Not quite — try again", why);
-    }
+    if (btn.getAttribute("data-correct") === "true") markRight(check, btn, false);
+    else markWrong(check, btn);
   });
 
   /* ---- quiz ---- */
@@ -1164,24 +1253,22 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
   var blocks = Array.prototype.slice.call(document.querySelectorAll(".qz"));
   var total = blocks.length;
 
+  function select(block, btn) {
+    Array.prototype.forEach.call(block.querySelectorAll(".opt"), function (o) { o.classList.remove("sel"); });
+    btn.classList.add("sel");
+  }
+
   document.addEventListener("click", function (e) {
     var btn = e.target.closest ? e.target.closest(".qz .opt") : null;
     if (!btn || btn.disabled) return;
     var block = btn.closest(".qz");
-    Array.prototype.forEach.call(block.querySelectorAll(".opt"), function (o) { o.classList.remove("sel"); });
-    btn.classList.add("sel");
+    select(block, btn);
+    saved.quiz[block.getAttribute("data-qz")] = btn.getAttribute("data-oi");
+    save();
     nudge.hidden = true;
   });
 
-  scoreBtn.addEventListener("click", function () {
-    var unanswered = blocks.filter(function (b) { return !b.querySelector(".opt.sel"); });
-    if (unanswered.length) {
-      nudge.hidden = false;
-      unanswered[0].scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
-      return;
-    }
-    nudge.hidden = true;
-
+  function showScore(silent) {
     var score = 0;
     blocks.forEach(function (block) {
       var picked = block.querySelector(".opt.sel");
@@ -1217,7 +1304,20 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
     resetBtn.hidden = false;
     scoreBtn.hidden = true;
     rail(lastStage, "done");
-    scoreBox.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+    if (!silent) scoreBox.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+  }
+
+  scoreBtn.addEventListener("click", function () {
+    var unanswered = blocks.filter(function (b) { return !b.querySelector(".opt.sel"); });
+    if (unanswered.length) {
+      nudge.hidden = false;
+      unanswered[0].scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+      return;
+    }
+    nudge.hidden = true;
+    saved.scored = true;
+    save();
+    showScore(false);
   });
 
   resetBtn.addEventListener("click", function () {
@@ -1234,8 +1334,88 @@ footer .disc{font-family:var(--mono);font-size:.78rem;line-height:1.6;letter-spa
     resetBtn.hidden = true;
     scoreBtn.hidden = false;
     rail(lastStage, "on");
+    saved.quiz = {};
+    saved.scored = false;
+    save();
     blocks[0].scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
   });
+
+  /* ---- put a saved run back on the page, silently ---- */
+  Object.keys(saved.checks).forEach(function (key) {
+    var check = document.querySelector('.check[data-ck="' + key + '"]');
+    var rec = saved.checks[key];
+    if (!check || !rec || typeof rec !== "object") { delete saved.checks[key]; return; }
+
+    var wrong = Object.prototype.toString.call(rec.wrong) === "[object Array]" ? rec.wrong : [];
+    var last = null;
+    wrong.forEach(function (oi) {
+      var opt = check.querySelector('.opt[data-oi="' + oi + '"]');
+      if (!opt || opt.getAttribute("data-correct") === "true") return;
+      opt.classList.add("no");
+      opt.disabled = true;
+      last = opt;
+    });
+
+    if (rec.passed) {
+      var right = check.querySelector('.opt[data-correct="true"]');
+      if (right) markRight(check, right, true);
+    } else if (last) {
+      say(check.querySelector(".feedback"), "bad", "Not quite — try again", last.getAttribute("data-why") || "");
+    }
+  });
+
+  Object.keys(saved.quiz).forEach(function (id) {
+    var block = document.querySelector('.qz[data-qz="' + id + '"]');
+    var opt = block && block.querySelector('.opt[data-oi="' + saved.quiz[id] + '"]');
+    if (opt) select(block, opt);
+    else delete saved.quiz[id];
+  });
+
+  if (saved.scored && total && blocks.every(function (b) { return b.querySelector(".opt.sel"); })) showScore(true);
+  else saved.scored = false;
+
+  loading = false;
+  if (count(saved.checks) || count(saved.quiz)) save(); /* rewrite, pruned of anything that no longer matches the page */
+
+  /* ---- the bar under the rail ---- */
+  var resume = document.getElementById("resume");
+  var resumeTxt = document.getElementById("resumeTxt");
+  var resumeBtn = document.getElementById("resumeBtn");
+  var clearBtn = document.getElementById("clearBtn");
+
+  function reached() {
+    for (var i = lastStage; i > 1; i--) {
+      var s = document.querySelector('.stage[data-stage="' + i + '"]');
+      if (s && !s.classList.contains("locked")) return i;
+    }
+    return 1;
+  }
+
+  if (resume) {
+    if (!store) {
+      resumeTxt.textContent = "This browser won't let the page store anything, so your progress will go when you close the tab.";
+      resume.hidden = false;
+    } else if (count(saved.checks) || count(saved.quiz)) {
+      resumeTxt.textContent = "Picked up where you left off — lesson " + reached() + " of " + lastStage + ", saved in this browser.";
+      resumeBtn.hidden = false;
+      clearBtn.hidden = false;
+      resume.hidden = false;
+
+      resumeBtn.addEventListener("click", function () {
+        var s = document.querySelector('.stage[data-stage="' + reached() + '"]');
+        if (s) s.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+      });
+
+      clearBtn.addEventListener("click", function () {
+        if (!window.confirm("Clear your saved progress on this page and start again from lesson 1?")) return;
+        forget();
+        window.location.reload();
+      });
+    } else {
+      resumeTxt.textContent = "Your progress saves itself in this browser as you go, so you can close the page and come back to it.";
+      resume.hidden = false;
+    }
+  }
 })();
 </script>
 </body>
